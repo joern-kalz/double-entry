@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  description: |
+    This is an accounting server.
+  version: "1.0.0"
+  title: Accounting
+tags:
+  - name: transactions
+  - name: accounts
+paths:
+  '/transactions':
+    post:
+      operationId: transactions.create
+      tags: [transactions]
+      summary: Create a transaction
+      responses:
+        '201':
+          description: Created
+      requestBody:
+        $ref: '#/components/requestBodies/transaction'
+    get:
+      operationId: transactions.findAll
+      tags: [transactions]
+      summary: Returns all transactions
+      responses:
+        '200':
+          $ref: '#/components/responses/transactions'
+  '/transactions/{transactionId}':
+    put:
+      operationId: transactions.update
+      tags: [transactions]
+      summary: Updates a transaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: Id of the transaction
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Updated
+      requestBody:
+        $ref: '#/components/requestBodies/transaction'
+    delete:
+      operationId: transactions.delete
+      tags: [transactions]
+      summary: Updates a transaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: Id of the transaction
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Deleted
+  '/accounts':
+    post:
+      operationId: accounts.create
+      tags: [accounts]
+      summary: Create an account
+      responses:
+        '201':
+          description: Created
+      requestBody:
+        $ref: '#/components/requestBodies/account'
+    get:
+      operationId: accounts.findAll
+      tags: [accounts]
+      summary: Returns all accounts
+      responses:
+        '200':
+          $ref: '#/components/responses/accounts'
+  '/accounts/{accountId}':
+    put:
+      operationId: accounts.update
+      tags: [accounts]
+      summary: Updates an account
+      parameters:
+        - name: accountId
+          in: path
+          description: Id of the account
+          required: true
+          schema: {type: string}
+      responses:
+        '200':
+          description: Updated
+      requestBody:
+        $ref: '#/components/requestBodies/account'
+components:
+  schemas:
+    BaseAccount:
+      type: object
+      required: [name]
+      properties:
+        name: {type: string, example: 'grocery'}
+        parentId: {type: string, example: '65478'}
+        active: {type: boolean, example: true}
+    ReadAccount:
+      allOf:
+        - $ref: '#/components/schemas/BaseAccount'
+        - type: object
+          properties:
+            id: {type: string, example: '45798'}
+    BaseEntry:
+      type: object
+      required: [amount]
+      properties:
+        amount: {type: number}
+        verified: {type: boolean}
+    ReadEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            account: 
+              type: object
+              properties:
+                id: {type: string, example: '45798'}
+                name: {type: string, example: 'grocery'}
+    WriteableEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            accountId: {type: string, example: '45798'}
+    BaseTransaction:
+      type: object
+      required: [date, name]
+      properties:
+        date: {type: string, format: date}
+        name: {type: string, example: 'milk and bread'}
+    ReadTransaction:
+      allOf:
+        - $ref: '#/components/schemas/BaseTransaction'
+        - type: object
+          properties:
+            id: {type: string, example: '168158'}
+            entries:
+              type: array
+              example: 
+                - account: {name: 'grocery', id: '658795'}
+                  amount: 10.24
+                - account: {name: 'cash', id: '654789'}
+                  amount: -10.24
+              items: 
+                $ref: '#/components/schemas/ReadEntry'
+    WriteableTransaction:
+      allOf:
+        - $ref: '#/components/schemas/BaseTransaction'
+        - type: object
+          required: [entries]
+          properties:
+            entries:
+              type: array
+              example: 
+                - account: '658795'
+                  amount: 10.24
+                - account: '654789'
+                  amount: -10.24
+              items:
+                $ref: '#/components/schemas/WriteableEntry'
+  requestBodies:
+    transaction:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WriteableTransaction'
+      description: Transaction to save
+      required: true
+    account:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BaseAccount'
+      description: Account to save
+      required: true
+  responses:
+    transaction:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ReadTransaction'
+      description: Loaded transaction 
+    transactions:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ReadTransaction'
+      description: Loaded transactions
+    accounts:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ReadAccount'
+      description: Loaded accounts
