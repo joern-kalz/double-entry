@@ -1,0 +1,129 @@
+form {
+    display: flex;
+    margin-bottom: 40px;
+    justify-content: space-between;
+
+    label {
+        max-width: 150px;
+        display: flex;
+        align-items: baseline;
+        width: calc(0.5 * (100% - 60px));
+    }
+    span {
+        width: 29px;
+        text-align: right;
+        padding-right: 1px;
+    }
+    input {
+        width: calc(100% - 30px);
+    }
+    input.ng-invalid.show-errors {
+        border-color: #ff8787;
+        box-shadow: 0 0 2px #ff8787 inset;
+    }
+    input.ng-invalid.show-errors:focus {
+        outline-color: #ff8787;
+    }
+    button {
+        width: 59px;
+        margin-left: 1px;
+        padding: 0;
+    }
+}
+
+.create {
+    text-align: right;
+    margin-bottom: 5px;
+}
+
+@media (min-width: 450px) {
+    form {
+        label {
+            width: calc(0.5 * (100% - 90px));
+        }
+        span {
+            width: 45px;
+            text-align: left;
+        }
+        input {
+            width: calc(100% - 45px);
+        }
+        button {
+            width: 90px;
+            margin-left: 0;
+        }
+    }
+    .create button {
+        width: 90px;
+    }
+}
+
+@media (min-width: 600px) {
+    form {
+        width: 420px;
+        float: left;
+    }
+    .create {
+        float: right;
+    }
+    .transaction {
+        clear: both;
+    }
+}
+
+.transaction {
+    display: flex;
+    flex-wrap: wrap;
+    div {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    div:nth-child(1) {
+        width: 120px;
+        font-size: 15px;
+        margin-bottom: 3px;
+    }
+    div:nth-child(2) {
+        width: calc(100% - 120px);
+        text-align: right;
+        font-size: 15px;
+        margin-bottom: 3px;
+    }
+    div:nth-child(3) {
+        width: calc(100% - 100px);
+    }
+    div:nth-child(4) {
+        width: 100px;
+        text-align: right;
+    }
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #83dbff;
+}
+.transaction:last-child {
+    border-bottom: none;
+}
+
+@media (min-width: 500px) {
+    .transaction {
+        div:nth-child(1) {
+            width: 20%;
+            font-size: inherit;
+        }
+        div:nth-child(2) {
+            width: 30%;
+            text-align: left;
+            font-size: inherit;
+        }
+        div:nth-child(3) {
+            width: 30%;
+        }
+        div:nth-child(4) {
+            width: 20%;
+            text-align: right;
+        }
+    }
+        
+}

@@ -1,0 +1,14 @@
+<form (ngSubmit)="submit()" [formGroup]="form">
+  <label>
+    <span>Datum</span>
+    <input formControlName="date" #date [class.show-errors]="showErrors">
+  </label>
+  <button type="submit">Berechnen</button>
+</form>
+
+<div *ngFor="let account of accounts" 
+  [ngClass]="'level' + (account.level < 2 ? account.level : 2)">
+
+  {{account.name}}:
+  {{account.amount | formatAmount}}
+</div>

@@ -1,0 +1,18 @@
+<form (ngSubmit)="submit()" [formGroup]="form">
+  <label>
+    <span>Von</span>
+    <input formControlName="after" #after [class.show-errors]="showErrors">
+  </label>
+  <label>
+    <span>Bis</span>
+    <input formControlName="before" #before [class.show-errors]="showErrors">
+  </label>
+  <button type="submit">Suchen</button>
+</form>
+
+<div *ngFor="let earning of earnings" 
+  [ngClass]="'level' + (earning.level < 2 ? earning.level : 2)">
+
+  {{earning.name}}:
+  {{earning.amount | formatAmount}}
+</div>

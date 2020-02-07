@@ -1,0 +1,38 @@
+form {
+    display: flex;
+    margin-bottom: 40px;
+    justify-content: space-between;
+    max-width: 320px;
+
+    label {
+        max-width: 200px;
+        display: flex;
+        align-items: baseline;
+        width: calc(100% - 100px);
+    }
+    span {
+        width: 60px;
+    }
+    input {
+        width: calc(100% - 60px);
+    }
+    input.ng-invalid.show-errors {
+        border-color: #ff8787;
+        box-shadow: 0 0 2px #ff8787 inset;
+    }
+    input.ng-invalid.show-errors:focus {
+        outline-color: #ff8787;
+    }
+    button {
+        width: 100px;
+        margin-left: 1px;
+        padding: 0;
+    }
+}
+
+div {
+    clear: both;
+}
+.level2 {
+    font-size: 0.9em;
+}

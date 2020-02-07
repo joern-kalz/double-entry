@@ -1,0 +1,135 @@
+<h1 [ngSwitch]="transactionType">
+  <ng-container *ngSwitchCase="transactionTypes.TRANSFER">
+    Transfer buchen
+  </ng-container>
+  <ng-container *ngSwitchCase="transactionTypes.EXPENSE">
+    Ausgabe buchen
+  </ng-container>
+  <ng-container *ngSwitchCase="transactionTypes.REVENUE">
+    Einnahme buchen
+  </ng-container>
+</h1>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+  <label class="row">
+      <span>Datum</span>
+      <input formControlName="date" #dateElement>
+  </label>
+  <div *ngIf="submitted && date.invalid" class="error">
+    <i>!</i> Gültiges Datum erforderlich
+  </div>
+
+  <label class="row">
+      <span>Beschreibung</span>
+      <input formControlName="name">
+  </label>
+
+  <div class="row splitted">
+    <label>
+      <span [ngSwitch]="transactionType">
+        <ng-container *ngSwitchCase="transactionTypes.TRANSFER">
+          Von Konto
+        </ng-container>
+        <ng-container *ngSwitchCase="transactionTypes.EXPENSE">
+          Zahlungsmittel
+        </ng-container>
+        <ng-container *ngSwitchCase="transactionTypes.REVENUE">
+          Zahlungsmittel
+        </ng-container>
+      </span>
+      <select formControlName="creditAccount">
+        <ng-container *ngIf="accountLists">
+          <option [ngValue]="accountLists.get(accountTypes.ASSET).rootId">
+            Vermögen
+          </option>
+          <option *ngFor="let account of accountLists.get(accountTypes.ASSET).entries" [ngValue]="account.id" 
+            [innerHtml]="'&nbsp&nbsp'.repeat(account.hierarchyLevel) + account.name">
+          </option>
+        </ng-container>
+      </select>
+    </label>
+    <button type="button" (click)="createAccount(0)">Hinzufügen</button>
+  </div>
+  <div *ngIf="submitted && creditAccount.invalid" class="error" [ngSwitch]="transactionType">
+    <ng-container *ngSwitchCase="transactionTypes.TRANSFER">
+      <i>!</i> Quellkonto erforderlich
+    </ng-container>
+    <ng-container *ngSwitchCase="transactionTypes.EXPENSE">
+      <i>!</i> Kategorie erforderlich
+    </ng-container>
+    <ng-container *ngSwitchCase="transactionTypes.REVENUE">
+      <i>!</i> Kategorie erforderlich
+    </ng-container>
+  </div>
+
+  <div class="row splitted">
+    <label>
+      <span [ngSwitch]="transactionType">
+        <ng-container *ngSwitchCase="transactionTypes.TRANSFER">
+          Nach Konto
+        </ng-container>
+        <ng-container *ngSwitchCase="transactionTypes.EXPENSE">
+          Kategorie
+        </ng-container>
+        <ng-container *ngSwitchCase="transactionTypes.REVENUE">
+          Kategorie
+        </ng-container>
+      </span>
+      <select formControlName="debitAccount">
+        <ng-container *ngIf="accountLists" [ngSwitch]="transactionType">
+          <ng-container *ngSwitchCase="transactionTypes.TRANSFER">
+            <option [ngValue]="accountLists.get(accountTypes.ASSET).rootId">
+              Vermögen
+            </option>
+            <option *ngFor="let account of accountLists.get(accountTypes.ASSET).entries" [ngValue]="account.id" 
+              [innerHtml]="'&nbsp&nbsp'.repeat(account.hierarchyLevel) + account.name">
+            </option>
+          </ng-container>
+          <ng-container *ngSwitchCase="transactionTypes.EXPENSE">
+            <option [ngValue]="accountLists.get(accountTypes.EXPENSE).rootId">
+              Ausgaben
+            </option>
+            <option *ngFor="let account of accountLists.get(accountTypes.EXPENSE).entries" [ngValue]="account.id" 
+              [innerHtml]="'&nbsp&nbsp'.repeat(account.hierarchyLevel) + account.name">
+            </option>
+          </ng-container>
+          <ng-container *ngSwitchCase="transactionTypes.REVENUE">
+            <option [ngValue]="accountLists.get(accountTypes.REVENUE).rootId">
+              Einnahmen
+            </option>
+            <option *ngFor="let account of accountLists.get(accountTypes.REVENUE).entries" [ngValue]="account.id" 
+              [innerHtml]="'&nbsp&nbsp'.repeat(account.hierarchyLevel) + account.name">
+            </option>
+          </ng-container>
+        </ng-container>
+      </select>
+    </label>
+    <button type="button" (click)="createAccount(1)">Hinzufügen</button>
+  </div>
+  <div *ngIf="submitted && debitAccount.invalid" class="error" [ngSwitch]="transactionType">
+    <ng-container *ngSwitchCase="transactionTypes.TRANSFER">
+      <i>!</i> Zielkonto erforderlich
+    </ng-container>
+    <ng-container *ngSwitchCase="transactionTypes.EXPENSE">
+      <i>!</i> Kategorie erforderlich
+    </ng-container>
+    <ng-container *ngSwitchCase="transactionTypes.REVENUE">
+      <i>!</i> Kategorie erforderlich
+    </ng-container>
+  </div>
+
+  <label class="row">
+      <span>Betrag</span>
+      <input formControlName="amount">
+  </label>
+  <div *ngIf="submitted && amount.invalid" class="error">
+    <i>!</i> Gültiger Betrag erforderlich
+  </div>
+
+  <div class="buttons">
+    <button type="button" (click)="cancel()">Abbrechen</button>
+    <button type="submit">Erstellen</button>
+  </div>
+
+</form>

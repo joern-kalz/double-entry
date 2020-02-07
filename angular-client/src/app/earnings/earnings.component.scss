@@ -1,0 +1,75 @@
+form {
+    display: flex;
+    margin-bottom: 40px;
+    justify-content: space-between;
+
+    label {
+        max-width: 150px;
+        display: flex;
+        align-items: baseline;
+        width: calc(0.5 * (100% - 60px));
+    }
+    span {
+        width: 29px;
+        text-align: right;
+        padding-right: 1px;
+    }
+    input {
+        width: calc(100% - 30px);
+    }
+    input.ng-invalid.show-errors {
+        border-color: #ff8787;
+        box-shadow: 0 0 2px #ff8787 inset;
+    }
+    input.ng-invalid.show-errors:focus {
+        outline-color: #ff8787;
+    }
+    button {
+        width: 59px;
+        margin-left: 1px;
+        padding: 0;
+    }
+}
+
+@media (min-width: 450px) {
+    form {
+        label {
+            width: calc(0.5 * (100% - 90px));
+        }
+        span {
+            width: 45px;
+            text-align: left;
+        }
+        input {
+            width: calc(100% - 45px);
+        }
+        button {
+            width: 90px;
+            margin-left: 0;
+        }
+    }
+    .create button {
+        width: 90px;
+    }
+}
+
+@media (min-width: 600px) {
+    form {
+        width: 420px;
+        float: left;
+    }
+    .create {
+        float: right;
+    }
+    .transaction {
+        clear: both;
+    }
+}
+
+div {
+    clear: both;
+}
+
+.level2 {
+    font-size: 0.9em;
+}

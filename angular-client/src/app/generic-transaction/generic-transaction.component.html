@@ -1,0 +1,72 @@
+<h1>Freie Buchung erstellen</h1>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <label class="row">
+      <span>Datum</span>
+      <input formControlName="date" #dateElement>
+  </label>
+  <div *ngIf="submitted && date.invalid" class="error">
+    <i>!</i> Gültiges Datum erforderlich
+  </div>
+  <label class="row">
+      <span>Beschreibung</span>
+      <input formControlName="name">
+  </label>
+  <div formArrayName="entries" class="group">
+    <div *ngFor="let entry of entries.controls; let i=index" [formGroupName]="i">
+      <div class="row splitted">
+        <label>
+          <span>Konto</span>
+          <select formControlName="accountId">
+            <ng-container *ngIf="accountLists">
+              <option [ngValue]="accountLists.get(accountTypes.ASSET).rootId">
+                Bestandskonten
+              </option>
+              <option *ngFor="let account of accountLists.get(accountTypes.ASSET).entries" [ngValue]="account.id" 
+                [innerHtml]="'&nbsp&nbsp'.repeat(account.hierarchyLevel) + account.name">
+              </option>
+              <option [ngValue]="accountLists.get(accountTypes.EXPENSE).rootId">
+                Ausgaben
+              </option>
+              <option *ngFor="let account of accountLists.get(accountTypes.EXPENSE).entries" [ngValue]="account.id" 
+                [innerHtml]="'&nbsp&nbsp'.repeat(account.hierarchyLevel) + account.name">
+              </option>
+              <option [ngValue]="accountLists.get(accountTypes.REVENUE).rootId">
+                Einnahmen
+              </option>
+              <option *ngFor="let account of accountLists.get(accountTypes.REVENUE).entries" [ngValue]="account.id" 
+                [innerHtml]="'&nbsp&nbsp'.repeat(account.hierarchyLevel) + account.name">
+              </option>
+            </ng-container>
+          </select>
+        </label>
+        <button type="button" (click)="createAccount(i)">Hinzufügen</button>
+      </div>
+      <div *ngIf="submitted && entry.get('accountId').invalid" class="error">
+        <i>!</i> Konto erforderlich
+      </div>
+      <div *ngIf="submitted && entries.errors && entries.errors.accountsUnique && entries.errors.accountsUnique.index == i" class="error">
+        <i>!</i> Konto darf nicht zweifach erfasst werden
+      </div>
+      <label class="row">
+        <span>Betrag</span>
+        <input formControlName="amount">
+      </label>
+      <div *ngIf="submitted && entry.get('amount').invalid" class="error">
+        <i>!</i> Gültiger Betrag erforderlich
+      </div>
+      <div *ngIf="submitted && entries.errors && entries.errors.totalIsZero && entries.errors.totalIsZero.index == i" class="error">
+        <i>!</i> Summe der Beträge muss Null ergeben
+      </div>
+      <div class="row">
+        <button type="button" (click)="removeEntry(i)" [disabled]="entries.length < 3">Buchungsteil löschen</button>
+      </div>
+    </div>
+    <div>
+      <button type="button" (click)="addEntry()">Buchungsteil hinzufügen</button>
+    </div>
+  </div>
+  <div class="buttons">
+    <button type="button" (click)="cancel()">Abbrechen</button>
+    <button type="submit">Erstellen</button>
+  </div>
+</form>
