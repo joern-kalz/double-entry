@@ -1,109 +1,84 @@
 from flask import make_response
-
-import db
-from psycopg2.extras import execute_values
+from db import Session
+from model import Transaction, Entry
+from sqlalchemy.orm import selectinload
+from datetime import datetime
 
 
 def create(body): 
-    transaction = (body.get('date'), body.get('name'))
+    transaction = Transaction(
+        name = body.get('name'), 
+        date = body.get('date'),
+        entries = create_entries(body.get('entries'))
+    )
 
-    db.cur.execute("""
-        INSERT INTO transactions (date, name) 
-        VALUES (%s, %s)
-        RETURNING id""",
-        transaction)
-        
-    transactionId = db.cur.fetchone()[0]
+    with Session() as session: session.add(transaction)
 
-    createEntries(transactionId, body.get('entries'))
-    return make_response('transaction created', 201)
+    return make_response({'createdId': transaction.id}, 201)
 
 
 def update(transactionId, body): 
-    transaction = (body.get('date'), body.get('name'), transactionId)
+    with Session() as session:
+        transaction = session.query(Transaction).get(transactionId)
+        transaction.name = body.get('name')
+        transaction.date = body.get('date')
+        transaction.entries = create_entries(body.get('entries'))
 
-    db.cur.execute("""
-        UPDATE transactions 
-        SET date = %s, name = %s
-        WHERE id = %s""",
-        transaction)
-        
-    db.cur.execute("""
-        DELETE FROM entries 
-        WHERE transactionId = %s""", 
-        (transactionId,))
-
-    createEntries(transactionId, body.get('entries'))
     return 'transaction updated'
 
 
 def delete(transactionId): 
-    db.cur.execute("""
-        DELETE FROM transactions 
-        WHERE id = %s""", 
-        (transactionId,))
-        
-    db.cur.execute("""
-        DELETE FROM entries 
-        WHERE transactionId = %s""", 
-        (transactionId,))
+    with Session() as session: 
+        transaction = session.query(Transaction).get(transactionId)
+        session.delete(transaction)
 
     return 'transaction deleted'
 
 
-def findAll():
-    db.cur.execute("""
-        SELECT 
-            transactions.id,
-            transactions.date,
-            transactions.name,
-            entries.amount,
-            entries.verified,
-            entries.accountId,
-            accounts.name
-        FROM transactions
-        INNER JOIN entries 
-            ON transactions.id = entries.transactionId
-        LEFT OUTER JOIN accounts 
-            ON accounts.id = entries.accountId
-        ORDER BY transactions.id, accounts.id
-        """)
+def find_all(after = None, before = None):
+    with Session() as session:
+        transactions = session.query(Transaction).options(
+            selectinload(Transaction.entries)
+        )
 
-    result = []
-    currentId = ''
-    for row in db.cur.fetchall():
-        (id, date, name, amount, verified, accountId, accountName) = row
- 
-        if id != currentId: 
-            result.append({
-                'id': id, 
-                'date': date, 
-                'name': name, 
-                'entries': []
-            })
-            currentId = id
+        if after != None: 
+            try:
+                datetime.strptime(after, '%Y-%m-%d')
+            except ValueError:
+                return make_response('invalid query parameter "after"', 400)
+            transactions = transactions.filter(Transaction.date >= after)
 
-        result[-1]['entries'].append({
-            'amount': amount,
-            'verified': verified,
-            'account': {'id': accountId, 'name': accountName}
-        })
+        if before != None: 
+            try:
+                datetime.strptime(before, '%Y-%m-%d')
+            except ValueError:
+                return make_response('invalid query parameter "before"', 400)
+            transactions = transactions.filter(Transaction.date <= before)
 
-    return result
+        return [
+            {
+                'id': transaction.id, 
+                'date': transaction.date.strftime('%Y-%m-%d'), 
+                'name': transaction.name, 
+                'entries': [
+                    {
+                        'amount': entry.amount,
+                        'verified': entry.verified,
+                        'accountId': entry.account_id
+                    } 
+                    for entry in transaction.entries
+                ]
+            } 
+            for transaction in transactions.order_by(Transaction.date, Transaction.id)
+        ]
     
     
-def createEntries(transactionId, entries):
-    entries = [
-        (
-            transactionId, 
-            entry.get('account'), 
-            entry.get('amount'), 
-            entry.get('verified', False)
+def create_entries(entries):
+    return [
+        Entry(
+            account_id = entry.get('accountId'), 
+            amount = entry.get('amount'), 
+            verified = entry.get('verified', False)
         ) 
         for entry in entries
     ]
-
-    execute_values(db.cur, """
-        INSERT INTO entries (transactionId, accountId, amount, verified) 
-        VALUES %s""",
-        entries)

@@ -1,46 +1,39 @@
 from flask import make_response
+from db import Session
+from model import Account
 
-import db
 
 def create(body): 
-    account = (body.get('name'), body.get('parentId'), body.get('active'))
-
-    db.cur.execute("""
-        INSERT INTO accounts (name, parentId, active) 
-        VALUES (%s, %s, %s)
-        RETURNING id""",
-        account)
-
-    id = db.cur.fetchone()[0]
-
-    return make_response(f'account {id} created', 201)
-
-def update(body, accountId): 
-    account = (
-        body.get('name'), 
-        body.get('parentId'), 
-        body.get('active'), 
-        accountId
+    account = Account(
+        name = body.get('name'), 
+        parent_id = body.get('parentId'), 
+        active = body.get('active')
     )
 
-    db.cur.execute("""
-        UPDATE accounts 
-        SET name = %s, parentId = %s, active = %s
-        WHERE id = %s""",
-        account)
+    with Session() as session: session.add(account)
+
+    return make_response({'createdId': account.id}, 201)
+
+
+def update(body, accountId): 
+    with  Session() as session:
+        account = session.query(Account).get(accountId)
+        account.name = body.get('name')
+        account.parent_id = body.get('parentId')
+        account.active = body.get('active')
 
     return 'account updated'
 
-def findAll():
-    db.cur.execute("""
-        SELECT id, name, parentId, active
-        FROM accounts
-        """)
 
-    return [{
-            'id': row[0], 
-            'name': row[1], 
-            'parentId': row[2], 
-            'active': row[3]
-        } for row in db.cur.fetchall()]
+def find_all():
+    with Session() as session:
+        return [
+            {
+                'id': account.id, 
+                'name': account.name, 
+                'parentId': account.parent_id, 
+                'active': account.active
+            } 
+            for account in session.query(Account).all()
+        ]
     
