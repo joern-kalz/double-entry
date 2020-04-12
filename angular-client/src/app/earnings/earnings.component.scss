@@ -1,75 +1,40 @@
-form {
+.types {
+    text-align: right;
+    select { width: 66.5%; }
+}
+
+.row {
     display: flex;
-    margin-bottom: 40px;
     justify-content: space-between;
-
-    label {
-        max-width: 150px;
-        display: flex;
-        align-items: baseline;
-        width: calc(0.5 * (100% - 60px));
-    }
-    span {
-        width: 29px;
-        text-align: right;
-        padding-right: 1px;
-    }
-    input {
-        width: calc(100% - 30px);
-    }
-    input.ng-invalid.show-errors {
-        border-color: #ff8787;
-        box-shadow: 0 0 2px #ff8787 inset;
-    }
-    input.ng-invalid.show-errors:focus {
-        outline-color: #ff8787;
-    }
-    button {
-        width: 59px;
-        margin-left: 1px;
-        padding: 0;
-    }
+    & > div { width: 33%; }
+    margin-top: 10px;
 }
 
-@media (min-width: 450px) {
-    form {
-        label {
-            width: calc(0.5 * (100% - 90px));
-        }
-        span {
-            width: 45px;
-            text-align: left;
-        }
-        input {
-            width: calc(100% - 45px);
-        }
-        button {
-            width: 90px;
-            margin-left: 0;
-        }
+.row.title { margin: 20px 0; }
+
+.date-box {
+    border: 1px solid #3e748a;
+    display: flex;
+    flex-wrap: wrap;
+    font-weight: 300;
+    span { 
+        width: 100%; 
+        padding: 3px 0; 
+        display: inline-block; 
+        text-align: center; 
     }
-    .create button {
-        width: 90px;
-    }
+    button { width: 50%; }
 }
 
-@media (min-width: 600px) {
-    form {
-        width: 420px;
-        float: left;
-    }
-    .create {
-        float: right;
-    }
-    .transaction {
-        clear: both;
-    }
+.category { font-weight: 300; }
+
+.name { 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
 }
 
-div {
-    clear: both;
-}
+.bar { display: none; }
 
-.level2 {
-    font-size: 0.9em;
+.value {
+    text-align: right;
 }

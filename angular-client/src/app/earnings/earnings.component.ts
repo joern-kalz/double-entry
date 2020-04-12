@@ -1,33 +1,36 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { FormValidatorService } from '../form-validator.service';
 import { LocalService } from '../local.service';
-import { AccountListsService } from '../account-lists.service';
+import { AccountListsService, Account } from '../account-lists.service';
 import { SessionService } from '../session.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BalancesService } from '../server/api/api';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { AccountType } from '../account-type';
+import { ResponseBalance } from '../server';
+import { EarningTimespanType } from '../earning-timespan-type.enum';
+import { Earning } from '../earning';
 
 @Component({
   selector: 'app-earnings',
   templateUrl: './earnings.component.html',
   styleUrls: ['./earnings.component.scss']
 })
-export class EarningsComponent implements OnInit {
+export class EarningsComponent implements OnInit, OnDestroy {
+
+  accountTypes = AccountType;
+  timespanTypes = EarningTimespanType;
 
   accountType: AccountType;
-  earnings: any[];
 
-  showErrors = false;
+  timespanType = new FormControl(EarningTimespanType.MONTH);
+  primaryDate = this.primaryDefault;
+  secondaryDate = this.secondaryDefault;
 
-  form = this.fb.group({
-    after: [this.defaultAfter, this.fv.date()],
-    before: [this.defaultBefore, this.fv.date()],
-  });
+  earnings: Earning[];
 
-  @ViewChild('after') afterElement: ElementRef;
-  @ViewChild('before') beforeElement: ElementRef;
+  subscription: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -45,60 +48,113 @@ export class EarningsComponent implements OnInit {
       this.accountType = params.get('accountType') == 'expense' ? 
         AccountType.EXPENSE : AccountType.REVENUE;
 
-      this.submit();
+      this.load();
     });
+
+    this.subscription = this.timespanType.valueChanges.subscribe(() => this.load());
   }
 
-  get defaultAfter(): string {
-    const today = new Date();
-    return this.fromDate(new Date(today.getFullYear(), today.getMonth(), 1));
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
-  get defaultBefore(): string {
-    const today = new Date();
-    return this.fromDate(new Date(today.getFullYear(), today.getMonth() + 1, 0));
-  }
-
-  fromDate(date: Date): string {
-    const dateIso = this.local.fromDate(date);
-    return this.local.formatDate(dateIso);
-  }
-
-  submit() {
-    if (this.accountType == null) return;
-
-    if (this.after.invalid) {
-      this.showErrors = true;
-      return this.afterElement.nativeElement.focus();
-    }
-
-    if (this.before.invalid) {
-      this.showErrors = true;
-      return this.beforeElement.nativeElement.focus();
-    }
-
-    this.showErrors = false;
-
-    const after = this.local.parseDate(this.after.value);
-    const before = this.local.parseDate(this.before.value);
+  load() {
+    const [primaryAfter, primaryBefore] = this.createInterval(this.primaryDate);
+    const [secondaryAfter, secondaryBefore] = this.createInterval(this.secondaryDate);
 
     forkJoin(
-      this.balancesService.balancesFindAll(after, before),
+      this.balancesService.balancesFindAll(primaryAfter, primaryBefore),
+      this.balancesService.balancesFindAll(secondaryAfter, secondaryBefore),
       this.accountListsService.getAccountListsCache()
     )
-    .subscribe(([balances, accountListsCache]) => {
-      this.earnings = accountListsCache.accountLists.get(this.accountType).entries.map(account => {
-        const balance = balances.find(balance => balance.accountId == account.id);
+    .subscribe(([primaryBalances, secondaryBalances, accountListsCache]) => {
+      const accountList = accountListsCache.accountLists.get(this.accountType);
+      const rootAccount = {id: accountList.rootId, name: null, hierarchyLevel: 0};
+      const earningAccounts = [rootAccount, ...accountList.entries];
 
+      this.earnings = earningAccounts.map(account => {
         return {
           name: account.name,
-          amount: balance ? balance.balance : 0,
+          primaryValue: this.findBalance(primaryBalances, account.id),
+          secondaryValue: this.findBalance(secondaryBalances, account.id),
           level: account.hierarchyLevel
+        };
+      });
+/*
+      const trace = [{earning: this.earning, childIndex: 0}];
+
+      while (trace.length > 0) {
+        const current = trace[trace.length - 1];
+
+        if (current.earning.children.length > current.childIndex) {
+          trace.push({earning: current.earning.children[current.childIndex], childIndex: 0});
+          current.childIndex++;
+        } else {
+          trace.pop();
+          if (trace.length > 0) {
+            trace[trace.length - 1].earning.primaryValue += current.earning.primaryValue;
+            trace[trace.length - 1].earning.secondaryValue += current.earning.secondaryValue;
+          }
         }
-      })
+      }
+      console.log(this.earning)*/
     });
   }
 
-  get after() { return this.form.get('after'); }
-  get before() { return this.form.get('before'); }
+  createInterval(date: Date): string[] {
+    const after = this.timespanType.value == EarningTimespanType.MONTH ? 
+      new Date(date.getFullYear(), date.getMonth(), 1) :
+      new Date(date.getFullYear(), 0, 1);
+
+    const before = this.timespanType.value == EarningTimespanType.MONTH ? 
+      new Date(date.getFullYear(), date.getMonth() + 1, 0) :
+      new Date(date.getFullYear() + 1, 0, 0);
+
+    return [
+      this.local.fromDate(after),
+      this.local.fromDate(before)
+    ];
+  }
+
+  findBalance(balances: ResponseBalance[], accountId: number) {
+    const balance = balances.find(balance => balance.accountId == accountId);
+    return balance ? balance.balance : 0;
+  }
+
+  decrementPrimary() {
+    this.primaryDate = this.offsetDate(this.primaryDate, -1);
+    this.load();
+  }
+
+  incrementPrimary() {
+    this.primaryDate = this.offsetDate(this.primaryDate, 1);
+    this.load();
+  }
+
+  decrementSecondary() {
+    this.secondaryDate = this.offsetDate(this.secondaryDate, -1);
+    this.load();
+  }
+
+  incrementSecondary() {
+    this.secondaryDate = this.offsetDate(this.secondaryDate, 1);
+    this.load();
+  }
+
+  offsetDate(date: Date, offset: number): Date {
+    return this.timespanType.value == EarningTimespanType.MONTH ? 
+      new Date(date.getFullYear(), date.getMonth() + offset, 1) :
+      new Date(date.getFullYear() + offset, 0, 1);
+  }
+
+  get primaryDefault(): Date {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+
+  get secondaryDefault(): Date {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  }
+
 }
