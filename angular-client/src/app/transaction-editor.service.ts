@@ -21,7 +21,6 @@ export class TransactionEditorService {
 
   open(transactionId: number) {
     const returnAddress = this.router.url;
-    console.log(returnAddress)
 
     this.transactionsService.transactionsFindById(transactionId).subscribe(transaction => {
       this.sessionService.transaction = {
@@ -40,5 +39,38 @@ export class TransactionEditorService {
         { queryParams: {returnAddress} }
       );
     });
+  }
+
+  createSimpel(transactionType: TransactionType) {
+    this.create(transactionType);
+    this.router.navigate(
+      ['/transaction/simple'], 
+      { queryParams: {returnAddress: this.router.url} }
+    );
+  }
+
+  createGeneric() {
+    this.create(TransactionType.OTHER);
+    this.router.navigate(
+      ['/transaction/generic'], 
+      { queryParams: {returnAddress: this.router.url} }
+    );
+  }
+
+  close() {
+    this.sessionService.transaction = null;
+  }
+
+  private create(transactionType: TransactionType) {
+    this.sessionService.transaction = {
+      transactionType,
+      date: null, 
+      dateUser: null,
+      name: null, 
+      entries: [
+        { accountId: null, amount: null, amountUser: null },
+        { accountId: null, amount: null, amountUser: null },
+      ]
+    };
   }
 }

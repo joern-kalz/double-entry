@@ -1,23 +1,20 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AccountListsService, AccountList } from '../account-lists.service';
 import { TransactionsService } from '../server/api/transactions.service';
 import { FormValidatorService } from '../form-validator.service';
 import { LocalService } from '../local.service';
-import { Location } from '@angular/common';
 import { SessionService } from '../session.service';
 import { AccountType } from '../account-type';
 import { TransactionType } from '../transaction-type.enum';
-import { combineLatest, Subscription } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-simple-transaction',
   templateUrl: './simple-transaction.component.html',
   styleUrls: ['./simple-transaction.component.scss']
 })
-export class SimpleTransactionComponent implements OnInit, OnDestroy {
+export class SimpleTransactionComponent implements OnInit {
   transactionType: TransactionType;
   returnAddress: string;
 
@@ -36,7 +33,6 @@ export class SimpleTransactionComponent implements OnInit, OnDestroy {
   transactionTypes = TransactionType;
 
   submitted = false;
-  subscription: Subscription;
 
   constructor(
     private accountListsService: AccountListsService,
@@ -54,30 +50,19 @@ export class SimpleTransactionComponent implements OnInit, OnDestroy {
       this.returnAddress = queryParam.get('returnAddress');
     });
 
-    this.subscription = this.sessionService.transactionChangeEvent.subscribe(() => this.update());
     this.update();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 
   update() {
     const transaction = this.sessionService.transaction;
 
-    if (!transaction) return;
-
-    this.transactionType = transaction.transactionType;
-    
-    const isValidTransactionType = [
-      TransactionType.TRANSFER, TransactionType.EXPENSE, TransactionType.REVENUE
-    ].includes(this.transactionType);
-
-    if (!isValidTransactionType) {
+    if (!transaction || !this.isValidTransactionType(transaction.transactionType)) {
       this.router.navigate(['/dashboard']);
       return;
     } 
 
+    this.transactionType = transaction.transactionType;
+    
     this.form.setValue({ 
       name: transaction.name, 
       date: transaction.date == null ? 
@@ -96,6 +81,12 @@ export class SimpleTransactionComponent implements OnInit, OnDestroy {
 
     this.submitted = false;
     this.dateElement.nativeElement.focus();
+  }
+
+  isValidTransactionType(transactionType: TransactionType) {
+    return [
+      TransactionType.TRANSFER, TransactionType.EXPENSE, TransactionType.REVENUE
+    ].includes(transactionType);
   }
 
   createAccount(entryIndex: number) {
@@ -121,8 +112,6 @@ export class SimpleTransactionComponent implements OnInit, OnDestroy {
           { amountUser: this.amount.value, amount: null, accountId: this.debitAccount.value },
         ]
       };
-
-      this.sessionService.transactionChangeEvent.emit();
     });
   }
 
@@ -157,13 +146,8 @@ export class SimpleTransactionComponent implements OnInit, OnDestroy {
   }
 
   exit() {
-    const destination = this.returnAddress ? this.returnAddress : '/dashboard';
-
     this.sessionService.transaction = null;
-
-    this.router.navigate([destination]).then(() => {
-      this.sessionService.transactionChangeEvent.emit();
-    });
+    this.router.navigate([this.returnAddress ? this.returnAddress : '/dashboard']);
   }
 
   get date() { return this.form.get('date') as FormControl; }

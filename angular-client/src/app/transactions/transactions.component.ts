@@ -5,7 +5,6 @@ import { FormValidatorService } from '../form-validator.service';
 import { AccountListsService } from '../account-lists.service';
 import { forkJoin } from 'rxjs';
 import { LocalService } from '../local.service';
-import { SessionService } from '../session.service';
 import { Router } from '@angular/router';
 import { TransactionType } from '../transaction-type.enum';
 import { TransactionEditorService } from '../transaction-editor.service';
@@ -35,7 +34,6 @@ export class TransactionsComponent implements OnInit {
     private fv: FormValidatorService,
     private local: LocalService,
     private accountListsService: AccountListsService,
-    private sessionService: SessionService,
     private router: Router,
     private transactionEditorService: TransactionEditorService,
   ) { }
@@ -95,25 +93,7 @@ export class TransactionsComponent implements OnInit {
   }
 
   createGenericTransaction() {
-    this.sessionService.transaction = null;
-
-    this.router.navigate(
-      ['/transaction/generic'],
-      { queryParams: {returnAddress: '/transactions'} }
-    ).then(() => {
-      this.sessionService.transaction = {
-        transactionType: TransactionType.OTHER,
-        date: null, 
-        dateUser: null,
-        name: null, 
-        entries: [
-          { accountId: null, amount: null, amountUser: null },
-          { accountId: null, amount: null, amountUser: null },
-        ]
-      };
-
-      this.sessionService.transactionChangeEvent.emit();
-    });
+    this.transactionEditorService.createGeneric();
   }
 
   edit(transaction: any) {

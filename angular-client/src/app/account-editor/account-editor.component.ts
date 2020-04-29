@@ -112,11 +112,7 @@ export class AccountEditorComponent implements OnInit {
       transaction.entries[this.entryIndex].accountId = createdId;
     }
 
-    this.sessionService.transaction = null;
-    this.router.navigate([this.returnAddress ? this.returnAddress : '/dashboard']).then(() => {
-      this.sessionService.transaction = transaction;
-      this.sessionService.transactionChangeEvent.emit();
-    });
+    this.router.navigate([this.returnAddress ? this.returnAddress : '/dashboard']);
   }
 
   get name() {

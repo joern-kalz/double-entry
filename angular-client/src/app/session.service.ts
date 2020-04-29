@@ -21,7 +21,6 @@ export class Transaction {
 })
 export class SessionService {
 
-  transactionChangeEvent = new EventEmitter<void>();
-
   transaction: Transaction = null;
+  
 }

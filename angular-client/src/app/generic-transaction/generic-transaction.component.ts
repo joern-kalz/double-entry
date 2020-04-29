@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormArray, FormControl, AbstractControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AccountListsService, AccountList } from '../account-lists.service';
@@ -8,15 +8,13 @@ import { LocalService } from '../local.service';
 import { AccountType } from '../account-type';
 import { SessionService } from '../session.service';
 import { TransactionType } from '../transaction-type.enum';
-import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-generic-transaction',
   templateUrl: './generic-transaction.component.html',
   styleUrls: ['./generic-transaction.component.scss']
 })
-export class GenericTransactionComponent implements OnInit, OnDestroy {
+export class GenericTransactionComponent implements OnInit {
  
   returnAddress: string;
 
@@ -37,8 +35,6 @@ export class GenericTransactionComponent implements OnInit, OnDestroy {
 
   submitted = false;
 
-  subscription: Subscription;
-
   constructor(
     private accountListsService: AccountListsService,
     private fb: FormBuilder,
@@ -55,20 +51,13 @@ export class GenericTransactionComponent implements OnInit, OnDestroy {
       this.returnAddress = queryParam.get('returnAddress');
     });
 
-    this.subscription = this.sessionService.transactionChangeEvent.subscribe(() => this.update())
     this.update();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 
   update() {
     const transaction = this.sessionService.transaction;
 
-    if (!transaction) return;
-
-    if (transaction.transactionType != TransactionType.OTHER) {
+    if (!transaction || transaction.transactionType != TransactionType.OTHER) {
       this.router.navigate(['/dashboard']);
       return;
     } 
@@ -131,8 +120,6 @@ export class GenericTransactionComponent implements OnInit, OnDestroy {
           amountUser: entry.get('amount').value
         }))
       };
-
-      this.sessionService.transactionChangeEvent.emit();
     });
   }
 
@@ -198,10 +185,7 @@ export class GenericTransactionComponent implements OnInit, OnDestroy {
 
   exit() {
     this.sessionService.transaction = null;
-
-    this.router.navigate([this.returnAddress ? this.returnAddress : '/dashboard']).then(() => {
-      this.sessionService.transactionChangeEvent.emit();
-    });
+    this.router.navigate([this.returnAddress ? this.returnAddress : '/dashboard']);
   }
 
   get entries() { return this.form.get('entries') as FormArray; }
