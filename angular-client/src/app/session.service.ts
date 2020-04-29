@@ -1,11 +1,9 @@
 import { Injectable, EventEmitter } from '@angular/core';
-import { AccountType } from './account-type';
-import { BehaviorSubject } from 'rxjs';
 import { TransactionType } from './transaction-type.enum';
 
 export class TransactionEntry {
   accountId: number;
-  amountUser: string;
+  amountUser?: string;
   amount: number;
 }
 
@@ -26,5 +24,4 @@ export class SessionService {
   transactionChangeEvent = new EventEmitter<void>();
 
   transaction: Transaction = null;
-  
 }

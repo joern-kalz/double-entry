@@ -8,6 +8,7 @@ import { LocalService } from '../local.service';
 import { SessionService } from '../session.service';
 import { Router } from '@angular/router';
 import { TransactionType } from '../transaction-type.enum';
+import { TransactionEditorService } from '../transaction-editor.service';
 
 @Component({
   selector: 'app-transactions',
@@ -35,7 +36,8 @@ export class TransactionsComponent implements OnInit {
     private local: LocalService,
     private accountListsService: AccountListsService,
     private sessionService: SessionService,
-    private router: Router
+    private router: Router,
+    private transactionEditorService: TransactionEditorService,
   ) { }
 
   ngOnInit() {
@@ -77,6 +79,7 @@ export class TransactionsComponent implements OnInit {
           .reduce((amount, entry) => amount + entry.amount, 0);
 
         return {
+          id: transaction.id,
           date: transaction.date,
           name: transaction.name,
           negatives,
@@ -111,6 +114,10 @@ export class TransactionsComponent implements OnInit {
 
       this.sessionService.transactionChangeEvent.emit();
     });
+  }
+
+  edit(transaction: any) {
+    this.transactionEditorService.open(transaction.id);
   }
 
   get after() { return this.form.get('after'); }

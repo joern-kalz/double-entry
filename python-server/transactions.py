@@ -35,6 +35,26 @@ def delete(transactionId):
     return 'transaction deleted'
 
 
+def find_by_id(transactionId):
+    with Session() as session:
+        transaction = session.query(Transaction).options(
+            selectinload(Transaction.entries)
+        ).get(transactionId)
+        
+        return {
+            'id': transaction.id, 
+            'date': transaction.date.strftime('%Y-%m-%d'), 
+            'name': transaction.name, 
+            'entries': [
+                {
+                    'amount': entry.amount,
+                    'verified': entry.verified,
+                    'accountId': entry.account_id
+                } 
+                for entry in transaction.entries
+            ]
+        }
+    
 def find_all(after = None, before = None):
     with Session() as session:
         transactions = session.query(Transaction).options(
@@ -69,7 +89,7 @@ def find_all(after = None, before = None):
                     for entry in transaction.entries
                 ]
             } 
-            for transaction in transactions.order_by(Transaction.date, Transaction.id)
+            for transaction in transactions.order_by(Transaction.date.desc(), Transaction.id)
         ]
     
     

@@ -93,9 +93,9 @@ export class TransactionsService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.post<ResponseCreated>(`${this.basePath}/transactions`,
-            body,
+        return this.httpClient.request<ResponseCreated>('post',`${this.basePath}/transactions`,
             {
+                body: body,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -134,7 +134,7 @@ export class TransactionsService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.delete<any>(`${this.basePath}/transactions/${encodeURIComponent(String(transactionId))}`,
+        return this.httpClient.request<any>('delete',`${this.basePath}/transactions/${encodeURIComponent(String(transactionId))}`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -182,9 +182,50 @@ export class TransactionsService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Array<ResponseTransaction>>(`${this.basePath}/transactions`,
+        return this.httpClient.request<Array<ResponseTransaction>>('get',`${this.basePath}/transactions`,
             {
                 params: queryParameters,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Finds a transaction by id
+     * 
+     * @param transactionId Id of the transaction
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public transactionsFindById(transactionId: number, observe?: 'body', reportProgress?: boolean): Observable<ResponseTransaction>;
+    public transactionsFindById(transactionId: number, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ResponseTransaction>>;
+    public transactionsFindById(transactionId: number, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ResponseTransaction>>;
+    public transactionsFindById(transactionId: number, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (transactionId === null || transactionId === undefined) {
+            throw new Error('Required parameter transactionId was null or undefined when calling transactionsFindById.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            'application/json'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<ResponseTransaction>('get',`${this.basePath}/transactions/${encodeURIComponent(String(transactionId))}`,
+            {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -233,9 +274,9 @@ export class TransactionsService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.put<any>(`${this.basePath}/transactions/${encodeURIComponent(String(transactionId))}`,
-            body,
+        return this.httpClient.request<any>('put',`${this.basePath}/transactions/${encodeURIComponent(String(transactionId))}`,
             {
+                body: body,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

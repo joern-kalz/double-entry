@@ -33,6 +33,7 @@ export class GenericTransactionComponent implements OnInit, OnDestroy {
 
   accountTypes = AccountType;
   accountLists: Map<AccountType, AccountList>;
+  id: number;
 
   submitted = false;
 
@@ -92,6 +93,7 @@ export class GenericTransactionComponent implements OnInit, OnDestroy {
       this.accountLists = accountListsCache.accountLists;
     });
 
+    this.id = transaction.id;
     this.submitted = false;
     this.dateElement.nativeElement.focus();
   }
@@ -169,17 +171,25 @@ export class GenericTransactionComponent implements OnInit, OnDestroy {
 
     if (this.form.invalid) return;
     
-    this.transactionService.transactionsCreate({
+    const transaction = {
       date: this.local.parseDate(this.form.get('date').value),
       name: this.form.get('name').value,
       entries: this.entries.controls.map(entry => ({
         accountId: entry.get('accountId').value,
         amount: this.local.parseAmount(entry.get('amount').value),
         verified: false
-      })),
-    }).subscribe(() => {
-      this.exit();
-    });
+      }))
+    };
+
+    if (this.id) {
+      this.transactionService
+        .transactionsUpdate(transaction, this.id)
+        .subscribe(() => this.exit())
+    } else {
+      this.transactionService
+        .transactionsCreate(transaction)
+        .subscribe(() => this.exit());
+    }
   }
 
   cancel() {

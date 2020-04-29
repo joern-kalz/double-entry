@@ -72,6 +72,15 @@ form {
 }
 
 .transaction {
+    border-bottom: 1px solid #83dbff;
+}
+.transaction:last-child {
+    border-bottom: none;
+}
+
+.data {
+    cursor: pointer;
+    padding: 20px 0;
     display: flex;
     flex-wrap: wrap;
     div {
@@ -98,16 +107,9 @@ form {
         width: 100px;
         text-align: right;
     }
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #83dbff;
 }
-.transaction:last-child {
-    border-bottom: none;
-}
-
 @media (min-width: 500px) {
-    .transaction {
+    .data {
         div:nth-child(1) {
             width: 20%;
             font-size: inherit;
@@ -125,5 +127,13 @@ form {
             text-align: right;
         }
     }
-        
+}
+
+.buttons {
+    padding-bottom: 20px;
+    text-align: right;
+    button {
+        margin-left: 30px;
+        width: 100px;
+    }
 }

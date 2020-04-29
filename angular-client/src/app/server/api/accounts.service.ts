@@ -93,9 +93,9 @@ export class AccountsService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.post<ResponseCreated>(`${this.basePath}/accounts`,
-            body,
+        return this.httpClient.request<ResponseCreated>('post',`${this.basePath}/accounts`,
             {
+                body: body,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,
@@ -130,7 +130,7 @@ export class AccountsService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Array<ResponseAccount>>(`${this.basePath}/accounts`,
+        return this.httpClient.request<Array<ResponseAccount>>('get',`${this.basePath}/accounts`,
             {
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
@@ -180,9 +180,9 @@ export class AccountsService {
             headers = headers.set('Content-Type', httpContentTypeSelected);
         }
 
-        return this.httpClient.put<any>(`${this.basePath}/accounts/${encodeURIComponent(String(accountId))}`,
-            body,
+        return this.httpClient.request<any>('put',`${this.basePath}/accounts/${encodeURIComponent(String(accountId))}`,
             {
+                body: body,
                 withCredentials: this.configuration.withCredentials,
                 headers: headers,
                 observe: observe,

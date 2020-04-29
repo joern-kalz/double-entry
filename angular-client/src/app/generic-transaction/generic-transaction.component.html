@@ -67,6 +67,9 @@
   </div>
   <div class="buttons">
     <button type="button" (click)="cancel()">Abbrechen</button>
-    <button type="submit">Erstellen</button>
+    <button type="submit">
+      <ng-container *ngIf="!id">Erstellen</ng-container>
+      <ng-container *ngIf="id">Speichern</ng-container>
+    </button>
   </div>
 </form>

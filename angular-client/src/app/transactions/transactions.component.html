@@ -15,29 +15,35 @@
 </div>
 
 <div *ngFor="let transaction of transactions" class="transaction">
-  <div>{{transaction.date | formatDateIso}}</div>
-  <div>{{transaction.name}}</div>
-  <div>
-    von
-    <ng-container *ngFor="let account of transaction.negatives; last as last">
-      <ng-container [ngSwitch]="account">
-        <ng-container *ngSwitchCase="'[ASSET]'">Bestand</ng-container>
-        <ng-container *ngSwitchCase="'[EXPENSE]'">Ausgaben</ng-container>
-        <ng-container *ngSwitchCase="'[REVENUE]'">Einnahmen</ng-container>
-        <ng-container *ngSwitchDefault>{{account}}</ng-container>
+  <div class="data" (click)="transaction.expanded = !transaction.expanded">
+    <div>{{transaction.date | formatDateIso}}</div>
+    <div>{{transaction.name}}</div>
+    <div>
+      von
+      <ng-container *ngFor="let account of transaction.negatives; last as last">
+        <ng-container [ngSwitch]="account">
+          <ng-container *ngSwitchCase="'[ASSET]'">Bestand</ng-container>
+          <ng-container *ngSwitchCase="'[EXPENSE]'">Ausgaben</ng-container>
+          <ng-container *ngSwitchCase="'[REVENUE]'">Einnahmen</ng-container>
+          <ng-container *ngSwitchDefault>{{account}}</ng-container>
+        </ng-container>
+        <ng-container *ngIf="!last">, </ng-container>
       </ng-container>
-      <ng-container *ngIf="!last">, </ng-container>
-    </ng-container>
-    nach
-    <ng-container *ngFor="let account of transaction.positives; last as last">
-      <ng-container [ngSwitch]="account">
-        <ng-container *ngSwitchCase="'[ASSET]'">Bestand</ng-container>
-        <ng-container *ngSwitchCase="'[EXPENSE]'">Ausgaben</ng-container>
-        <ng-container *ngSwitchCase="'[REVENUE]'">Einnahmen</ng-container>
-        <ng-container *ngSwitchDefault>{{account}}</ng-container>
+      nach
+      <ng-container *ngFor="let account of transaction.positives; last as last">
+        <ng-container [ngSwitch]="account">
+          <ng-container *ngSwitchCase="'[ASSET]'">Bestand</ng-container>
+          <ng-container *ngSwitchCase="'[EXPENSE]'">Ausgaben</ng-container>
+          <ng-container *ngSwitchCase="'[REVENUE]'">Einnahmen</ng-container>
+          <ng-container *ngSwitchDefault>{{account}}</ng-container>
+        </ng-container>
+        <ng-container *ngIf="!last">, </ng-container>
       </ng-container>
-      <ng-container *ngIf="!last">, </ng-container>
-    </ng-container>
+    </div>
+    <div>{{transaction.amount | formatAmount}}</div>
   </div>
-  <div>{{transaction.amount | formatAmount}}</div>
+  <div class="buttons" *ngIf="transaction.expanded">
+    <button (click)="edit(transaction)">Bearbeiten</button>
+    <button (click)="delete(transaction)">Löschen</button>
+  </div>
 </div>

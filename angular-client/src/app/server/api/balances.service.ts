@@ -93,7 +93,7 @@ export class BalancesService {
         const consumes: string[] = [
         ];
 
-        return this.httpClient.get<Array<ResponseBalance>>(`${this.basePath}/balances`,
+        return this.httpClient.request<Array<ResponseBalance>>('get',`${this.basePath}/balances`,
             {
                 params: queryParameters,
                 withCredentials: this.configuration.withCredentials,

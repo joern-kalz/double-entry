@@ -36,6 +36,19 @@ paths:
         '200':
           $ref: '#/components/responses/transactions'
   '/transactions/{transactionId}':
+    get:
+      operationId: transactions.find_by_id
+      tags: [transactions]
+      summary: Finds a transaction by id
+      parameters:
+        - name: transactionId
+          in: path
+          description: Id of the transaction
+          required: true
+          schema: {type: integer}
+      responses:
+        '200':
+          $ref: '#/components/responses/transaction'
     put:
       operationId: transactions.update
       tags: [transactions]
@@ -224,6 +237,12 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ResponseTransaction'
+    transaction:
+      description: Loaded transaction
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseTransaction'
     accounts:
       description: Loaded accounts
       content:
