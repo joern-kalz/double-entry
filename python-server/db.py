@@ -1,4 +1,4 @@
-from model import Base, Account
+from model import Base, Account, Transaction, Entry
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from os import environ
@@ -18,6 +18,11 @@ class Session:
             self.sessionImplementation.commit()
         else:
             self.sessionImplementation.rollback()
+
+#with Session() as session:
+#    session.query(Entry).delete()
+#    session.query(Transaction).delete()
+#    session.query(Account).delete()
 
 with Session() as session:
     if session.query(Account).count() == 0:
