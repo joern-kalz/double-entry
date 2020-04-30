@@ -16,6 +16,7 @@ import { SimpleTransactionComponent } from './simple-transaction/simple-transact
 import { GenericTransactionComponent } from './generic-transaction/generic-transaction.component';
 import { EarningsComponent } from './earnings/earnings.component';
 import { AccountsComponent } from './accounts/accounts.component';
+import { DialogsComponent } from './dialogs/dialogs.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { AccountsComponent } from './accounts/accounts.component';
     GenericTransactionComponent,
     EarningsComponent,
     AccountsComponent,
+    DialogsComponent,
   ],
   imports: [
     BrowserModule,

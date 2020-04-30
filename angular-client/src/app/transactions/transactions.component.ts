@@ -8,6 +8,9 @@ import { LocalService } from '../local.service';
 import { Router } from '@angular/router';
 import { TransactionType } from '../transaction-type.enum';
 import { TransactionEditorService } from '../transaction-editor.service';
+import { DialogsService } from '../dialogs.service';
+import { DialogMessage } from '../dialog-message.enum';
+import { DialogButton } from '../dialog-button.enum';
 
 @Component({
   selector: 'app-transactions',
@@ -34,8 +37,8 @@ export class TransactionsComponent implements OnInit {
     private fv: FormValidatorService,
     private local: LocalService,
     private accountListsService: AccountListsService,
-    private router: Router,
     private transactionEditorService: TransactionEditorService,
+    private dialogsService: DialogsService,
   ) { }
 
   ngOnInit() {
@@ -98,6 +101,23 @@ export class TransactionsComponent implements OnInit {
 
   edit(transaction: any) {
     this.transactionEditorService.open(transaction.id);
+  }
+
+  delete(transaction: any) {
+    this.dialogsService.show(
+      DialogMessage.REMOVE_TRANSACTION, 
+      [DialogButton.OK, DialogButton.CANCEL],
+      (button) => {
+        if (button == DialogButton.OK) this.deleteTransaction(transaction);
+      }
+    );
+  }
+
+  private deleteTransaction(transaction: any) {
+    this.transactionsService.transactionsDelete(transaction.id).subscribe(() => {
+      const index = this.transactions.indexOf(transaction);
+      if (index >= 0) this.transactions.splice(index, 1);
+    });
   }
 
   get after() { return this.form.get('after'); }
