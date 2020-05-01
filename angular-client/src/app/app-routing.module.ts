@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'create-account/:accountType', component: AccountEditorComponent },
   { path: 'accounts', component: AccountsComponent },
-  { path: 'accounts/:accountId', component: AccountEditorComponent },
+  { path: 'accounts/edit/:accountId', component: AccountEditorComponent },
   { path: 'transaction/generic', component: GenericTransactionComponent },
   { path: 'transaction/simple', component: SimpleTransactionComponent },
   { path: 'transaction/entries/:entryIndex/create-account/:accountType', component: AccountEditorComponent },

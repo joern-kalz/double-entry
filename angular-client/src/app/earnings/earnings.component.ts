@@ -74,6 +74,7 @@ export class EarningsComponent implements OnInit, OnDestroy {
 
       this.earnings = earningAccounts.map(account => {
         return {
+          id: account.id,
           name: account.name,
           primaryValue: this.findBalance(primaryBalances, account.id),
           secondaryValue: this.findBalance(secondaryBalances, account.id),
