@@ -13,20 +13,47 @@
 .row.title { margin: 20px 0; }
 
 .date-box {
-    border: 1px solid #3e748a;
     display: flex;
     flex-wrap: wrap;
     font-weight: 300;
+    justify-content: space-between;
     span { 
         width: 100%; 
         padding: 3px 0; 
         display: inline-block; 
+        margin-bottom: 2px;
         text-align: center; 
+        border: 1px solid #3e748a;
     }
-    button { width: 50%; }
+    button { width: calc(50% - 1px); }
 }
 
-.category { font-weight: 300; }
+@media (min-width: 520px) {
+    .date-box {
+        justify-content: flex-end;
+        span { 
+            width: calc(100% - 64px); 
+        }
+        button { 
+            margin-left: 2px;
+            width: 30px;
+        }
+    }
+}
+
+@media (min-width: 700px) {
+    .date-box {
+        span { 
+            width: 100px; 
+        }
+    }
+}
+
+.category data { font-weight: 300; }
+
+.data {
+    cursor: pointer;
+}
 
 .name { 
     overflow: hidden; 
@@ -37,4 +64,13 @@
 
 .value {
     text-align: right;
+}
+
+.actions {
+    text-align: right;
+    margin: 0 0 20px 0; 
+    a, button { 
+        width: 100px;
+        margin: 2px 0 2px 2px; 
+    }
 }

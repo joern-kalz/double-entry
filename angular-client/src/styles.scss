@@ -25,7 +25,7 @@ input, textarea {
     padding-left: 4px; 
 }
 
-button { 
+a, button { 
     text-align: center;
     font: inherit; 
     display: inline-block;
@@ -40,11 +40,13 @@ button {
     &:focus {
         outline: 2px solid #83dbff;
     }
+    &:disabled {
+        background: #9bbecc;
+        cursor: default;
+    }
 }
-
-button:disabled {
-    background: #9bbecc;
-    cursor: default;
+a {
+    padding-top: 4px;
 }
 
 .clearfix:after { 
