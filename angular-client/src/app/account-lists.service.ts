@@ -98,7 +98,7 @@ export class AccountListsService {
     while (unvisitedEdges.length > 0) {
       const edge = unvisitedEdges.pop();
 
-      if (visitedIds.has(edge.child.id)) continue;
+      if (visitedIds.has(edge.child.id) || !edge.child.active) continue;
       visitedIds.add(edge.child.id);
 
       allChildren.push({

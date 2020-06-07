@@ -11,13 +11,10 @@ import { TransactionsService } from './api/transactions.service';
   imports:      [],
   declarations: [],
   exports:      [],
-  providers: [
-    AccountsService,
-    BalancesService,
-    TransactionsService ]
+  providers: []
 })
 export class ApiModule {
-    public static forRoot(configurationFactory: () => Configuration): ModuleWithProviders {
+    public static forRoot(configurationFactory: () => Configuration): ModuleWithProviders<ApiModule> {
         return {
             ngModule: ApiModule,
             providers: [ { provide: Configuration, useFactory: configurationFactory } ]

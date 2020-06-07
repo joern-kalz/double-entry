@@ -170,7 +170,7 @@ export class GenericTransactionComponent implements OnInit {
 
     if (this.id) {
       this.transactionService
-        .transactionsUpdate(transaction, this.id)
+        .transactionsUpdate(this.id, transaction)
         .subscribe(() => this.exit())
     } else {
       this.transactionService

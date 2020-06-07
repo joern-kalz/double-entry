@@ -183,7 +183,6 @@ components:
             verified: false
     RequestAccount:
       type: object
-      required: [name]
       properties:
         name: {type: string, maxLength: 200}
         parentId: {type: integer}

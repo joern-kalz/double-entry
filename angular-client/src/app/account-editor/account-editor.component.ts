@@ -86,7 +86,7 @@ export class AccountEditorComponent implements OnInit {
     };
 
     if (this.accountId) {
-      this.accountsService.accountsUpdate(requestBody, +this.accountId).subscribe(result => {
+      this.accountsService.accountsUpdate(+this.accountId,  requestBody).subscribe(result => {
         this.exit(null)
       });
     } else {

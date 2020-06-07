@@ -5,12 +5,15 @@ import { LocalService } from '../local.service';
 import { AccountListsService, Account } from '../account-lists.service';
 import { SessionService } from '../session.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { BalancesService } from '../server/api/api';
+import { BalancesService, AccountsService } from '../server/api/api';
 import { forkJoin, Subscription } from 'rxjs';
 import { AccountType } from '../account-type';
 import { ResponseBalance } from '../server';
 import { EarningTimespanType } from '../earning-timespan-type.enum';
 import { Earning } from '../earning';
+import { DialogsService } from '../dialogs.service';
+import { DialogMessage } from '../dialog-message.enum';
+import { DialogButton } from '../dialog-button.enum';
 
 @Component({
   selector: 'app-earnings',
@@ -37,10 +40,10 @@ export class EarningsComponent implements OnInit, OnDestroy {
     private fv: FormValidatorService,
     private local: LocalService,
     private accountListsService: AccountListsService,
-    private sessionService: SessionService,
-    private router: Router,
     private balancesService: BalancesService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialogsService: DialogsService,
+    private accountsService: AccountsService,
   ) { }
 
   ngOnInit() {
@@ -158,4 +161,20 @@ export class EarningsComponent implements OnInit, OnDestroy {
     return new Date(now.getFullYear(), now.getMonth() - 1, 1);
   }
 
+  remove(earning: Earning) {
+    this.dialogsService.show(
+      DialogMessage.REMOVE_ACCOUNT,
+      [DialogButton.OK, DialogButton.CANCEL],
+      (button) => {
+        if (button == DialogButton.OK) this.removeEarning(earning);
+      }
+    )
+  }
+
+  private removeEarning(earning: Earning) {
+    this.accountsService.accountsUpdate(earning.id, {active: false}).subscribe(() => {
+      const index = this.earnings.indexOf(earning);
+      if (index >= 0) this.earnings.splice(index, 1);
+    })
+  }
 }

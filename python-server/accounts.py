@@ -18,9 +18,12 @@ def create(body):
 def update(body, accountId): 
     with  Session() as session:
         account = session.query(Account).get(accountId)
-        account.name = body.get('name')
-        account.parent_id = body.get('parentId')
-        account.active = body.get('active')
+        if body.get('name') != None: 
+            account.name = body.get('name')
+        if body.get('parentId') != None: 
+            account.parent_id = body.get('parentId')
+        if body.get('active') != None: 
+            account.active = body.get('active')
 
     return 'account updated'
 
