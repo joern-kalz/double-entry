@@ -4,7 +4,7 @@ import { FormBuilder } from '@angular/forms';
 import { FormValidatorService } from '../form-validator.service';
 import { LocalService } from '../local.service';
 import { AccountListsService } from '../account-lists.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { BalancesService, ResponseBalance, AccountsService } from '../server';
 import { forkJoin } from 'rxjs';
 import { Asset } from '../asset';
@@ -24,7 +24,7 @@ export class AssetsComponent implements OnInit {
   showErrors = false;
 
   form = this.fb.group({
-    date: [this.defaultDate, this.fv.date()],
+    date: ['', this.fv.date()],
   });
 
   @ViewChild('date') dateElement: ElementRef;
@@ -38,10 +38,19 @@ export class AssetsComponent implements OnInit {
     private balancesService: BalancesService,
     private dialogsService: DialogsService,
     private accountsService: AccountsService,
+    private activatedRoute: ActivatedRoute,
   ) { }
 
   ngOnInit() {
-    this.submit();
+    this.activatedRoute.queryParamMap.subscribe(queryParamMap => {
+      let date = queryParamMap.get('date');
+
+      this.date.setValue(date == null ? this.defaultDate : 
+        date == '' ? '' :
+        this.local.formatDate(date));
+
+      this.load(date);
+    });
   }
 
   get defaultDate(): string {
@@ -61,10 +70,18 @@ export class AssetsComponent implements OnInit {
 
     this.showErrors = false;
 
-    const before = this.local.parseDate(this.date.value);
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      replaceUrl: true,
+      queryParams: {
+        date: this.local.parseDate(this.date.value)
+      }
+    })
+  }
 
+  load(date: string) {
     forkJoin(
-      this.balancesService.balancesFindAll(null, before),
+      this.balancesService.balancesFindAll(null, date),
       this.accountListsService.getAccountListsCache()
     )
     .subscribe(([balances, accountListsCache]) => {
