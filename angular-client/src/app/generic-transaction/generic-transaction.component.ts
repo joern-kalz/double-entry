@@ -145,7 +145,7 @@ export class GenericTransactionComponent implements OnInit {
       for (let control of entries.controls) {
         const amount = this.local.parseAmount(control.get('amount').value);
         if (amount == null) return;
-        total += Math.trunc(amount * 100);
+        total += Math.round(amount * 100);
       }
   
       return total == 0 ? null : { totalIsZero: { index: entries.controls.length - 1 }};
