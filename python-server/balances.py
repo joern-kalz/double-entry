@@ -41,7 +41,7 @@ def get_balances(session, after, before):
     for transaction in get_transactions(session, after, before):
         for entry in transaction.entries:
             balance = balances_by_accountId.get(entry.account_id, 0)
-            balance += int(entry.amount * 100)
+            balance += round(entry.amount * 100)
             balances_by_accountId[entry.account_id] = balance
     
     return balances_by_accountId
