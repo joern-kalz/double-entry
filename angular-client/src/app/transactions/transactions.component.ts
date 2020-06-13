@@ -2,13 +2,15 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { TransactionsService } from '../server/api/api';
 import { FormBuilder } from '@angular/forms';
 import { FormValidatorService } from '../form-validator.service';
-import { AccountListsService } from '../account-lists.service';
+import { AccountListsService, AccountListsCache } from '../account-lists.service';
 import { forkJoin } from 'rxjs';
 import { LocalService } from '../local.service';
 import { TransactionEditorService } from '../transaction-editor.service';
 import { DialogsService } from '../dialogs.service';
 import { DialogMessage } from '../dialog-message.enum';
 import { DialogButton } from '../dialog-button.enum';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ResponseTransaction } from '../server';
 
 @Component({
   selector: 'app-transactions',
@@ -17,13 +19,15 @@ import { DialogButton } from '../dialog-button.enum';
 })
 export class TransactionsComponent implements OnInit {
 
+  accountId?: number = null;
+
   transactions: any[];
 
   showErrors = false;
 
   form = this.fb.group({
-    after: [this.afterDefault, this.fv.date()],
-    before: [this.beforeDefault, this.fv.date()],
+    after: ['', this.fv.date()],
+    before: ['', this.fv.date()],
   });
 
   @ViewChild('after') afterElement: ElementRef;
@@ -37,13 +41,39 @@ export class TransactionsComponent implements OnInit {
     private accountListsService: AccountListsService,
     private transactionEditorService: TransactionEditorService,
     private dialogsService: DialogsService,
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit() {
-    this.submit();
+    this.route.queryParamMap.subscribe(queryParam => {
+      const after = queryParam.get('after');
+      const before = queryParam.get('before');
+      const accountId = queryParam.get('account');
+
+      this.after.setValue(after == null ? 
+        this.afterDefault : this.local.formatDate(after));
+      this.before.setValue(before == null ? 
+        this.beforeDefault : this.local.formatDate(before));
+      this.accountId = accountId == null ? null : +accountId;
+
+      this.load();
+    });
   }
 
   submit() {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      replaceUrl: true,
+      queryParams: {
+        after: this.local.parseDate(this.after.value),
+        before: this.local.parseDate(this.before.value),
+        account: this.accountId,
+      }
+    })
+  }
+
+  load() {
     if (!this.isEmpty(this.after.value) && this.after.invalid) {
       this.showErrors = true;
       return this.afterElement.nativeElement.focus();
@@ -64,29 +94,51 @@ export class TransactionsComponent implements OnInit {
       this.accountListsService.getAccountListsCache()
     )
     .subscribe(([transactions, accountListsCache]) => {
-      this.transactions = transactions.map(transaction => {
-        const negatives = transaction.entries
-          .filter(entry => entry.amount < 0)
-          .map(entry => accountListsCache.accounts.get(entry.accountId).name);
-
-        const positives = transaction.entries
-          .filter(entry => entry.amount >= 0)
-          .map(entry => accountListsCache.accounts.get(entry.accountId).name);
-
-        const amount = transaction.entries
-          .filter(entry => entry.amount >= 0)
-          .reduce((amount, entry) => amount + entry.amount, 0);
-
-        return {
-          id: transaction.id,
-          date: transaction.date,
-          name: transaction.name,
-          negatives,
-          positives,
-          amount
-        }
-      })
+      this.transactions = transactions
+        .filter(transaction => this.isTransactionRelevant(transaction, accountListsCache))
+        .map(transaction => this.createTransactionViewModel(transaction, accountListsCache))
     });
+  }
+
+  private isTransactionRelevant(transaction: ResponseTransaction, 
+    accountListsCache: AccountListsCache): boolean {
+
+    if (this.accountId == null) return true;
+
+    for (let entry of transaction.entries) {
+      let account = accountListsCache.accounts.get(entry.accountId);
+      while (account) {
+        if (account.id == this.accountId) return true;
+        account = accountListsCache.accounts.get(account.parentId);
+      }
+    }
+
+    return false;
+  }
+
+  private createTransactionViewModel(transaction: ResponseTransaction, 
+    accountListsCache: AccountListsCache) {
+
+    const negatives = transaction.entries
+      .filter(entry => entry.amount < 0)
+      .map(entry => accountListsCache.accounts.get(entry.accountId).name);
+
+    const positives = transaction.entries
+      .filter(entry => entry.amount >= 0)
+      .map(entry => accountListsCache.accounts.get(entry.accountId).name);
+
+    const amount = transaction.entries
+      .filter(entry => entry.amount >= 0)
+      .reduce((amount, entry) => amount + entry.amount, 0);
+
+    return {
+      id: transaction.id,
+      date: transaction.date,
+      name: transaction.name,
+      negatives,
+      positives,
+      amount
+    }
   }
 
   isEmpty(value: string) {

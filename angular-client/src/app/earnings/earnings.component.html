@@ -49,7 +49,14 @@
     </div>
   </div>
   <div class="actions" *ngIf="earning.expanded">
-    <a [routerLink]="[]">Ansehen</a>
+    <button (click)="showPrimary(earning)" [ngSwitch]="timespanType.value">
+      <ng-container *ngSwitchCase="timespanTypes.MONTH">{{primaryDate | date:'LLL y'}}</ng-container>
+      <ng-container *ngSwitchCase="timespanTypes.YEAR">{{primaryDate | date:'y'}}</ng-container>
+    </button>
+    <button (click)="showSecondary(earning)" [ngSwitch]="timespanType.value">
+      <ng-container *ngSwitchCase="timespanTypes.MONTH">{{secondaryDate | date:'LLL y'}}</ng-container>
+      <ng-container *ngSwitchCase="timespanTypes.YEAR">{{secondaryDate | date:'y'}}</ng-container>
+    </button>
     <button *ngIf="earning.level != 0" (click)="edit(earning)">Bearbeiten</button>
     <button *ngIf="earning.level != 0" (click)="remove(earning)">Löschen</button>
   </div>

@@ -186,4 +186,24 @@ export class EarningsComponent implements OnInit, OnDestroy {
     );
   }
 
+  showPrimary(earning: Earning) {
+    this.show(earning, this.primaryDate);
+  }
+
+  showSecondary(earning: Earning) {
+    this.show(earning, this.secondaryDate);
+  }
+
+  show(earning: Earning, date: Date) {
+    const type = this.accountType == AccountType.EXPENSE ? 'expense' : 'revenue';
+    const [primaryAfter, primaryBefore] = this.createInterval(date);
+    this.router.navigate(['/transactions'], { queryParams: {
+      returnAddress: '/earnings/' + type,
+      after: primaryAfter,
+      before: primaryBefore,
+      account: earning.id,
+    }}
+    );
+  }
+
 }
