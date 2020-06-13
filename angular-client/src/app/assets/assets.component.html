@@ -1,0 +1,26 @@
+<form (ngSubmit)="submit()" [formGroup]="form">
+  <label>
+    <span>Datum</span>
+    <input formControlName="date" #date [class.show-errors]="showErrors">
+  </label>
+  <button type="submit">Berechnen</button>
+</form>
+
+<div class="asset" *ngFor="let asset of assets">
+  <div class="data" (click)="asset.expanded = !asset.expanded">
+    <div class="name" *ngIf="asset.level == 0">Summe</div>
+    <div class="name" *ngIf="asset.level != 0">
+      <span [innerHtml]="'&nbsp&nbsp'.repeat(asset.level - 1)"></span>
+      {{asset.name}}
+    </div>
+    <div>
+      <div class="bar"><div [style.width.%]="asset.amount / maxValue"></div></div>
+      <div class="value">{{asset.amount | formatAmount}}</div>
+    </div>
+  </div>
+  <div class="actions" *ngIf="asset.expanded">
+    <a [routerLink]="[]">Ansehen</a>
+    <button *ngIf="asset.level != 0" (click)="edit(asset)">Bearbeiten</button>
+    <button *ngIf="asset.level != 0" (click)="remove(asset)">Löschen</button>
+  </div>
+</div>

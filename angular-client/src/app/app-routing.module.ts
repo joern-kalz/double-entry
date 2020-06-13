@@ -6,12 +6,12 @@ import { TransactionsComponent } from './transactions/transactions.component';
 import { GenericTransactionComponent } from './generic-transaction/generic-transaction.component';
 import { SimpleTransactionComponent } from './simple-transaction/simple-transaction.component';
 import { EarningsComponent } from './earnings/earnings.component';
-import { AccountsComponent } from './accounts/accounts.component';
+import { AssetsComponent } from './assets/assets.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'create-account/:accountType', component: AccountEditorComponent },
-  { path: 'accounts', component: AccountsComponent },
+  { path: 'assets', component: AssetsComponent },
   { path: 'accounts/edit/:accountId', component: AccountEditorComponent },
   { path: 'transaction/generic', component: GenericTransactionComponent },
   { path: 'transaction/simple', component: SimpleTransactionComponent },

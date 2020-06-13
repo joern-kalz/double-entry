@@ -30,9 +30,36 @@ form {
     }
 }
 
-div {
-    clear: both;
+.asset {
+    border-top: 1px solid #c1e2ef;
+    &:nth-child(1) {
+        border-top: none;
+    }
 }
-.level2 {
-    font-size: 0.9em;
+
+.data {
+    display: flex;
+    & > div { width: 50%; }
+    & > div:nth-child(2) { text-align: right; }
+    padding: 5px 0;
+    cursor: pointer;
+    &:hover {
+        background: #e2f1f7;
+    }
+}
+
+.name { 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+.bar { display: none; }
+
+.actions {
+    text-align: right;
+    margin: 10px 0 20px 0; 
+    a, button { 
+        width: 100px;
+        margin: 2px 0 2px 2px; 
+    }
 }

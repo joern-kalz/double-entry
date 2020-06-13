@@ -15,7 +15,7 @@ import { TransactionsComponent } from './transactions/transactions.component';
 import { SimpleTransactionComponent } from './simple-transaction/simple-transaction.component';
 import { GenericTransactionComponent } from './generic-transaction/generic-transaction.component';
 import { EarningsComponent } from './earnings/earnings.component';
-import { AccountsComponent } from './accounts/accounts.component';
+import { AssetsComponent } from './assets/assets.component';
 import { DialogsComponent } from './dialogs/dialogs.component';
 
 @NgModule({
@@ -29,7 +29,7 @@ import { DialogsComponent } from './dialogs/dialogs.component';
     SimpleTransactionComponent,
     GenericTransactionComponent,
     EarningsComponent,
-    AccountsComponent,
+    AssetsComponent,
     DialogsComponent,
   ],
   imports: [
