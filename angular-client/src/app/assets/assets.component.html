@@ -19,7 +19,7 @@
     </div>
   </div>
   <div class="actions" *ngIf="asset.expanded">
-    <a [routerLink]="[]">Ansehen</a>
+    <button (click)="show(asset)">Ansehen</button>
     <button *ngIf="asset.level != 0" (click)="edit(asset)">Bearbeiten</button>
     <button *ngIf="asset.level != 0" (click)="remove(asset)">Löschen</button>
   </div>

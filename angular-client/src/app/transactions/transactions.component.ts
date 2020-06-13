@@ -51,10 +51,14 @@ export class TransactionsComponent implements OnInit {
       const before = queryParam.get('before');
       const accountId = queryParam.get('account');
 
-      this.after.setValue(after == null ? 
-        this.afterDefault : this.local.formatDate(after));
-      this.before.setValue(before == null ? 
-        this.beforeDefault : this.local.formatDate(before));
+      this.after.setValue(after == null ? this.afterDefault : 
+        after == '' ? '' :
+        this.local.formatDate(after));
+
+      this.before.setValue(before == null ? this.beforeDefault : 
+        before == '' ? '' :
+        this.local.formatDate(before));
+
       this.accountId = accountId == null ? null : +accountId;
 
       this.load();

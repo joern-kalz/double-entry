@@ -114,4 +114,13 @@ export class AssetsComponent implements OnInit {
     );
   }
 
+  show(asset: Asset) {
+    this.router.navigate(['/transactions'], { queryParams: {
+      returnAddress: '/assets',
+      after: '',
+      before: this.local.parseDate(this.date.value),
+      account: asset.id,
+    }});
+  }
+
 }

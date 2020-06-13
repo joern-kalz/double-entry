@@ -202,8 +202,7 @@ export class EarningsComponent implements OnInit, OnDestroy {
       after: primaryAfter,
       before: primaryBefore,
       account: earning.id,
-    }}
-    );
+    }});
   }
 
 }

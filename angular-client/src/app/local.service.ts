@@ -38,7 +38,7 @@ export class LocalService {
 
   formatDate(dateIso: string): string {
     const match = dateIso.match(/^(\d\d\d\d)-(\d\d)-(\d\d)$/);
-    return `${match[3]}.${match[2]}.${match[1]}`
+    return match ? `${match[3]}.${match[2]}.${match[1]}` : null;
   }
 
   parseAmount(text: string) {
