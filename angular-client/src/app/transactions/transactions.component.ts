@@ -5,8 +5,6 @@ import { FormValidatorService } from '../form-validator.service';
 import { AccountListsService } from '../account-lists.service';
 import { forkJoin } from 'rxjs';
 import { LocalService } from '../local.service';
-import { Router } from '@angular/router';
-import { TransactionType } from '../transaction-type.enum';
 import { TransactionEditorService } from '../transaction-editor.service';
 import { DialogsService } from '../dialogs.service';
 import { DialogMessage } from '../dialog-message.enum';
@@ -24,8 +22,8 @@ export class TransactionsComponent implements OnInit {
   showErrors = false;
 
   form = this.fb.group({
-    after: ['', this.fv.date()],
-    before: ['', this.fv.date()],
+    after: [this.afterDefault, this.fv.date()],
+    before: [this.beforeDefault, this.fv.date()],
   });
 
   @ViewChild('after') afterElement: ElementRef;
@@ -122,5 +120,19 @@ export class TransactionsComponent implements OnInit {
 
   get after() { return this.form.get('after'); }
   get before() { return this.form.get('before'); }
+
+  get afterDefault(): string {
+    const now = new Date();
+    const after = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const afterIso = this.local.fromDate(after);
+    return this.local.formatDate(afterIso);
+  }
+
+  get beforeDefault(): string {
+    const now = new Date();
+    const after = new Date(now.getFullYear(), now.getMonth() + 1, -1);
+    const afterIso = this.local.fromDate(after);
+    return this.local.formatDate(afterIso);
+  }
 
 }
