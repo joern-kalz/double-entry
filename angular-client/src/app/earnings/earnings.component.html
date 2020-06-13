@@ -29,7 +29,7 @@
   </div>
 </div>
 
-<div class="account" *ngFor="let earning of earnings" [class.category]="earning.level != 0">
+<div class="account" *ngFor="let earning of earnings">
   <div class="row data" (click)="earning.expanded = !earning.expanded">
     <div class="name" *ngIf="earning.level == 0" [ngSwitch]="accountType">
       <ng-container *ngSwitchCase="accountTypes.EXPENSE">Ausgaben</ng-container>
