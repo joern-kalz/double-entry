@@ -7,7 +7,7 @@
     display: flex;
     justify-content: space-between;
     & > div { width: 33%; }
-    padding-top: 10px;
+    padding: 5px 0;
 }
 
 .row.title { margin: 20px 0; }
@@ -53,6 +53,13 @@
 
 .data {
     cursor: pointer;
+    border-top: 1px solid #c1e2ef;
+    &:nth-child(2) {
+        border-top: none;
+    }
+    &:hover {
+        background: #e2f1f7;
+    }
 }
 
 .name { 
@@ -68,7 +75,7 @@
 
 .actions {
     text-align: right;
-    margin: 0 0 20px 0; 
+    margin: 10px 0 20px 0; 
     a, button { 
         width: 100px;
         margin: 2px 0 2px 2px; 

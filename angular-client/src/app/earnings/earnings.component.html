@@ -50,7 +50,7 @@
   </div>
   <div class="actions" *ngIf="earning.expanded">
     <a [routerLink]="[]">Ansehen</a>
-    <a [routerLink]="['/accounts', 'edit', earning.id]">Bearbeiten</a>
+    <button (click)="edit(earning)">Bearbeiten</button>
     <button (click)="remove(earning)">Löschen</button>
   </div>
 </div>

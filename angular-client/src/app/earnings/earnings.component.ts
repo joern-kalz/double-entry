@@ -3,7 +3,6 @@ import { FormBuilder, FormControl } from '@angular/forms';
 import { FormValidatorService } from '../form-validator.service';
 import { LocalService } from '../local.service';
 import { AccountListsService, Account } from '../account-lists.service';
-import { SessionService } from '../session.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BalancesService, AccountsService } from '../server/api/api';
 import { forkJoin, Subscription } from 'rxjs';
@@ -44,6 +43,7 @@ export class EarningsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private dialogsService: DialogsService,
     private accountsService: AccountsService,
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -177,4 +177,13 @@ export class EarningsComponent implements OnInit, OnDestroy {
       if (index >= 0) this.earnings.splice(index, 1);
     })
   }
+
+  edit(earning: Earning) {
+    const type = this.accountType == AccountType.EXPENSE ? 'expense' : 'revenue';
+    this.router.navigate(
+      ['/accounts', 'edit', earning.id],
+      { queryParams: {returnAddress: '/earnings/' + type} }
+    );
+  }
+
 }
