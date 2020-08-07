@@ -36,7 +36,7 @@
       <ng-container *ngSwitchCase="accountTypes.REVENUE">Einnahmen</ng-container>
     </div>
     <div class="name" *ngIf="earning.level != 0">
-      <span [innerHtml]="'&nbsp&nbsp'.repeat(earning.level - 1)"></span>
+      <span [innerHtml]="'&nbsp&nbsp&nbsp'.repeat(earning.level - 1)"></span>
       {{earning.name}}
     </div>
     <div>
