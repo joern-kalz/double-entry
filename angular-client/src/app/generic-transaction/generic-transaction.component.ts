@@ -185,7 +185,7 @@ export class GenericTransactionComponent implements OnInit {
 
   exit() {
     this.sessionService.transaction = null;
-    this.router.navigate([this.returnAddress ? this.returnAddress : '/dashboard']);
+    this.router.navigateByUrl(this.returnAddress ? this.returnAddress : '/dashboard');
   }
 
   get entries() { return this.form.get('entries') as FormArray; }
