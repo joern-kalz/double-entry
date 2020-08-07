@@ -50,7 +50,7 @@ export class LocalService {
   }
 
   formatAmount(amount: number) {
-    const options = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+    const options = { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false };
     const amountFormat = new Intl.NumberFormat('de-DE', options);
     return amountFormat.format(amount);
   }
