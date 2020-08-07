@@ -120,6 +120,8 @@ export class SimpleTransactionComponent implements OnInit {
     window.scrollTo(0, 0);
 
     if (this.form.invalid) return;
+
+    const factor = this.transactionType == TransactionType.REVENUE ? 1 : -1;
     
     this.transactionService.transactionsCreate({
       date: this.local.parseDate(this.date.value),
@@ -127,12 +129,12 @@ export class SimpleTransactionComponent implements OnInit {
       entries: [
         {
           accountId: this.creditAccount.value,
-          amount: -1 * this.local.parseAmount(this.amount.value),
+          amount: factor * this.local.parseAmount(this.amount.value),
           verified: false
         },
         {
           accountId: this.debitAccount.value,
-          amount: this.local.parseAmount(this.amount.value),
+          amount: -1 * factor * this.local.parseAmount(this.amount.value),
           verified: false
         }
       ]
