@@ -1,0 +1,22 @@
+<div class="balance">
+  <span>Alter Kontostand</span>
+  <span>{{oldBalance}}</span>
+</div>
+
+<div class="balance">
+  <span>Neuer Kontostand</span>
+  <span>{{newBalance}}</span>
+</div>
+
+<div class="save">
+  <button (click)="save()">Speichern</button>
+</div>
+
+<label *ngFor="let item of items">
+  <input type="checkbox" 
+    [checked]=item.checked 
+    (change)="item.checked = !item.checked">
+  <span class="date">{{item.transaction.date | formatDateIso}}</span>
+  <span class="name">{{item.transaction.name}}</span>
+  <span class="amount">{{getVerificationAmount(item)}}</span>
+</label>

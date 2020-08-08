@@ -131,12 +131,9 @@ export class AssetsComponent implements OnInit {
     );
   }
 
-  show(asset: Asset) {
-    this.router.navigate(['/transactions'], { queryParams: {
+  verify(asset: Asset) {
+    this.router.navigate(['/assets/verify', asset.id], { queryParams: {
       returnAddress: '/assets',
-      after: '',
-      before: this.local.parseDate(this.date.value),
-      account: asset.id,
     }});
   }
 

@@ -1,0 +1,37 @@
+.balance {
+    display: flex;
+    padding: 15px 0;
+    justify-content: flex-end;
+
+    span:last-child {
+        width: 200px;
+        text-align: right;
+    }
+}
+
+.save {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+label {
+    display: flex;
+    padding: 5px 0;
+    &:hover {
+        background: #eee;
+    }
+}
+
+.date {
+    margin-left: 25px;
+}
+
+.name {
+    flex-grow: 1;
+    margin-left: 25px;
+}
+
+.amount {
+    width: 200px;
+    text-align: right;
+}

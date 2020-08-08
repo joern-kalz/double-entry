@@ -7,11 +7,13 @@ import { GenericTransactionComponent } from './generic-transaction/generic-trans
 import { SimpleTransactionComponent } from './simple-transaction/simple-transaction.component';
 import { EarningsComponent } from './earnings/earnings.component';
 import { AssetsComponent } from './assets/assets.component';
+import { VerificationComponent } from './verification/verification.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'create-account/:accountType', component: AccountEditorComponent },
   { path: 'assets', component: AssetsComponent },
+  { path: 'assets/verify/:accountId', component: VerificationComponent },
   { path: 'accounts/edit/:accountId', component: AccountEditorComponent },
   { path: 'transaction/generic', component: GenericTransactionComponent },
   { path: 'transaction/simple', component: SimpleTransactionComponent },

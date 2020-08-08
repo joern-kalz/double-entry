@@ -9,7 +9,7 @@ body {
     overflow-y: scroll;
 }
 
-input, textarea, select { 
+input[type=text], textarea, select { 
     font: inherit; 
     color: inherit; 
     margin: 0; 

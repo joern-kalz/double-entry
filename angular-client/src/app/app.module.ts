@@ -17,6 +17,7 @@ import { GenericTransactionComponent } from './generic-transaction/generic-trans
 import { EarningsComponent } from './earnings/earnings.component';
 import { AssetsComponent } from './assets/assets.component';
 import { DialogsComponent } from './dialogs/dialogs.component';
+import { VerificationComponent } from './verification/verification.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { DialogsComponent } from './dialogs/dialogs.component';
     EarningsComponent,
     AssetsComponent,
     DialogsComponent,
+    VerificationComponent,
   ],
   imports: [
     BrowserModule,
