@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TransactionsService, ResponseTransaction } from '../server';
 import { ActivatedRoute } from '@angular/router';
 import { Item } from './item';
+import { forkJoin, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-verification',
@@ -13,7 +14,7 @@ export class VerificationComponent implements OnInit {
   private accountId: number;
 
   oldBalance: number;
-  items: Item[];
+  items: Item[] = [];
   loading: boolean;
 
   constructor(
@@ -38,6 +39,9 @@ export class VerificationComponent implements OnInit {
       for (let transaction of transactions) {
         this.loadTransaction(transaction);
       }
+
+      this.items.sort((a, b) => a.transaction.date < b.transaction.date ? -1 :
+        a.transaction.date > b.transaction.date ? 1 : 0);
 
       this.loading = false;
     });
@@ -80,11 +84,13 @@ export class VerificationComponent implements OnInit {
 
   save() {
     if (this.loading) return;
+
+    const requests: Observable<any>[] = [];
     
     for (let item of this.items) {
       if (!item.checked) continue;
 
-      this.transactionsService.transactionsUpdate(item.transaction.id, {
+      const transaction = {
         date: item.transaction.date,
         name: item.transaction.name,
         entries: item.transaction.entries.map(entry => ({
@@ -92,10 +98,12 @@ export class VerificationComponent implements OnInit {
           amount: entry.amount,
           verified: entry.accountId == this.accountId ? true : entry.verified
         }))
-      });
+      };
+
+      requests.push(this.transactionsService.transactionsUpdate(item.transaction.id, transaction));
     }
 
-    this.load();
+    forkJoin(requests).subscribe(() => this.load());
   }
 
 }
