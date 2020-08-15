@@ -4,11 +4,11 @@ import com.github.joern.kalz.doubleentry.controllers.exceptions.AlreadyExistsExc
 import com.github.joern.kalz.doubleentry.controllers.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.generated.api.SignUpApi;
 import com.github.joern.kalz.doubleentry.generated.model.SignUpRequest;
-import com.github.joern.kalz.doubleentry.model.User;
-import com.github.joern.kalz.doubleentry.model.UsersRepository;
+import com.github.joern.kalz.doubleentry.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
@@ -17,11 +17,20 @@ import javax.validation.Valid;
 @RestController
 public class SignUpApiImpl implements SignUpApi {
 
+    public static final String DEFAULT_AUTHORITY = "USER";
+
     @Autowired
     private UsersRepository usersRepository;
 
+    @Autowired
+    private AuthoritiesRepo authoritiesRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public ResponseEntity<Void> signUp(@Valid SignUpRequest signUpRequest) {
+
         String name = signUpRequest.getName();
         String password = signUpRequest.getPassword();
 
@@ -35,7 +44,7 @@ public class SignUpApiImpl implements SignUpApi {
 
         User user = new User();
         user.setUsername(name);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
         user.setEnabled(true);
 
         createUser(user);
@@ -49,6 +58,7 @@ public class SignUpApiImpl implements SignUpApi {
             throw new AlreadyExistsException("username already exists");
         }
 
-        usersRepository.save(user);
+        User createdUser = usersRepository.save(user);
+        authoritiesRepo.save(new Authority(createdUser, DEFAULT_AUTHORITY));
     }
 }

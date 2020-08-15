@@ -17,6 +17,14 @@ public class AuthorityId implements Serializable {
 
     private String authority;
 
+    public AuthorityId() {
+    }
+
+    public AuthorityId(User user, String authority) {
+        this.user = user;
+        this.authority = authority;
+    }
+
     public User getUser() {
         return user;
     }

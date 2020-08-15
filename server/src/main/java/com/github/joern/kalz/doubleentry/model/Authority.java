@@ -11,6 +11,13 @@ public class Authority {
     @EmbeddedId
     private AuthorityId id;
 
+    public Authority() {
+    }
+
+    public Authority(User user, String authority) {
+        id = new AuthorityId(user, authority);
+    }
+
     public AuthorityId getId() {
         return id;
     }
