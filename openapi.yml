@@ -1,0 +1,374 @@
+openapi: 3.0.0
+info:
+  description: |
+    This is an accounting server.
+  version: "2.0.0"
+  title: Accounting
+tags:
+  - name: transactions
+  - name: accounts
+  - name: balances
+  - name: verifications
+  - name: users
+  - name: me
+paths:
+  '/transactions':
+    post:
+      operationId: createTransaction
+      tags: [transactions]
+      summary: Create a transaction
+      requestBody:
+        $ref: '#/components/requestBodies/SaveTransactionRequest'
+      responses:
+        '201':
+          $ref: '#/components/schemas/CreatedResponse'
+    get:
+      operationId: getTransactions
+      tags: [transactions]
+      summary: Returns all transactions
+      parameters:
+        - name: after
+          in: query
+          description: Only return transactions after this date
+          schema: {type: string, format: date}
+        - name: before
+          in: query
+          description: Only return transactions before this date
+          schema: {type: string, format: date}
+        - name: accountId
+          in: query
+          description: Only return transactions touching this account
+          schema: {type: number}
+      responses:
+        '200':
+          description: Requested transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetTransactionResponse'
+  '/transactions/{transactionId}':
+    get:
+      operationId: getTransaction
+      tags: [transactions]
+      summary: Finds a transaction by id
+      parameters:
+        - name: transactionId
+          in: path
+          description: Id of the transaction
+          required: true
+          schema: {type: integer}
+      responses:
+        '200':
+          description: Requested transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTransactionResponse'
+    put:
+      operationId: updateTransaction
+      tags: [transactions]
+      summary: Updates a transaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: Id of the transaction
+          required: true
+          schema: {type: integer}
+      requestBody:
+        $ref: '#/components/requestBodies/SaveTransactionRequest'
+      responses:
+        '204':
+          description: Updated
+    delete:
+      operationId: deleteTransaction
+      tags: [transactions]
+      summary: Deletes a transaction
+      parameters:
+        - name: transactionId
+          in: path
+          description: Id of the transaction
+          required: true
+          schema: {type: integer}
+      responses:
+        '204':
+          description: Deleted
+  '/accounts':
+    post:
+      operationId: createAccount
+      tags: [accounts]
+      summary: Creates an account
+      requestBody:
+        $ref: '#/components/requestBodies/SaveAccountRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedResponse'
+    get:
+      operationId: getAccounts
+      tags: [accounts]
+      summary: Returns accounts
+      responses:
+        '200':
+          description: Requested accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetAccountResponse'
+  '/accounts/{accountId}':
+    put:
+      operationId: updateAccount
+      tags: [accounts]
+      summary: Updates an account
+      parameters:
+        - name: accountId
+          in: path
+          description: Id of the account
+          required: true
+          schema: {type: integer}
+      requestBody:
+        $ref: '#/components/requestBodies/SaveAccountRequest'
+      responses:
+        '204':
+          description: Updated
+  '/balances':
+    get:
+      operationId: getBalances
+      tags: [balances]
+      summary: |
+        Calculates for each account the sum of all amounts in transactions of 
+        the specified time interval
+      parameters:
+        - name: after
+          in: query
+          description: Start of balance calculation
+          schema: {type: string, format: date}
+        - name: before
+          in: query
+          description: End of balance calculation
+          schema: {type: string, format: date}
+      responses:
+        '200':
+          description: Requested balances
+          content:
+            application/json: 
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetBalanceResponse'
+  '/verifications/{accountId}':
+    get:
+      operationId: getVerification
+      tags: [verifications]
+      summary: |
+        Retrieves for the specified account the balance for all verified 
+        transactions and the list of unverified transactions 
+      parameters:
+        - name: accountId
+          in: path
+          description: Id of the account
+          required: true
+          schema: {type: integer}
+      responses:
+        '200':
+          description: Requested verified balance and unverified transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetVerificationResponse'
+    patch:
+      operationId: updateVerification
+      tags: [verifications]
+      summary: |
+        Sets the verification flag for the entries corresponding to the 
+        specified account in all specified transactions
+      parameters:
+        - name: accountId
+          in: path
+          description: Id of the account for which entries are to be updated
+          required: true
+          schema: {type: integer}
+      requestBody:
+        description: Ids of the transactions for which entries are to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items: {type: integer}
+      responses:
+        '204':
+          description: Updated
+  '/users':
+    post:
+      operationId: createUser
+      tags: [users]
+      summary: Creates a user
+      requestBody:
+        description: User to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: Created
+  '/me':
+    get:
+      operationId: getMe
+      tags: [me]
+      summary: Retrieves information on the logged in user
+      responses:
+        '200':
+          description: Information on the logged in user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMeResponse'
+    patch:
+      operationId: updateMe
+      tags: [me]
+      summary: Updates information on the logged in user
+      requestBody:
+        description: Information to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMeRequest'
+      responses:
+        '200':
+          description: Updated
+components:
+  schemas:
+    SaveTransactionRequest:
+      type: object
+      required: [date, name, entries]
+      properties:
+        date: {type: string, format: date}
+        name: {type: string, maxLength: 200}
+        entries:
+          type: array
+          items: 
+            type: object
+            required: [accountId, amount]
+            properties:
+              accountId: {type: integer}
+              amount: {type: number}
+              verified: {type: boolean}
+      example: 
+        date: '2020-01-01'
+        name: 'milk and bread'
+        entries:
+          - accountId: 548814
+            amount: 10.12
+            verified: false
+          - accountId: 982753
+            amount: -10.12
+            verified: false
+    GetTransactionResponse:
+      type: object
+      properties:
+        id: {type: integer}
+        date: {type: string, format: date}
+        name: {type: string, maxLength: 200}
+        entries:
+          type: array
+          items: 
+            type: object
+            properties:
+              accountId: {type: number}
+              amount: {type: number}
+              verified: {type: boolean}
+      example: 
+        id: 619734
+        date: '2020-01-01'
+        name: 'milk and bread'
+        entries:
+          - accountId: 548814
+            amount: 10.12
+            verified: false
+          - accountId: 982753
+            amount: -10.12
+            verified: false
+    SaveAccountRequest:
+      type: object
+      properties:
+        name: {type: string, maxLength: 200}
+        parentId: {type: integer}
+        active: {type: boolean}
+      example: 
+        name: grocery
+        parentId: 982753
+        active: true
+    CreateUserRequest:
+      type: object
+      properties:
+        name: {type: string, maxLength: 30}
+        password: {type: string, maxLength: 30}
+      example: 
+        name: joern
+        password: secret
+    GetAccountResponse:
+      type: object
+      properties:
+        id: {type: integer}
+        name: {type: string, maxLength: 200}
+        parentId: {type: integer}
+        active: {type: boolean}
+      example: 
+        id: 571764
+        name: grocery
+        parentId: 982753
+        active: true
+    GetBalanceResponse:
+      type: object
+      properties:
+        accountId: {type: integer}
+        balance: {type: number}
+    GetVerificationResponse:
+      type: object
+      properties:
+        verifiedBalance: {type: number}
+        unverifiedTransactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetTransactionResponse'
+    GetMeResponse:
+      type: object
+      properties:
+        name: {type: string}
+    UpdateMeRequest:
+      type: object
+      properties:
+        oldPassword: {type: string}
+        newPassword: {type: string}
+    CreatedResponse:
+      type: object
+      properties:
+        createdId: {type: integer}
+  requestBodies:
+    SaveTransactionRequest:
+      description: Transaction to save
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SaveTransactionRequest'
+    SaveAccountRequest:
+      description: Account to save
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SaveAccountRequest'
+  responses:
+    CreatedResponse:
+      description: Created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatedResponse'
