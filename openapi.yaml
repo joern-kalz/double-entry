@@ -9,7 +9,7 @@ tags:
   - name: accounts
   - name: balances
   - name: verifications
-  - name: users
+  - name: sign-up
   - name: me
 paths:
   '/transactions':
@@ -21,7 +21,7 @@ paths:
         $ref: '#/components/requestBodies/SaveTransactionRequest'
       responses:
         '201':
-          $ref: '#/components/schemas/CreatedResponse'
+          $ref: '#/components/responses/CreatedResponse'
     get:
       operationId: getTransactions
       tags: [transactions]
@@ -201,21 +201,33 @@ paths:
       responses:
         '204':
           description: Updated
-  '/users':
+  '/sign-up':
     post:
-      operationId: createUser
-      tags: [users]
-      summary: Creates a user
+      operationId: signUp
+      tags: [sign-up]
+      summary: Sign up as a new user
       requestBody:
-        description: User to create
+        description: Sign up information
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUserRequest'
+              $ref: '#/components/schemas/SignUpRequest'
       responses:
         '201':
           description: Created
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Invalid username or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   '/me':
     get:
       operationId: getMe
@@ -304,11 +316,12 @@ components:
         name: grocery
         parentId: 982753
         active: true
-    CreateUserRequest:
+    SignUpRequest:
       type: object
+      required: [name, password]
       properties:
-        name: {type: string, maxLength: 30}
-        password: {type: string, maxLength: 30}
+        name: {type: string, maxLength: 50}
+        password: {type: string, maxLength: 50}
       example: 
         name: joern
         password: secret
@@ -350,6 +363,10 @@ components:
       type: object
       properties:
         createdId: {type: integer}
+    ErrorResponse:
+      type: object
+      properties:
+        message: {type: string}
   requestBodies:
     SaveTransactionRequest:
       description: Transaction to save
