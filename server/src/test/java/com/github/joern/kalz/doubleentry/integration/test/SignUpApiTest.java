@@ -1,4 +1,4 @@
-package com.github.joern.kalz.doubleentry.tests;
+package com.github.joern.kalz.doubleentry.integration.test;
 
 import com.github.joern.kalz.doubleentry.generated.model.ErrorResponse;
 import com.github.joern.kalz.doubleentry.generated.model.SignUpRequest;
