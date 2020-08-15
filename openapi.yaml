@@ -240,6 +240,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetMeResponse'
+        '401':
+          description: Unauthorized
     patch:
       operationId: updateMe
       tags: [me]
