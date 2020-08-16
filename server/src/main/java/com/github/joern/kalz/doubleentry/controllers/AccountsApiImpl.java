@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 public class AccountsApiImpl implements AccountsApi {
@@ -48,7 +51,17 @@ public class AccountsApiImpl implements AccountsApi {
 
     @Override
     public ResponseEntity<List<GetAccountResponse>> getAccounts() {
-        return null;
+        Spliterator<Account> accounts = accountsRepository.findAll().spliterator();
+
+        List<GetAccountResponse> responseBody = StreamSupport.stream(accounts, false)
+                .map(account -> new GetAccountResponse()
+                    .id(account.getId())
+                    .name(account.getName())
+                    .parentId(account.getParent() != null ? account.getParent().getId() : null)
+                    .active(account.isActive()))
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     @Override

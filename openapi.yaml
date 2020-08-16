@@ -121,6 +121,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GetAccountResponse'
+        '401':
+          description: Unauthorized
   '/accounts/{accountId}':
     put:
       operationId: updateAccount

@@ -12,10 +12,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -51,5 +54,13 @@ public class AccountsApiTest {
         List<Account> accounts = accountsRepository.findByName(accountName);
         assertEquals(1, accounts.size());
         assertEquals(rootAccountId, accounts.get(0).getParent().getId());
+    }
+
+    @Test
+    public void shouldGetAccounts() throws Exception {
+        mockMvc.perform(get("/accounts")
+                .with(user("user")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name", is("root")));
     }
 }
