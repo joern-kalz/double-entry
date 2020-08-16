@@ -48,6 +48,6 @@ public class MeApiImpl implements MeApi {
         user.setPassword(passwordEncoder.encode(updateMeRequest.getNewPassword()));
         usersRepository.save(user);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

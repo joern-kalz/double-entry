@@ -49,7 +49,7 @@ public class SignUpApiImpl implements SignUpApi {
 
         createUser(user);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Transactional

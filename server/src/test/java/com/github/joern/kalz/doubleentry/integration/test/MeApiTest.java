@@ -66,7 +66,7 @@ public class MeApiTest {
         ResponseEntity<Void> response = restTemplate.exchange("/me", HttpMethod.PATCH,
                 new HttpEntity<>(updateMeRequest, sessionHeaders), Void.class);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         Optional<User> user = usersRepository.findById(USERNAME);
         assertTrue(user.isPresent());
         assertTrue(passwordEncoder.matches(newPassword, user.get().getPassword()));

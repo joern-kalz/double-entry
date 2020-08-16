@@ -262,7 +262,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateMeRequest'
       responses:
-        '200':
+        '204':
           description: Updated
         '400':
           $ref: '#/components/responses/InvalidParameterResponse'

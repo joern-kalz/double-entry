@@ -20,7 +20,7 @@ public class SignUpApiTest {
     public void shouldSignUp() {
         SignUpRequest request = new SignUpRequest().name("joern").password("secret");
         ResponseEntity<ErrorResponse> response = restTemplate.postForEntity("/sign-up", request, ErrorResponse.class);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
     }
 
     @Test
