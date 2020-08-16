@@ -348,6 +348,9 @@ components:
       properties:
         accountId: {type: integer, format: int64}
         balance: {type: number}
+      example:
+        accountId: 260425
+        balance: 100.45
     GetVerificationResponse:
       type: object
       properties:
@@ -356,23 +359,45 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GetTransactionResponse'
+      example:
+        verifiedBalance: 4621.24
+        unverifiedTransactions:
+          - id: 619734
+            date: '2020-01-01'
+            name: 'milk and bread'
+            entries:
+              - accountId: 548814
+                amount: 10.12
+                verified: false
+              - accountId: 982753
+                amount: -10.12
+                verified: false
     GetMeResponse:
       type: object
       properties:
         name: {type: string}
+      example:
+        name: smith
     UpdateMeRequest:
       type: object
       properties:
         oldPassword: {type: string}
         newPassword: {type: string}
+      example:
+        oldPassword: 1234
+        newPassword: secret
     CreatedResponse:
       type: object
       properties:
         createdId: {type: integer, format: int64}
+      example:
+        createdId: 512472
     ErrorResponse:
       type: object
       properties:
         message: {type: string}
+      example:
+        message: error description
   requestBodies:
     SaveTransactionRequest:
       description: Transaction to save
