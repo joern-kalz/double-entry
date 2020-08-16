@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -23,6 +24,12 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Object> handleAlreadyExistsException(AlreadyExistsException exception) {
         ErrorResponse errorResponse = new ErrorResponse().message("already exists error: " + exception.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(HttpMessageConversionException.class)
+    public ResponseEntity<Object> handleHttpMessageConversionException(HttpMessageConversionException exception) {
+        ErrorResponse errorResponse = new ErrorResponse().message("Request structure invalid");
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
