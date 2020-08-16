@@ -29,14 +29,14 @@ public class AccountsApiImpl implements AccountsApi {
             throw new ParameterException("name missing");
         }
 
-        Integer parentId = saveAccountRequest.getParentId();
+        Long parentId = saveAccountRequest.getParentId();
 
         if (parentId == null) {
             throw new ParameterException("parentId missing");
         }
 
         Account parent = accountsRepository
-                .findById(parentId.longValue())
+                .findById(parentId)
                 .orElseThrow(() -> new ParameterException("parent account " + parentId + " not found"));
 
         boolean active = saveAccountRequest.getActive() != null ? saveAccountRequest.getActive() : true;
@@ -52,7 +52,7 @@ public class AccountsApiImpl implements AccountsApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateAccount(Integer accountId, @Valid SaveAccountRequest saveAccountRequest) {
+    public ResponseEntity<Void> updateAccount(Long accountId, @Valid SaveAccountRequest saveAccountRequest) {
         return null;
     }
 

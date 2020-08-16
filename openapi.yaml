@@ -58,7 +58,7 @@ paths:
           in: path
           description: Id of the transaction
           required: true
-          schema: {type: integer}
+          schema: {type: integer, format: int64}
       responses:
         '200':
           description: Requested transaction
@@ -75,7 +75,7 @@ paths:
           in: path
           description: Id of the transaction
           required: true
-          schema: {type: integer}
+          schema: {type: integer, format: int64}
       requestBody:
         $ref: '#/components/requestBodies/SaveTransactionRequest'
       responses:
@@ -90,7 +90,7 @@ paths:
           in: path
           description: Id of the transaction
           required: true
-          schema: {type: integer}
+          schema: {type: integer, format: int64}
       responses:
         '204':
           description: Deleted
@@ -131,7 +131,7 @@ paths:
           in: path
           description: Id of the account
           required: true
-          schema: {type: integer}
+          schema: {type: integer, format: int64}
       requestBody:
         $ref: '#/components/requestBodies/SaveAccountRequest'
       responses:
@@ -174,7 +174,7 @@ paths:
           in: path
           description: Id of the account
           required: true
-          schema: {type: integer}
+          schema: {type: integer, format: int64}
       responses:
         '200':
           description: Requested verified balance and unverified transactions
@@ -193,7 +193,7 @@ paths:
           in: path
           description: Id of the account for which entries are to be updated
           required: true
-          schema: {type: integer}
+          schema: {type: integer, format: int64}
       requestBody:
         description: Ids of the transactions for which entries are to be updated
         required: true
@@ -201,7 +201,7 @@ paths:
           application/json:
             schema:
               type: array
-              items: {type: integer}
+              items: {type: integer, format: int64}
       responses:
         '204':
           description: Updated
@@ -274,7 +274,7 @@ components:
             type: object
             required: [accountId, amount]
             properties:
-              accountId: {type: integer}
+              accountId: {type: integer, format: int64}
               amount: {type: number}
               verified: {type: boolean}
       example: 
@@ -290,7 +290,7 @@ components:
     GetTransactionResponse:
       type: object
       properties:
-        id: {type: integer}
+        id: {type: integer, format: int64}
         date: {type: string, format: date}
         name: {type: string, maxLength: 200}
         entries:
@@ -316,7 +316,7 @@ components:
       type: object
       properties:
         name: {type: string, maxLength: 200}
-        parentId: {type: integer}
+        parentId: {type: integer, format: int64}
         active: {type: boolean}
       example: 
         name: grocery
@@ -334,9 +334,9 @@ components:
     GetAccountResponse:
       type: object
       properties:
-        id: {type: integer}
+        id: {type: integer, format: int64}
         name: {type: string, maxLength: 200}
-        parentId: {type: integer}
+        parentId: {type: integer, format: int64}
         active: {type: boolean}
       example: 
         id: 571764
@@ -346,7 +346,7 @@ components:
     GetBalanceResponse:
       type: object
       properties:
-        accountId: {type: integer}
+        accountId: {type: integer, format: int64}
         balance: {type: number}
     GetVerificationResponse:
       type: object
@@ -368,7 +368,7 @@ components:
     CreatedResponse:
       type: object
       properties:
-        createdId: {type: integer}
+        createdId: {type: integer, format: int64}
     ErrorResponse:
       type: object
       properties:

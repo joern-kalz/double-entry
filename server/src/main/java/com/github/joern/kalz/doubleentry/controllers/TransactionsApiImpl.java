@@ -18,12 +18,12 @@ public class TransactionsApiImpl implements TransactionsApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteTransaction(Integer transactionId) {
+    public ResponseEntity<Void> deleteTransaction(Long transactionId) {
         return null;
     }
 
     @Override
-    public ResponseEntity<GetTransactionResponse> getTransaction(Integer transactionId) {
+    public ResponseEntity<GetTransactionResponse> getTransaction(Long transactionId) {
         return null;
     }
 
@@ -33,7 +33,7 @@ public class TransactionsApiImpl implements TransactionsApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateTransaction(Integer transactionId, @Valid SaveTransactionRequest saveTransactionRequest) {
+    public ResponseEntity<Void> updateTransaction(Long transactionId, @Valid SaveTransactionRequest saveTransactionRequest) {
         return null;
     }
 }
