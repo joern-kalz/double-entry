@@ -11,13 +11,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,5 +63,22 @@ public class AccountsApiTest {
                 .with(user("user")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name", is("root")));
+    }
+
+    @Test
+    public void shouldUpdateAccount() throws Exception {
+        String newAccountName = "grocery";
+        String requestBody = "{\"name\":\"" + newAccountName + "\"}";
+
+        mockMvc.perform(patch("/accounts/" + rootAccountId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)
+                .with(user("user"))
+                .with(csrf()))
+                .andExpect(status().isNoContent());
+
+        Optional<Account> account = accountsRepository.findById(rootAccountId);
+        assertTrue(account.isPresent());
+        assertEquals(newAccountName, account.get().getName());
     }
 }

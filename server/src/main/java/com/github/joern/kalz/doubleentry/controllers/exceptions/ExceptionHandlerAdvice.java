@@ -26,6 +26,12 @@ public class ExceptionHandlerAdvice {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException exception) {
+        ErrorResponse errorResponse = new ErrorResponse().message("not found error: " + exception.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(HttpMessageConversionException.class)
     public ResponseEntity<Object> handleHttpMessageConversionException(HttpMessageConversionException exception) {
         ErrorResponse errorResponse = new ErrorResponse().message("Request structure invalid");
