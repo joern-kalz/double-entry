@@ -15,13 +15,13 @@ public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(ParameterException.class)
     public ResponseEntity<Object> handleParameterException(ParameterException exception) {
-        ErrorResponse errorResponse = new ErrorResponse().message(exception.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse().message("parameter error: " + exception.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<Object> handleAlreadyExistsException(AlreadyExistsException exception) {
-        ErrorResponse errorResponse = new ErrorResponse().message(exception.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse().message("already exists error: " + exception.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
