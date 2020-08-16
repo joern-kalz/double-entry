@@ -256,6 +256,14 @@ paths:
       responses:
         '200':
           description: Updated
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
 components:
   schemas:
     SaveTransactionRequest:
