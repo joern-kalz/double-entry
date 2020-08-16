@@ -27,7 +27,7 @@ public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUnexpectedException(Exception exception) {
-        LOG.error("unexpected exception: {}", exception.toString());
+        LOG.error("unexpected exception", exception);
         ErrorResponse errorResponse = new ErrorResponse().message("unexpected exception");
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
