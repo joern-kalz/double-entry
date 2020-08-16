@@ -23,7 +23,7 @@ public class SignUpApiImpl implements SignUpApi {
     private UsersRepository usersRepository;
 
     @Autowired
-    private AuthoritiesRepo authoritiesRepo;
+    private AuthoritiesRepository authoritiesRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -59,6 +59,6 @@ public class SignUpApiImpl implements SignUpApi {
         }
 
         User createdUser = usersRepository.save(user);
-        authoritiesRepo.save(new Authority(createdUser, DEFAULT_AUTHORITY));
+        authoritiesRepository.save(new Authority(createdUser, DEFAULT_AUTHORITY));
     }
 }

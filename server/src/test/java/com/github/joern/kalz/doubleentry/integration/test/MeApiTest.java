@@ -2,7 +2,7 @@ package com.github.joern.kalz.doubleentry.integration.test;
 
 import com.github.joern.kalz.doubleentry.generated.model.GetMeResponse;
 import com.github.joern.kalz.doubleentry.generated.model.UpdateMeRequest;
-import com.github.joern.kalz.doubleentry.model.AuthoritiesRepo;
+import com.github.joern.kalz.doubleentry.model.AuthoritiesRepository;
 import com.github.joern.kalz.doubleentry.model.Authority;
 import com.github.joern.kalz.doubleentry.model.User;
 import com.github.joern.kalz.doubleentry.model.UsersRepository;
@@ -32,7 +32,7 @@ public class MeApiTest {
     private UsersRepository usersRepository;
 
     @Autowired
-    private AuthoritiesRepo authoritiesRepo;
+    private AuthoritiesRepository authoritiesRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -45,7 +45,7 @@ public class MeApiTest {
         user.setEnabled(true);
 
         User createdUser = usersRepository.save(user);
-        authoritiesRepo.save(new Authority(createdUser, "USER"));
+        authoritiesRepository.save(new Authority(createdUser, "USER"));
     }
 
     @Test
