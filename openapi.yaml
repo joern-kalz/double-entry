@@ -104,6 +104,10 @@ paths:
       responses:
         '201':
           $ref: '#/components/responses/CreatedResponse'
+        '400':
+          $ref: '#/components/responses/InvalidParameterResponse'
+        '401':
+          description: Unauthorized
     get:
       operationId: getAccounts
       tags: [accounts]
@@ -216,14 +220,10 @@ paths:
       responses:
         '201':
           description: Created
+        '400':
+          $ref: '#/components/responses/InvalidParameterResponse'
         '409':
           description: User already exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
-          description: Invalid username or password
           content:
             application/json:
               schema:
@@ -257,11 +257,7 @@ paths:
         '200':
           description: Updated
         '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InvalidParameterResponse'
         '401':
           description: Unauthorized
 components:
@@ -399,3 +395,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreatedResponse'
+    InvalidParameterResponse:
+      description: Invalid parameter
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
