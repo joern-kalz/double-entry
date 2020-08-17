@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,10 +24,10 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(List<Entry> entries, LocalDate date, String name) {
-        this.entries = entries;
+    public Transaction(LocalDate date, String name) {
         this.date = date;
         this.name = name;
+        this.entries = new ArrayList<>();
     }
 
     public Long getId() {

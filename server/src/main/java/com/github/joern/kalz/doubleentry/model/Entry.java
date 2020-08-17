@@ -2,6 +2,7 @@ package com.github.joern.kalz.doubleentry.model;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import java.math.BigDecimal;
 
 @Entity
 public class Entry {
@@ -9,13 +10,13 @@ public class Entry {
     @EmbeddedId
     private EntryId id;
 
-    private double amount;
+    private BigDecimal amount;
     private boolean verified;
 
     public Entry() {
     }
 
-    public Entry(Transaction transaction, Account account, double amount, boolean verified) {
+    public Entry(Transaction transaction, Account account, BigDecimal amount, boolean verified) {
         this.id = new EntryId(transaction, account);
         this.amount = amount;
         this.verified = verified;
@@ -29,11 +30,11 @@ public class Entry {
         this.id = id;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
