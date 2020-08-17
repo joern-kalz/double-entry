@@ -1,7 +1,5 @@
 package com.github.joern.kalz.doubleentry.integration.test;
 
-import com.github.joern.kalz.doubleentry.generated.model.GetMeResponse;
-import com.github.joern.kalz.doubleentry.generated.model.UpdateMeRequest;
 import com.github.joern.kalz.doubleentry.model.AuthoritiesRepository;
 import com.github.joern.kalz.doubleentry.model.Authority;
 import com.github.joern.kalz.doubleentry.model.User;
@@ -10,23 +8,32 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 public class MeApiTest {
 
     private static final String USERNAME = "USERNAME";
     private static final String PASSWORD = "PASSWORD";
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private UsersRepository usersRepository;
@@ -37,68 +44,54 @@ public class MeApiTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private MockMvc mockMvc;
+
     @BeforeEach
-    public void setupUser() {
-        User user = new User();
-        user.setUsername(USERNAME);
-        user.setPassword(passwordEncoder.encode(PASSWORD));
-        user.setEnabled(true);
+    public void setup() {
+        User testUser = new User();
+        testUser.setUsername(USERNAME);
+        testUser.setPassword(passwordEncoder.encode(PASSWORD));
+        testUser.setEnabled(true);
 
-        User createdUser = usersRepository.save(user);
-        authoritiesRepository.save(new Authority(createdUser, "USER"));
+        User createdTestUser = usersRepository.save(testUser);
+        authoritiesRepository.save(new Authority(createdTestUser, "USER"));
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .defaultRequest(get("/me").with(user(USERNAME)).with(csrf()))
+                .build();
     }
 
     @Test
-    public void shouldProvideUserInformation() {
-        ResponseEntity<GetMeResponse> response = restTemplate.withBasicAuth(USERNAME, PASSWORD)
-                .getForEntity("/me", GetMeResponse.class);
-
-        assertNotNull(response.getBody());
-        assertEquals(USERNAME, response.getBody().getName());
+    public void shouldProvideUserInformation() throws Exception {
+        mockMvc.perform(get("/me").with(user(USERNAME)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(USERNAME)));
     }
 
     @Test
-    public void shouldUpdatePassword() {
-        HttpHeaders sessionHeaders = establishSession();
+    public void shouldUpdatePassword() throws Exception {
         String newPassword = "NEW_PASSWORD";
-        UpdateMeRequest updateMeRequest = new UpdateMeRequest().oldPassword(PASSWORD).newPassword(newPassword);
+        String requestBody = "{\"oldPassword\":\"" + PASSWORD + "\",\"newPassword\":\"" + newPassword + "\"}";
 
-        ResponseEntity<Void> response = restTemplate.exchange("/me", HttpMethod.PATCH,
-                new HttpEntity<>(updateMeRequest, sessionHeaders), Void.class);
+        mockMvc.perform(patch("/me").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNoContent());
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         Optional<User> user = usersRepository.findById(USERNAME);
         assertTrue(user.isPresent());
         assertTrue(passwordEncoder.matches(newPassword, user.get().getPassword()));
     }
 
-    private HttpHeaders establishSession() {
-        ResponseEntity<GetMeResponse> response = restTemplate.withBasicAuth(USERNAME, PASSWORD)
-                .getForEntity("/me", GetMeResponse.class);
+    @Test
+    public void shouldNotUpdatePasswordIfOldPasswordIncorrect() throws Exception {
+        String newPassword = "NEW_PASSWORD";
+        String requestBody = "{\"oldPassword\":\"" + newPassword + "\",\"newPassword\":\"" + newPassword + "\"}";
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        mockMvc.perform(patch("/me").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest());
 
-        String jsessionid = extractCookieValueFromHeaders("JSESSIONID", response.getHeaders());
-        String xsrfToken = extractCookieValueFromHeaders("XSRF-TOKEN", response.getHeaders());
-        System.out.println(response.getHeaders());
-        System.out.println(xsrfToken);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.COOKIE, "JSESSIONID=" + jsessionid + "; XSRF-TOKEN=" + xsrfToken);
-        headers.set("X-XSRF-TOKEN", xsrfToken);
-
-        return headers;
+        Optional<User> user = usersRepository.findById(USERNAME);
+        assertTrue(user.isPresent());
+        assertTrue(passwordEncoder.matches(PASSWORD, user.get().getPassword()));
     }
-
-    private String extractCookieValueFromHeaders(String cookieName, HttpHeaders httpHeaders) {
-        List<String> cookieHeaders = httpHeaders.get(HttpHeaders.SET_COOKIE);
-        assertNotNull(cookieHeaders);
-
-        return cookieHeaders.stream()
-                .filter(cookie -> cookie.startsWith(cookieName + "="))
-                .map(cookie -> cookie.split("[=;]")[1])
-                .findFirst()
-                .orElseGet(() -> fail("cookie " + cookieName + " missing"));
-    }
-
 }
