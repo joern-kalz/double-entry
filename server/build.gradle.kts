@@ -40,8 +40,11 @@ openApiGenerate {
     modelPackage.set("com.github.joern.kalz.doubleentry.generated.model")
     outputDir.set("$buildDir/generated/openapi")
     configOptions.set(mapOf(
-        "interfaceOnly" to "true",
-        "skipDefaultInterface" to "true"
+            "dateLibrary" to "java8",
+            "interfaceOnly" to "true",
+            "skipDefaultInterface" to "true",
+            "performBeanValidation" to "true",
+            "useOptional" to "true"
     ))
 }
 

@@ -64,7 +64,7 @@ public class TransactionsApiImpl implements TransactionsApi {
     }
 
     @Override
-    public ResponseEntity<List<GetTransactionResponse>> getTransactions(@Valid LocalDate after, @Valid LocalDate before, @Valid BigDecimal accountId) {
+    public ResponseEntity<List<GetTransactionResponse>> getTransactions(@Valid Optional<LocalDate> after, @Valid Optional<LocalDate> before, @Valid Optional<BigDecimal> accountId) {
         return null;
     }
 
