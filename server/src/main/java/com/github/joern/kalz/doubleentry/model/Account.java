@@ -11,6 +11,9 @@ public class Account {
     private Long id;
 
     @ManyToOne
+    private User user;
+
+    @ManyToOne
     private Account parent;
 
     @OneToMany(mappedBy = "parent")
@@ -19,28 +22,20 @@ public class Account {
     private String name;
     private boolean active;
 
-    public Account() {
-    }
-
-    public Account(Account parent, String name, boolean active) {
-        this.parent = parent;
-        this.name = name;
-        this.active = active;
-    }
-
-    public Account(Long id, Account parent, String name, boolean active) {
-        this.id = id;
-        this.parent = parent;
-        this.name = name;
-        this.active = active;
-    }
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Account getParent() {

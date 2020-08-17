@@ -7,4 +7,5 @@ import java.util.List;
 public interface AccountsRepository extends CrudRepository<Account, Long> {
 
     List<Account> findByName(String name);
+    List<Account> findByUser(User user);
 }

@@ -32,7 +32,7 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(NotFoundException exception) {
         ErrorResponse errorResponse = new ErrorResponse().message("not found error: " + exception.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(HttpMessageConversionException.class)

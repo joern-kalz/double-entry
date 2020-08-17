@@ -1,5 +1,6 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
+import com.github.joern.kalz.doubleentry.controllers.exceptions.NotFoundException;
 import com.github.joern.kalz.doubleentry.controllers.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.generated.api.AccountsApi;
 import com.github.joern.kalz.doubleentry.generated.model.CreatedResponse;
@@ -7,6 +8,8 @@ import com.github.joern.kalz.doubleentry.generated.model.GetAccountResponse;
 import com.github.joern.kalz.doubleentry.generated.model.SaveAccountRequest;
 import com.github.joern.kalz.doubleentry.model.Account;
 import com.github.joern.kalz.doubleentry.model.AccountsRepository;
+import com.github.joern.kalz.doubleentry.model.User;
+import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,20 +26,25 @@ import java.util.stream.StreamSupport;
 public class AccountsApiImpl implements AccountsApi {
 
     public static final int MAXIMUM_ACCOUNT_HIERARCHY_DEPTH = 100;
+
     @Autowired
     private AccountsRepository accountsRepository;
+
+    @Autowired
+    private PrincipalProvider principalProvider;
 
     @Override
     @Transactional
     public ResponseEntity<CreatedResponse> createAccount(@Valid SaveAccountRequest saveAccountRequest) {
-        Account account = convertToAccount(null, saveAccountRequest);
-        long id = accountsRepository.save(account).getId();
-        return new ResponseEntity<>(new CreatedResponse().createdId(id), HttpStatus.CREATED);
+        Account newAccount = convertToAccount(null, saveAccountRequest);
+        long newId = accountsRepository.save(newAccount).getId();
+        return new ResponseEntity<>(new CreatedResponse().createdId(newId), HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<List<GetAccountResponse>> getAccounts() {
-        Spliterator<Account> accounts = accountsRepository.findAll().spliterator();
+        User principal = principalProvider.getPrincipal();
+        Spliterator<Account> accounts = accountsRepository.findByUser(principal).spliterator();
 
         List<GetAccountResponse> responseBody = StreamSupport.stream(accounts, false)
                 .map(account -> new GetAccountResponse()
@@ -50,21 +58,31 @@ public class AccountsApiImpl implements AccountsApi {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<Void> updateAccount(Long accountId, @Valid SaveAccountRequest saveAccountRequest) {
-        Account account = convertToAccount(accountId, saveAccountRequest);
-        accountsRepository.save(account);
+        Account account = accountsRepository.findById(accountId)
+                .orElseThrow(() -> new NotFoundException("account " + accountId));
+
+        if (!account.getUser().equals(principalProvider.getPrincipal())) {
+            throw new NotFoundException("account " + accountId);
+        }
+
+        Account updatedAccount = convertToAccount(accountId, saveAccountRequest);
+        accountsRepository.save(updatedAccount);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private Account convertToAccount(Long accountId, SaveAccountRequest saveAccountRequest) {
-        String name = saveAccountRequest.getName();
         Long parentId = saveAccountRequest.getParentId();
-        boolean active = saveAccountRequest.getActive();
-
         Account parent = accountsRepository.findById(parentId)
                 .orElseThrow(() -> new ParameterException("parent " + parentId + " not found"));
 
-        Account account = new Account(accountId, parent, name, active);
+        Account account = new Account();
+        account.setId(accountId);
+        account.setUser(principalProvider.getPrincipal());
+        account.setName(saveAccountRequest.getName());
+        account.setParent(parent);
+        account.setActive(saveAccountRequest.getActive());
 
         validateParentChildRelationship(parent, account);
 

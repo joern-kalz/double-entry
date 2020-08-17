@@ -1,9 +1,6 @@
 package com.github.joern.kalz.doubleentry.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +11,9 @@ public class Transaction {
     @Id
     @GeneratedValue
     private Long id;
+
+    @ManyToOne
+    private User user;
 
     @OneToMany(mappedBy = "id.transaction")
     private List<Entry> entries;
@@ -36,6 +36,14 @@ public class Transaction {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public List<Entry> getEntries() {
