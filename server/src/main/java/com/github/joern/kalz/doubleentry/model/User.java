@@ -1,10 +1,6 @@
 package com.github.joern.kalz.doubleentry.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -18,8 +14,17 @@ public class User {
 
     private boolean enabled;
 
-    @OneToMany(mappedBy = "id.user")
+    @OneToMany(mappedBy = "id.user", cascade = CascadeType.REMOVE)
     private List<Authority> authorities;
+
+    public User() {
+    }
+
+    public User(String username, String password, boolean enabled) {
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+    }
 
     public String getUsername() {
         return username;
