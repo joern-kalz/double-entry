@@ -124,7 +124,7 @@ paths:
         '401':
           description: Unauthorized
   '/accounts/{accountId}':
-    patch:
+    put:
       operationId: updateAccount
       tags: [accounts]
       summary: Updates an account
@@ -322,10 +322,11 @@ components:
             verified: false
     SaveAccountRequest:
       type: object
+      required: [name, parentId]
       properties:
-        name: {type: string, maxLength: 200}
+        name: {type: string, minLength: 1, maxLength: 200}
         parentId: {type: integer, format: int64}
-        active: {type: boolean}
+        active: {type: boolean, default: true}
       example: 
         name: grocery
         parentId: 982753

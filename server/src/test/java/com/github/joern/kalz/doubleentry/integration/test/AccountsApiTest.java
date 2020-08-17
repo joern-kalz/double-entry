@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -34,32 +35,43 @@ public class AccountsApiTest {
     private AccountsRepository accountsRepository;
 
     private MockMvc mockMvc;
-    private long rootAccountId;
+    private Account rootAccount;
 
     @BeforeEach
     public void setup() {
         accountsRepository.deleteAll();
-        rootAccountId = accountsRepository.save(new Account(null, "root", true)).getId();
+        rootAccount = accountsRepository.save(new Account(null, "root", true));
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .defaultRequest(get("/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(user("joern")).with(csrf()))
+                .alwaysDo(MockMvcResultHandlers.print())
                 .build();
     }
 
     @Test
     public void shouldCreateAccount() throws Exception {
         String accountName = "cash";
-        String requestBody = "{\"name\":\"" + accountName + "\",\"parentId\":" + rootAccountId + "}";
+        String requestBody = "{\"name\":\"" + accountName + "\",\"parentId\":" + rootAccount.getId() + "}";
 
         mockMvc.perform(post("/accounts").content(requestBody))
                 .andExpect(status().isCreated());
 
         List<Account> accounts = accountsRepository.findByName(accountName);
         assertEquals(1, accounts.size());
-        assertEquals(rootAccountId, accounts.get(0).getParent().getId());
+        Account account = accounts.get(0);
+        assertEquals(rootAccount.getId(), account.getParent().getId());
+        assertTrue(account.isActive());
+    }
+
+    @Test
+    public void shouldFailIfNameBlank() throws Exception {
+        String requestBody = "{\"name\":\"\",\"parentId\":" + rootAccount.getId() + "}";
+
+        mockMvc.perform(post("/accounts").content(requestBody))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -71,14 +83,24 @@ public class AccountsApiTest {
 
     @Test
     public void shouldUpdateAccount() throws Exception {
-        String newAccountName = "grocery";
-        String requestBody = "{\"name\":\"" + newAccountName + "\"}";
+        String newAccountName = "food";
+        Account childAccount = accountsRepository.save(new Account(rootAccount, "lease", true));
+        String requestBody = "{\"name\":\"" + newAccountName + "\",\"parentId\":" + rootAccount.getId() + "}";
 
-        mockMvc.perform(patch("/accounts/" + rootAccountId).content(requestBody))
+        mockMvc.perform(put("/accounts/" + childAccount.getId()).content(requestBody))
                 .andExpect(status().isNoContent());
 
-        Optional<Account> account = accountsRepository.findById(rootAccountId);
+        Optional<Account> account = accountsRepository.findById(childAccount.getId());
         assertTrue(account.isPresent());
         assertEquals(newAccountName, account.get().getName());
+    }
+
+    @Test
+    public void shouldFailIfParentChildRelationshipCyclic() throws Exception {
+        Account childAccount = accountsRepository.save(new Account(rootAccount, "lease", true));
+        String requestBody = "{\"name\":\"" + rootAccount.getName() + "\",\"parentId\":" + childAccount.getId() + "}";
+
+        mockMvc.perform(put("/accounts/" + rootAccount.getId()).content(requestBody))
+                .andExpect(status().isBadRequest());
     }
 }

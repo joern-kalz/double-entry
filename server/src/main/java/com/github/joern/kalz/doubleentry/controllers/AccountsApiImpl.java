@@ -1,6 +1,5 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
-import com.github.joern.kalz.doubleentry.controllers.exceptions.NotFoundException;
 import com.github.joern.kalz.doubleentry.controllers.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.generated.api.AccountsApi;
 import com.github.joern.kalz.doubleentry.generated.model.CreatedResponse;
@@ -11,6 +10,7 @@ import com.github.joern.kalz.doubleentry.model.AccountsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -27,22 +27,11 @@ public class AccountsApiImpl implements AccountsApi {
     private AccountsRepository accountsRepository;
 
     @Override
+    @Transactional
     public ResponseEntity<CreatedResponse> createAccount(@Valid SaveAccountRequest saveAccountRequest) {
-        if (saveAccountRequest.getName() == null) {
-            throw new ParameterException("name missing");
-        }
-
-        if (saveAccountRequest.getParentId() == null) {
-            throw new ParameterException("parentId missing");
-        }
-
-        String name = getValidAccountNameOrThrow(saveAccountRequest);
-        Account parent = findAccountByIdOrThrow(saveAccountRequest.getParentId());
-        boolean active = saveAccountRequest.getActive() != null ? saveAccountRequest.getActive() : true;
-
-        accountsRepository.save(new Account(parent, name, active));
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Account account = convertToAccount(null, saveAccountRequest);
+        long id = accountsRepository.save(account).getId();
+        return new ResponseEntity<>(new CreatedResponse().createdId(id), HttpStatus.CREATED);
     }
 
     @Override
@@ -62,57 +51,40 @@ public class AccountsApiImpl implements AccountsApi {
 
     @Override
     public ResponseEntity<Void> updateAccount(Long accountId, @Valid SaveAccountRequest saveAccountRequest) {
-        Account account = accountsRepository.findById(accountId)
-                .orElseThrow(() -> new NotFoundException("account " + accountId));
-
-        if (saveAccountRequest.getName() != null) {
-            account.setName(getValidAccountNameOrThrow(saveAccountRequest));
-        }
-
-        if (saveAccountRequest.getParentId() != null) {
-            account.setParent(getValidParentForAccountOrThrow(saveAccountRequest, account));
-        }
-
-        if (saveAccountRequest.getActive() != null) {
-            account.setActive(saveAccountRequest.getActive());
-        }
-
+        Account account = convertToAccount(accountId, saveAccountRequest);
         accountsRepository.save(account);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private Account findAccountByIdOrThrow(Long accountId) {
-        return accountsRepository
-                .findById(accountId)
-                .orElseThrow(() -> new ParameterException("account " + accountId));
+    private Account convertToAccount(Long accountId, SaveAccountRequest saveAccountRequest) {
+        String name = saveAccountRequest.getName();
+        Long parentId = saveAccountRequest.getParentId();
+        boolean active = saveAccountRequest.getActive();
+
+        Account parent = accountsRepository.findById(parentId)
+                .orElseThrow(() -> new ParameterException("parent " + parentId + " not found"));
+
+        Account account = new Account(accountId, parent, name, active);
+
+        validateParentChildRelationship(parent, account);
+
+        return account;
     }
 
-    private String getValidAccountNameOrThrow(SaveAccountRequest saveAccountRequest) {
-        if (saveAccountRequest.getName().isBlank()) {
-            throw new ParameterException("name invalid");
-        }
+    private void validateParentChildRelationship(Account parent, Account account) {
+        Account currentPosition = parent;
 
-        return saveAccountRequest.getName();
-    }
-
-    private Account getValidParentForAccountOrThrow(SaveAccountRequest saveAccountRequest, Account account) {
-        Account newParent = findAccountByIdOrThrow(saveAccountRequest.getParentId());
-
-        Account examinedAccount = newParent;
-
-        for (int i = 0; i < MAXIMUM_ACCOUNT_HIERARCHY_DEPTH && examinedAccount != null; i++) {
-            if (examinedAccount.getId().equals(account.getId())) {
+        for (int i = 0; i < MAXIMUM_ACCOUNT_HIERARCHY_DEPTH && currentPosition != null; i++) {
+            if (currentPosition.getId().equals(account.getId())) {
                 throw new ParameterException("cyclic parent child relationship between " + account.getId() + " and " +
-                        newParent.getId());
+                        parent.getId());
             }
 
-            examinedAccount = examinedAccount.getParent();
+            currentPosition = currentPosition.getParent();
         }
 
-        if (examinedAccount != null) {
+        if (currentPosition != null) {
             throw new ParameterException("maximum hierarchy depth exceeded");
         }
-
-        return newParent;
     }
 }

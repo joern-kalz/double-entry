@@ -28,6 +28,13 @@ public class Account {
         this.active = active;
     }
 
+    public Account(Long id, Account parent, String name, boolean active) {
+        this.id = id;
+        this.parent = parent;
+        this.name = name;
+        this.active = active;
+    }
+
     public Long getId() {
         return id;
     }
