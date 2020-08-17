@@ -19,11 +19,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("io.springfox:springfox-swagger2:2.8.0")
     implementation("org.openapitools:jackson-databind-nullable:0.1.0")
+    implementation("org.hibernate:hibernate-validator:6.1.5.Final")
     implementation("javax.validation:validation-api")
+    implementation("org.apache.httpcomponents:httpclient")
     runtimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
+    testImplementation("org.springframework.security:spring-security-test")
 }
 
 tasks.withType<Test> {
