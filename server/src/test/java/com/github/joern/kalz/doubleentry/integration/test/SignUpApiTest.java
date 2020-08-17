@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -34,6 +35,7 @@ public class SignUpApiTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .defaultRequest(post("/sign-up")
                 .contentType(MediaType.APPLICATION_JSON))
+                .alwaysDo(MockMvcResultHandlers.print())
                 .build();
 
         usersRepository.deleteAll();
