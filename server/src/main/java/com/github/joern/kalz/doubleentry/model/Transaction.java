@@ -15,20 +15,11 @@ public class Transaction {
     @ManyToOne
     private User user;
 
-    @OneToMany(mappedBy = "id.transaction")
+    @OneToMany(mappedBy = "id.transaction", cascade = CascadeType.ALL)
     private List<Entry> entries;
 
     private LocalDate date;
     private String name;
-
-    public Transaction() {
-    }
-
-    public Transaction(LocalDate date, String name) {
-        this.date = date;
-        this.name = name;
-        this.entries = new ArrayList<>();
-    }
 
     public Long getId() {
         return id;
