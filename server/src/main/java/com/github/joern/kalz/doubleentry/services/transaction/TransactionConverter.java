@@ -20,7 +20,7 @@ public class TransactionConverter {
     @Autowired
     private AccountsRepository accountsRepository;
 
-    public Transaction convertToTransaction(CreateRequest createRequest) {
+    public Transaction convertToTransaction(CreateTransactionRequest createRequest) {
         Transaction transaction = new Transaction();
         transaction.setUser(principalProvider.getPrincipal());
         transaction.setDate(createRequest.getDate());
@@ -32,7 +32,7 @@ public class TransactionConverter {
         return transaction;
     }
 
-    public Transaction convertToTransaction(UpdateRequest updateRequest) {
+    public Transaction convertToTransaction(UpdateTransactionRequest updateRequest) {
         Transaction transaction = new Transaction();
         transaction.setId(updateRequest.getId());
         transaction.setUser(principalProvider.getPrincipal());

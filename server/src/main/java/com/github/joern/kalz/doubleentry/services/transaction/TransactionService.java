@@ -40,7 +40,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public Transaction create(CreateRequest createRequest) {
+    public Transaction create(CreateTransactionRequest createRequest) {
         Transaction transaction = transactionConverter.convertToTransaction(createRequest);
 
         Result validationResult = transactionValidator.validate(transaction);
@@ -53,7 +53,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public void update(UpdateRequest updateRequest) {
+    public void update(UpdateTransactionRequest updateRequest) {
         Transaction transaction = transactionConverter.convertToTransaction(updateRequest);
 
         Result validationResult = transactionValidator.validate(transaction);

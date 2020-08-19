@@ -4,11 +4,20 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateRequest {
+public class UpdateTransactionRequest {
 
+    private long id;
     private LocalDate date;
     private String name;
     private List<RequestEntry> entries = new ArrayList<>();
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public LocalDate getDate() {
         return date;

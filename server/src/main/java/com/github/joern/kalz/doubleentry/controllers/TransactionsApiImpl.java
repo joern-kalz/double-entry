@@ -4,10 +4,10 @@ import com.github.joern.kalz.doubleentry.generated.api.TransactionsApi;
 import com.github.joern.kalz.doubleentry.generated.model.*;
 import com.github.joern.kalz.doubleentry.model.Entry;
 import com.github.joern.kalz.doubleentry.model.Transaction;
-import com.github.joern.kalz.doubleentry.services.transaction.CreateRequest;
+import com.github.joern.kalz.doubleentry.services.transaction.CreateTransactionRequest;
 import com.github.joern.kalz.doubleentry.services.transaction.RequestEntry;
 import com.github.joern.kalz.doubleentry.services.transaction.TransactionService;
-import com.github.joern.kalz.doubleentry.services.transaction.UpdateRequest;
+import com.github.joern.kalz.doubleentry.services.transaction.UpdateTransactionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ public class TransactionsApiImpl implements TransactionsApi {
 
     @Override
     public ResponseEntity<CreatedResponse> createTransaction(@Valid SaveTransactionRequest saveTransactionRequest) {
-        CreateRequest createRequest = convertToCreateRequest(saveTransactionRequest);
+        CreateTransactionRequest createRequest = convertToCreateRequest(saveTransactionRequest);
         Transaction transaction = transactionService.create(createRequest);
         CreatedResponse createdResponse = new CreatedResponse().createdId(transaction.getId());
         return new ResponseEntity<>(createdResponse, HttpStatus.CREATED);
@@ -61,22 +61,22 @@ public class TransactionsApiImpl implements TransactionsApi {
     @Override
     public ResponseEntity<Void> updateTransaction(Long transactionId,
                                                   @Valid SaveTransactionRequest saveTransactionRequest) {
-        UpdateRequest updateRequest = convertToUpdateRequest(transactionId, saveTransactionRequest);
+        UpdateTransactionRequest updateRequest = convertToUpdateRequest(transactionId, saveTransactionRequest);
         transactionService.update(updateRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private CreateRequest convertToCreateRequest(
+    private CreateTransactionRequest convertToCreateRequest(
             @Valid SaveTransactionRequest saveTransactionRequest) {
-        CreateRequest createRequest = new CreateRequest();
+        CreateTransactionRequest createRequest = new CreateTransactionRequest();
         createRequest.setDate(saveTransactionRequest.getDate());
         createRequest.setName(saveTransactionRequest.getName());
         createRequest.setEntries(convertToRequestEntries(saveTransactionRequest.getEntries()));
         return createRequest;
     }
 
-    private UpdateRequest convertToUpdateRequest(long id, @Valid SaveTransactionRequest saveTransactionRequest) {
-        UpdateRequest updateRequest = new UpdateRequest();
+    private UpdateTransactionRequest convertToUpdateRequest(long id, @Valid SaveTransactionRequest saveTransactionRequest) {
+        UpdateTransactionRequest updateRequest = new UpdateTransactionRequest();
         updateRequest.setId(id);
         updateRequest.setDate(saveTransactionRequest.getDate());
         updateRequest.setName(saveTransactionRequest.getName());
