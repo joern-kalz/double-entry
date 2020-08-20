@@ -1,16 +1,16 @@
 package com.github.joern.kalz.doubleentry.integration.test;
 
-import com.github.joern.kalz.doubleentry.models.*;
+import com.github.joern.kalz.doubleentry.integration.test.setup.TestSetup;
+import com.github.joern.kalz.doubleentry.models.Account;
+import com.github.joern.kalz.doubleentry.models.Transaction;
+import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
+import com.github.joern.kalz.doubleentry.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,9 +20,6 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,22 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 public class TransactionsApiTest {
 
-    private static final String LOGGED_IN_USERNAME = "LOGGED_IN_USER";
-    private static final String OTHER_USERNAME = "OTHER_USER";
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
     private MockMvc mockMvc;
-
-    @Autowired
-    private AccountsRepository accountsRepository;
 
     @Autowired
     private TransactionsRepository transactionsRepository;
 
     @Autowired
-    private UsersRepository usersRepository;
+    private TestSetup testSetup;
 
     private User loggedInUser;
     private User otherUser;
@@ -56,23 +44,16 @@ public class TransactionsApiTest {
 
     @BeforeEach
     public void setup() {
-        transactionsRepository.deleteAll();
-        usersRepository.deleteAll();
-        loggedInUser = usersRepository.save(new User(LOGGED_IN_USERNAME, null, true));
-        otherUser = usersRepository.save(new User(OTHER_USERNAME, null, true));
+        testSetup.clearDatabase();
+        loggedInUser = testSetup.createUser("LOGGED_IN_USERNAME");
+        otherUser = testSetup.createUser("OTHER_USERNAME");
 
-        foodAccount = accountsRepository.save(createAccount("food", loggedInUser));
-        carAccount = accountsRepository.save(createAccount("car", loggedInUser));
-        cashAccount = accountsRepository.save(createAccount("cash", loggedInUser));
-        accountOfOtherUser = accountsRepository.save(createAccount("account of other user", otherUser));
+        mockMvc = testSetup.createAuthenticatedMockMvc(loggedInUser);
 
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(springSecurity())
-                .defaultRequest(get("/accounts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(user(LOGGED_IN_USERNAME)).with(csrf()))
-                .alwaysDo(MockMvcResultHandlers.print())
-                .build();
+        foodAccount = testSetup.createAccount("food", loggedInUser);
+        carAccount = testSetup.createAccount("car", loggedInUser);
+        cashAccount = testSetup.createAccount("cash", loggedInUser);
+        accountOfOtherUser = testSetup.createAccount("account of other user", otherUser);
     }
 
     @Test
@@ -134,21 +115,21 @@ public class TransactionsApiTest {
 
     @Test
     public void shouldDeleteTransaction() throws Exception {
-        long id = transactionsRepository.save(createTransactionWithUser("shopping", loggedInUser)).getId();
+        long id = createTransactionWithUser("shopping", loggedInUser).getId();
         mockMvc.perform(delete("/transactions/" + id)).andExpect(status().isNoContent());
         assertTrue(transactionsRepository.findById(id).isEmpty());
     }
 
     @Test
     public void shouldNotDeleteTransactionOfOtherUser() throws Exception {
-        long id = transactionsRepository.save(createTransactionWithUser("shopping", otherUser)).getId();
+        long id = createTransactionWithUser("shopping", otherUser).getId();
         mockMvc.perform(delete("/transactions/" + id)).andExpect(status().isNotFound());
         assertFalse(transactionsRepository.findById(id).isEmpty());
     }
 
     @Test
     public void shouldGetTransaction() throws Exception {
-        long id = transactionsRepository.save(createTransactionWithUser("supermarket", loggedInUser)).getId();
+        long id = createTransactionWithUser("supermarket", loggedInUser).getId();
         mockMvc.perform(get("/transactions/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("supermarket")));
@@ -156,14 +137,14 @@ public class TransactionsApiTest {
 
     @Test
     public void shouldNotGetTransactionOfOtherUser() throws Exception {
-        long id = transactionsRepository.save(createTransactionWithUser("supermarket", otherUser)).getId();
+        long id = createTransactionWithUser("supermarket", otherUser).getId();
         mockMvc.perform(get("/transactions/" + id))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void shouldGetTransactions() throws Exception {
-        transactionsRepository.save(createTransactionWithUser("supermarket", loggedInUser));
+        createTransactionWithUser("supermarket", loggedInUser);
         mockMvc.perform(get("/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name", is("supermarket")));
@@ -171,12 +152,9 @@ public class TransactionsApiTest {
 
     @Test
     public void shouldGetTransactionsByDate() throws Exception {
-        transactionsRepository.save(createTransactionWithDate("first",
-                LocalDate.of(2020, 1, 1)));
-        transactionsRepository.save(createTransactionWithDate("second",
-                LocalDate.of(2020, 1, 2)));
-        transactionsRepository.save(createTransactionWithDate("third",
-                LocalDate.of(2020, 1, 3)));
+        createTransactionWithDate("first", LocalDate.of(2020, 1, 1));
+        createTransactionWithDate("second", LocalDate.of(2020, 1, 2));
+        createTransactionWithDate("third", LocalDate.of(2020, 1, 3));
 
         mockMvc.perform(get("/transactions?after=2020-01-02&before=2020-01-02"))
                 .andExpect(status().isOk())
@@ -192,8 +170,8 @@ public class TransactionsApiTest {
 
     @Test
     public void shouldGetTransactionsByAccount() throws Exception {
-        transactionsRepository.save(createTransactionWithAccounts("food", foodAccount, cashAccount));
-        transactionsRepository.save(createTransactionWithAccounts("car", carAccount, cashAccount));
+        createTransactionWithAccounts("food", foodAccount, cashAccount);
+        createTransactionWithAccounts("car", carAccount, cashAccount);
 
         mockMvc.perform(get("/transactions?accountId=" + carAccount.getId()))
                 .andExpect(status().isOk())
@@ -203,7 +181,7 @@ public class TransactionsApiTest {
 
     @Test
     public void shouldNotGetTransactionsOfOtherUser() throws Exception {
-        transactionsRepository.save(createTransactionWithUser("supermarket", otherUser));
+        createTransactionWithUser("supermarket", otherUser);
         mockMvc.perform(get("/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(0)));
@@ -212,7 +190,7 @@ public class TransactionsApiTest {
     @Test
     @Transactional
     public void shouldUpdateTransaction() throws Exception {
-        long id = transactionsRepository.save(createTransactionWithUser("supermarket", loggedInUser)).getId();
+        long id = createTransactionWithUser("supermarket", loggedInUser).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-99.99}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":99.99}]}";
@@ -231,7 +209,7 @@ public class TransactionsApiTest {
     @Test
     @Transactional
     public void shouldNotUpdateTransactionOfOtherUser() throws Exception {
-        long id = transactionsRepository.save(createTransactionWithUser("supermarket", otherUser)).getId();
+        long id = createTransactionWithUser("supermarket", otherUser).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-99.99}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":99.99}]}";
@@ -240,38 +218,18 @@ public class TransactionsApiTest {
                 .andExpect(status().isNotFound());
     }
 
-    private Account createAccount(String name, User user) {
-        Account account = new Account();
-        account.setUser(user);
-        account.setName(name);
-        return account;
-    }
-
     private Transaction createTransactionWithUser(String name, User user) {
-        return createTransaction(name, user, LocalDate.of(2020, 1, 1), foodAccount, cashAccount);
+        return testSetup.createTransaction(name, user, LocalDate.of(2020, 1, 1),
+                foodAccount, "9.99", cashAccount, "-9.99");
     }
 
     private Transaction createTransactionWithDate(String name, LocalDate date) {
-        return createTransaction(name, loggedInUser, date, foodAccount, cashAccount);
+        return testSetup.createTransaction(name, loggedInUser, date,
+                foodAccount, "9.99", cashAccount, "-9.99");
     }
 
     private Transaction createTransactionWithAccounts(String name, Account debitAccount, Account creditAccount) {
-        return createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1), debitAccount,
-                creditAccount);
-    }
-
-    private Transaction createTransaction(String name, User user, LocalDate date, Account debitAccount,
-                                          Account creditAccount) {
-        Transaction transaction = new Transaction();
-        transaction.setName(name);
-        transaction.setDate(date);
-        transaction.setUser(user);
-
-        List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(transaction, debitAccount, new BigDecimal("9.99"), false));
-        entries.add(new Entry(transaction, creditAccount, new BigDecimal("-9.99"), false));
-        transaction.setEntries(entries);
-
-        return transaction;
+        return testSetup.createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1),
+                debitAccount, "9.99", creditAccount, "-9.99");
     }
 }
