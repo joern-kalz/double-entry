@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -48,10 +47,11 @@ public class TransactionsApiImpl implements TransactionsApi {
     }
 
     @Override
-    public ResponseEntity<List<GetTransactionResponse>> getTransactions(@Valid Optional<LocalDate> after,
-                                                                        @Valid Optional<LocalDate> before,
-                                                                        @Valid Optional<BigDecimal> accountId) {
-        List<GetTransactionResponse> responseBody = transactionsService.findAll().stream()
+    public ResponseEntity<List<GetTransactionResponse>> getTransactions(@Valid LocalDate after,
+                                                                        @Valid LocalDate before,
+                                                                        @Valid Long accountId) {
+        List<GetTransactionResponse> responseBody = transactionsService.findByDateAndAccount(after, before, accountId)
+                .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
 

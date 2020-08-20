@@ -50,6 +50,7 @@ public class TransactionsApiTest {
     private User loggedInUser;
     private User otherUser;
     private Account foodAccount;
+    private Account carAccount;
     private Account cashAccount;
     private Account accountOfOtherUser;
 
@@ -61,6 +62,7 @@ public class TransactionsApiTest {
         otherUser = usersRepository.save(new User(OTHER_USERNAME, null, true));
 
         foodAccount = accountsRepository.save(createAccount("food", loggedInUser));
+        carAccount = accountsRepository.save(createAccount("car", loggedInUser));
         cashAccount = accountsRepository.save(createAccount("cash", loggedInUser));
         accountOfOtherUser = accountsRepository.save(createAccount("account of other user", otherUser));
 
@@ -132,21 +134,21 @@ public class TransactionsApiTest {
 
     @Test
     public void shouldDeleteTransaction() throws Exception {
-        long id = transactionsRepository.save(createTransaction("shopping", loggedInUser)).getId();
+        long id = transactionsRepository.save(createTransactionWithUser("shopping", loggedInUser)).getId();
         mockMvc.perform(delete("/transactions/" + id)).andExpect(status().isNoContent());
         assertTrue(transactionsRepository.findById(id).isEmpty());
     }
 
     @Test
     public void shouldNotDeleteTransactionOfOtherUser() throws Exception {
-        long id = transactionsRepository.save(createTransaction("shopping", otherUser)).getId();
+        long id = transactionsRepository.save(createTransactionWithUser("shopping", otherUser)).getId();
         mockMvc.perform(delete("/transactions/" + id)).andExpect(status().isNotFound());
         assertFalse(transactionsRepository.findById(id).isEmpty());
     }
 
     @Test
     public void shouldGetTransaction() throws Exception {
-        long id = transactionsRepository.save(createTransaction("supermarket", loggedInUser)).getId();
+        long id = transactionsRepository.save(createTransactionWithUser("supermarket", loggedInUser)).getId();
         mockMvc.perform(get("/transactions/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("supermarket")));
@@ -154,22 +156,48 @@ public class TransactionsApiTest {
 
     @Test
     public void shouldNotGetTransactionOfOtherUser() throws Exception {
-        long id = transactionsRepository.save(createTransaction("supermarket", otherUser)).getId();
+        long id = transactionsRepository.save(createTransactionWithUser("supermarket", otherUser)).getId();
         mockMvc.perform(get("/transactions/" + id))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void shouldGetTransactions() throws Exception {
-        long id = transactionsRepository.save(createTransaction("supermarket", loggedInUser)).getId();
+        transactionsRepository.save(createTransactionWithUser("supermarket", loggedInUser));
         mockMvc.perform(get("/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name", is("supermarket")));
     }
 
     @Test
+    public void shouldGetTransactionsByDate() throws Exception {
+        transactionsRepository.save(createTransactionWithDate("first",
+                LocalDate.of(2020, 1, 1)));
+        transactionsRepository.save(createTransactionWithDate("second",
+                LocalDate.of(2020, 1, 2)));
+        transactionsRepository.save(createTransactionWithDate("third",
+                LocalDate.of(2020, 1, 3)));
+
+        mockMvc.perform(get("/transactions?after=2020-01-02&before=2020-01-02"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(jsonPath("$[0].name", is("second")));
+    }
+
+    @Test
+    public void shouldGetTransactionsByAccount() throws Exception {
+        transactionsRepository.save(createTransactionWithAccounts("food", foodAccount, cashAccount));
+        transactionsRepository.save(createTransactionWithAccounts("car", carAccount, cashAccount));
+
+        mockMvc.perform(get("/transactions?accountId=" + carAccount.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(jsonPath("$[0].name", is("car")));
+    }
+
+    @Test
     public void shouldNotGetTransactionsOfOtherUser() throws Exception {
-        long id = transactionsRepository.save(createTransaction("supermarket", otherUser)).getId();
+        transactionsRepository.save(createTransactionWithUser("supermarket", otherUser));
         mockMvc.perform(get("/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(0)));
@@ -178,7 +206,7 @@ public class TransactionsApiTest {
     @Test
     @Transactional
     public void shouldUpdateTransaction() throws Exception {
-        long id = transactionsRepository.save(createTransaction("supermarket", loggedInUser)).getId();
+        long id = transactionsRepository.save(createTransactionWithUser("supermarket", loggedInUser)).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-99.99}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":99.99}]}";
@@ -190,14 +218,14 @@ public class TransactionsApiTest {
         assertTrue(transaction.isPresent());
         assertEquals("bread and butter", transaction.get().getName());
         assertEquals(2, transaction.get().getEntries().size());
-        BigDecimal absoluteEntryAmuont = transaction.get().getEntries().get(0).getAmount().abs();
-        assertEquals(0, new BigDecimal("99.99").compareTo(absoluteEntryAmuont));
+        BigDecimal absoluteEntryAmount = transaction.get().getEntries().get(0).getAmount().abs();
+        assertEquals(0, new BigDecimal("99.99").compareTo(absoluteEntryAmount));
     }
 
     @Test
     @Transactional
     public void shouldNotUpdateTransactionOfOtherUser() throws Exception {
-        long id = transactionsRepository.save(createTransaction("supermarket", otherUser)).getId();
+        long id = transactionsRepository.save(createTransactionWithUser("supermarket", otherUser)).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-99.99}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":99.99}]}";
@@ -213,15 +241,29 @@ public class TransactionsApiTest {
         return account;
     }
 
-    private Transaction createTransaction(String name, User user) {
+    private Transaction createTransactionWithUser(String name, User user) {
+        return createTransaction(name, user, LocalDate.of(2020, 1, 1), foodAccount, cashAccount);
+    }
+
+    private Transaction createTransactionWithDate(String name, LocalDate date) {
+        return createTransaction(name, loggedInUser, date, foodAccount, cashAccount);
+    }
+
+    private Transaction createTransactionWithAccounts(String name, Account debitAccount, Account creditAccount) {
+        return createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1), debitAccount,
+                creditAccount);
+    }
+
+    private Transaction createTransaction(String name, User user, LocalDate date, Account debitAccount,
+                                          Account creditAccount) {
         Transaction transaction = new Transaction();
         transaction.setName(name);
-        transaction.setDate(LocalDate.of(2020, 1, 1));
+        transaction.setDate(date);
         transaction.setUser(user);
 
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(transaction, foodAccount, new BigDecimal("9.99"), false));
-        entries.add(new Entry(transaction, cashAccount, new BigDecimal("-9.99"), false));
+        entries.add(new Entry(transaction, debitAccount, new BigDecimal("9.99"), false));
+        entries.add(new Entry(transaction, creditAccount, new BigDecimal("-9.99"), false));
         transaction.setEntries(entries);
 
         return transaction;

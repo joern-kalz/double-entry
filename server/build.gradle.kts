@@ -43,8 +43,7 @@ openApiGenerate {
             "dateLibrary" to "java8",
             "interfaceOnly" to "true",
             "skipDefaultInterface" to "true",
-            "performBeanValidation" to "true",
-            "useOptional" to "true"
+            "performBeanValidation" to "true"
     ))
 }
 

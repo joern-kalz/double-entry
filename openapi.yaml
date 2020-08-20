@@ -42,7 +42,7 @@ paths:
         - name: accountId
           in: query
           description: Only return transactions touching this account
-          schema: {type: number}
+          schema: {type: integer, format: int64}
       responses:
         '200':
           description: Requested transactions
