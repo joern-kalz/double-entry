@@ -28,8 +28,8 @@ public class TransactionsApiImpl implements TransactionsApi {
 
     @Override
     public ResponseEntity<CreatedResponse> createTransaction(@Valid SaveTransactionRequest saveTransactionRequest) {
-        CreateTransactionRequest createRequest = convertToCreateRequest(saveTransactionRequest);
-        Transaction transaction = transactionService.create(createRequest);
+        CreateTransactionRequest createTransactionRequest = convertToCreateTransactionRequest(saveTransactionRequest);
+        Transaction transaction = transactionService.create(createTransactionRequest);
         CreatedResponse createdResponse = new CreatedResponse().createdId(transaction.getId());
         return new ResponseEntity<>(createdResponse, HttpStatus.CREATED);
     }
@@ -61,27 +61,28 @@ public class TransactionsApiImpl implements TransactionsApi {
     @Override
     public ResponseEntity<Void> updateTransaction(Long transactionId,
                                                   @Valid SaveTransactionRequest saveTransactionRequest) {
-        UpdateTransactionRequest updateRequest = convertToUpdateRequest(transactionId, saveTransactionRequest);
-        transactionService.update(updateRequest);
+        UpdateTransactionRequest updateTransactionRequest = convertToUpdateTransactionRequest(transactionId,
+                saveTransactionRequest);
+        transactionService.update(updateTransactionRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private CreateTransactionRequest convertToCreateRequest(
-            @Valid SaveTransactionRequest saveTransactionRequest) {
-        CreateTransactionRequest createRequest = new CreateTransactionRequest();
-        createRequest.setDate(saveTransactionRequest.getDate());
-        createRequest.setName(saveTransactionRequest.getName());
-        createRequest.setEntries(convertToRequestEntries(saveTransactionRequest.getEntries()));
-        return createRequest;
+    private CreateTransactionRequest convertToCreateTransactionRequest(SaveTransactionRequest saveTransactionRequest) {
+        CreateTransactionRequest createTransactionRequest = new CreateTransactionRequest();
+        createTransactionRequest.setDate(saveTransactionRequest.getDate());
+        createTransactionRequest.setName(saveTransactionRequest.getName());
+        createTransactionRequest.setEntries(convertToRequestEntries(saveTransactionRequest.getEntries()));
+        return createTransactionRequest;
     }
 
-    private UpdateTransactionRequest convertToUpdateRequest(long id, @Valid SaveTransactionRequest saveTransactionRequest) {
-        UpdateTransactionRequest updateRequest = new UpdateTransactionRequest();
-        updateRequest.setId(id);
-        updateRequest.setDate(saveTransactionRequest.getDate());
-        updateRequest.setName(saveTransactionRequest.getName());
-        updateRequest.setEntries(convertToRequestEntries(saveTransactionRequest.getEntries()));
-        return updateRequest;
+    private UpdateTransactionRequest convertToUpdateTransactionRequest(long id,
+                                                                       SaveTransactionRequest saveTransactionRequest) {
+        UpdateTransactionRequest updateTransactionRequest = new UpdateTransactionRequest();
+        updateTransactionRequest.setId(id);
+        updateTransactionRequest.setDate(saveTransactionRequest.getDate());
+        updateTransactionRequest.setName(saveTransactionRequest.getName());
+        updateTransactionRequest.setEntries(convertToRequestEntries(saveTransactionRequest.getEntries()));
+        return updateTransactionRequest;
     }
 
     private List<RequestEntry> convertToRequestEntries(List<SaveTransactionRequestEntries> entries) {
