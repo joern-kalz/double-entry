@@ -12,6 +12,7 @@ import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.stream.Collectors;
 
@@ -50,6 +51,14 @@ public class ExceptionHandlerAdvice {
                 .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                 .collect(Collectors.joining("; "));
 
+        ErrorResponse errorResponse = new ErrorResponse().message(message);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Object> handleMethodArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException exception) {
+        String message = "Parameter " + exception.getParameter().getParameterName() + " has invalid type";
         ErrorResponse errorResponse = new ErrorResponse().message(message);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

@@ -185,6 +185,12 @@ public class TransactionsApiTest {
     }
 
     @Test
+    public void shouldNotGetTransactionsIfQueryInvalid() throws Exception {
+        mockMvc.perform(get("/transactions?after=2020-99-99"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void shouldGetTransactionsByAccount() throws Exception {
         transactionsRepository.save(createTransactionWithAccounts("food", foodAccount, cashAccount));
         transactionsRepository.save(createTransactionWithAccounts("car", carAccount, cashAccount));
