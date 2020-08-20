@@ -1,7 +1,7 @@
 package com.github.joern.kalz.doubleentry.services;
 
-import com.github.joern.kalz.doubleentry.model.User;
-import com.github.joern.kalz.doubleentry.model.UsersRepository;
+import com.github.joern.kalz.doubleentry.models.User;
+import com.github.joern.kalz.doubleentry.models.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.github.joern.kalz.doubleentry.integration.test;
 
-import com.github.joern.kalz.doubleentry.model.*;
+import com.github.joern.kalz.doubleentry.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 

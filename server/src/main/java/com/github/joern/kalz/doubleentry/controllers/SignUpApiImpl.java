@@ -2,8 +2,8 @@ package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.SignUpApi;
 import com.github.joern.kalz.doubleentry.generated.model.SignUpRequest;
-import com.github.joern.kalz.doubleentry.services.user.CreateUserRequest;
-import com.github.joern.kalz.doubleentry.services.user.UserService;
+import com.github.joern.kalz.doubleentry.services.users.CreateUserRequest;
+import com.github.joern.kalz.doubleentry.services.users.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +15,12 @@ import javax.validation.Valid;
 public class SignUpApiImpl implements SignUpApi {
 
     @Autowired
-    private UserService userService;
+    private UsersService usersService;
 
     @Override
     public ResponseEntity<Void> signUp(@Valid SignUpRequest signUpRequest) {
         CreateUserRequest createUserRequest = createCreateUserRequest(signUpRequest);
-        userService.create(createUserRequest);
+        usersService.create(createUserRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

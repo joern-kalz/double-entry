@@ -1,7 +1,7 @@
 package com.github.joern.kalz.doubleentry.integration.test;
 
-import com.github.joern.kalz.doubleentry.model.User;
-import com.github.joern.kalz.doubleentry.model.UsersRepository;
+import com.github.joern.kalz.doubleentry.models.User;
+import com.github.joern.kalz.doubleentry.models.UsersRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

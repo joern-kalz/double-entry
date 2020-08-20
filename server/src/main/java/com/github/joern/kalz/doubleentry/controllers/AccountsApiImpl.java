@@ -4,10 +4,10 @@ import com.github.joern.kalz.doubleentry.generated.api.AccountsApi;
 import com.github.joern.kalz.doubleentry.generated.model.CreatedResponse;
 import com.github.joern.kalz.doubleentry.generated.model.GetAccountResponse;
 import com.github.joern.kalz.doubleentry.generated.model.SaveAccountRequest;
-import com.github.joern.kalz.doubleentry.model.Account;
-import com.github.joern.kalz.doubleentry.services.account.AccountService;
-import com.github.joern.kalz.doubleentry.services.account.CreateAccountRequest;
-import com.github.joern.kalz.doubleentry.services.account.UpdateAccountRequest;
+import com.github.joern.kalz.doubleentry.models.Account;
+import com.github.joern.kalz.doubleentry.services.accounts.AccountsService;
+import com.github.joern.kalz.doubleentry.services.accounts.CreateAccountRequest;
+import com.github.joern.kalz.doubleentry.services.accounts.UpdateAccountRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,19 +21,19 @@ import java.util.stream.Collectors;
 public class AccountsApiImpl implements AccountsApi {
 
     @Autowired
-    private AccountService accountService;
+    private AccountsService accountsService;
 
     @Override
     public ResponseEntity<CreatedResponse> createAccount(@Valid SaveAccountRequest saveAccountRequest) {
         CreateAccountRequest createAccountRequest = createCreateAccountRequest(saveAccountRequest);
-        Account account = accountService.createAccount(createAccountRequest);
+        Account account = accountsService.createAccount(createAccountRequest);
         CreatedResponse createdResponse = new CreatedResponse().createdId(account.getId());
         return new ResponseEntity<>(createdResponse, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<List<GetAccountResponse>> getAccounts() {
-        List<GetAccountResponse> responseBody = accountService.findAll().stream()
+        List<GetAccountResponse> responseBody = accountsService.findAll().stream()
                 .map(account -> new GetAccountResponse()
                     .id(account.getId())
                     .name(account.getName())
@@ -47,7 +47,7 @@ public class AccountsApiImpl implements AccountsApi {
     @Override
     public ResponseEntity<Void> updateAccount(Long accountId, @Valid SaveAccountRequest saveAccountRequest) {
         UpdateAccountRequest updateAccountRequest = createUpdateAccountRequest(accountId, saveAccountRequest);
-        accountService.updateAccount(updateAccountRequest);
+        accountsService.updateAccount(updateAccountRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
