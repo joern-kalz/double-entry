@@ -206,6 +206,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GetBalanceResponse'
+        '400':
+          $ref: '#/components/responses/InvalidParameterResponse'
+        '401':
+          description: Unauthorized
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   '/verifications/{accountId}':
