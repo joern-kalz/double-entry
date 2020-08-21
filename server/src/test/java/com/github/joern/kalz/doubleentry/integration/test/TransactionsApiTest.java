@@ -50,10 +50,10 @@ public class TransactionsApiTest {
 
         mockMvc = testSetup.createAuthenticatedMockMvc(loggedInUser);
 
-        foodAccount = testSetup.createAccount("food", loggedInUser);
-        carAccount = testSetup.createAccount("car", loggedInUser);
-        cashAccount = testSetup.createAccount("cash", loggedInUser);
-        accountOfOtherUser = testSetup.createAccount("account of other user", otherUser);
+        foodAccount = testSetup.createAccount("food", loggedInUser, null);
+        carAccount = testSetup.createAccount("car", loggedInUser, null);
+        cashAccount = testSetup.createAccount("cash", loggedInUser, null);
+        accountOfOtherUser = testSetup.createAccount("account of other user", otherUser, null);
     }
 
     @Test

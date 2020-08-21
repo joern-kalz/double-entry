@@ -43,10 +43,11 @@ public class TestSetup {
         return usersRepository.save(new User(name, null, true));
     }
 
-    public Account createAccount(String name, User user) {
+    public Account createAccount(String name, User user, Account parent) {
         Account account = new Account();
         account.setUser(user);
         account.setName(name);
+        account.setParent(parent);
         return accountsRepository.save(account);
     }
 
