@@ -1,6 +1,7 @@
 package com.github.joern.kalz.doubleentry.integration.test;
 
 import com.github.joern.kalz.doubleentry.integration.test.setup.TestSetup;
+import com.github.joern.kalz.doubleentry.integration.test.setup.TestTransactionEntry;
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 public class BalancesApiTest {
@@ -51,6 +53,7 @@ public class BalancesApiTest {
         createTransaction(foodAccount, "2.49", cashAccount, "-2.49");
 
         mockMvc.perform(get("/balances"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 4.48)]")
                         .exists())
                 .andExpect(jsonPath("$[?(@.accountId == " + cashAccount.getId() + " && @.balance == -4.48)]")
@@ -67,6 +70,7 @@ public class BalancesApiTest {
                 foodAccount, "2.49", cashAccount, "-2.49");
 
         mockMvc.perform(get("/balances?after=2020-01-01&before=2020-01-01"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 1.99)]")
                         .exists())
                 .andExpect(jsonPath("$[?(@.accountId == " + cashAccount.getId() + " && @.balance == -1.99)]")
@@ -78,6 +82,7 @@ public class BalancesApiTest {
         createTransaction(foodAccount, "1.99", cashAccount, "-1.99");
 
         mockMvc.perform(get("/balances"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.accountId == " + expenseAccount.getId() + " && @.balance == 1.99)]")
                         .exists())
                 .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 1.99)]")
@@ -94,6 +99,7 @@ public class BalancesApiTest {
                 foodAccountOfOtherUser, "2.49", cashAccountOfOtherUser, "-2.49");
 
         mockMvc.perform(get("/balances"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 1.89)]")
                         .exists())
                 .andExpect(jsonPath("$[?(@.accountId == " + cashAccount.getId() + " && @.balance == -1.89)]")
@@ -103,18 +109,21 @@ public class BalancesApiTest {
     private void createTransaction(Account debitAccount, String debitAmount,
                                    Account creditAccount, String creditAmount) {
         testSetup.createTransaction("", loggedInUser, LocalDate.of(2020, 1, 1),
-                debitAccount, debitAmount, creditAccount, creditAmount);
+                new TestTransactionEntry(debitAccount, debitAmount, false),
+                new TestTransactionEntry(creditAccount, creditAmount, false));
     }
 
     private void createTransactionForUser(User user, Account debitAccount, String debitAmount,
                                    Account creditAccount, String creditAmount) {
         testSetup.createTransaction("", user, LocalDate.of(2020, 1, 1),
-                debitAccount, debitAmount, creditAccount, creditAmount);
+                new TestTransactionEntry(debitAccount, debitAmount, false),
+                new TestTransactionEntry(creditAccount, creditAmount, false));
     }
 
     private void createTransactionForDate(LocalDate date, Account debitAccount, String debitAmount,
                                    Account creditAccount, String creditAmount) {
         testSetup.createTransaction("", loggedInUser, date,
-                debitAccount, debitAmount, creditAccount, creditAmount);
+                new TestTransactionEntry(debitAccount, debitAmount, false),
+                new TestTransactionEntry(creditAccount, creditAmount, false));
     }
 }

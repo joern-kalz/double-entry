@@ -40,7 +40,10 @@ public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepos
         }
 
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
-        query.select(transaction).where(cb.and(predicateArray));
+
+        query.select(transaction)
+                .where(cb.and(predicateArray))
+                .orderBy(cb.asc(transaction.get("date")));
 
         return new HashSet<>(entityManager.createQuery(query).getResultList());
     }

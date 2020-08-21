@@ -12,8 +12,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -55,17 +56,18 @@ public class TestSetup {
         return accountsRepository.save(account);
     }
 
-    public Transaction createTransaction(String name, User user, LocalDate date, Account debitAccount,
-                                         String debitAmount, Account creditAccount, String creditAmount) {
+    public Transaction createTransaction(String name, User user, LocalDate date, TestTransactionEntry... entries) {
         Transaction transaction = new Transaction();
         transaction.setName(name);
         transaction.setDate(date);
         transaction.setUser(user);
 
-        List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(transaction, debitAccount, new BigDecimal(debitAmount), false));
-        entries.add(new Entry(transaction, creditAccount, new BigDecimal(creditAmount), false));
-        transaction.setEntries(entries);
+        List<Entry> entryList = Arrays.stream(entries)
+                .map(entry -> new Entry(transaction, entry.getAccount(), new BigDecimal(entry.getAmount()),
+                        entry.isVerified()))
+                .collect(Collectors.toList());
+
+        transaction.setEntries(entryList);
 
         return transactionsRepository.save(transaction);
     }

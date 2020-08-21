@@ -232,6 +232,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetVerificationResponse'
+        '401':
+          description: Unauthorized
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
     patch:

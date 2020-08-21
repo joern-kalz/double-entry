@@ -1,6 +1,7 @@
 package com.github.joern.kalz.doubleentry.integration.test;
 
 import com.github.joern.kalz.doubleentry.integration.test.setup.TestSetup;
+import com.github.joern.kalz.doubleentry.integration.test.setup.TestTransactionEntry;
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.Transaction;
 import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
@@ -220,16 +221,19 @@ public class TransactionsApiTest {
 
     private Transaction createTransactionWithUser(String name, User user) {
         return testSetup.createTransaction(name, user, LocalDate.of(2020, 1, 1),
-                foodAccount, "9.99", cashAccount, "-9.99");
+                new TestTransactionEntry(foodAccount, "9.99", false),
+                new TestTransactionEntry(cashAccount,  "-9.99", false));
     }
 
     private void createTransactionWithDate(String name, LocalDate date) {
         testSetup.createTransaction(name, loggedInUser, date,
-                foodAccount, "9.99", cashAccount, "-9.99");
+                new TestTransactionEntry(foodAccount, "9.99", false),
+                new TestTransactionEntry(cashAccount,  "-9.99", false));
     }
 
     private void createTransactionWithAccounts(String name, Account debitAccount, Account creditAccount) {
         testSetup.createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1),
-                debitAccount, "9.99", creditAccount, "-9.99");
+                new TestTransactionEntry(debitAccount, "9.99", false),
+                new TestTransactionEntry(creditAccount,  "-9.99", false));
     }
 }
