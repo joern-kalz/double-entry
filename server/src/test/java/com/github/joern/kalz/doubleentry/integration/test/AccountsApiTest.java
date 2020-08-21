@@ -100,7 +100,7 @@ public class AccountsApiTest {
 
     @Test
     public void shouldFailIfAccountOwnedByDifferentUser() throws Exception {
-        Account parentAccount = testSetup.createAccount("parent", otherUser, null);
+        Account parentAccount = testSetup.createAccount("parent", loggedInUser, null);
         Account childAccount = testSetup.createAccount("lease", otherUser, parentAccount);
         String requestBody = "{\"name\":\"food\",\"parentId\":" + parentAccount.getId() + "}";
 

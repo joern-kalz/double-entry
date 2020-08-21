@@ -59,7 +59,7 @@ public class VerificationsApiTest {
     @Test
     public void shouldNotGetVerificationsOfOtherAccount() throws Exception {
         createVerifiedTransaction("supermarket", loggedInUser, foodAccount, "1.59");
-        createUnverifiedTransaction("baker", loggedInUser, cashAccount, "3.79");
+        createUnverifiedTransaction("baker", loggedInUser, carAccount, "3.79");
 
         mockMvc.perform(get("/verifications/" + foodAccount.getId()))
                 .andExpect(status().isOk())
