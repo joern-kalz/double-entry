@@ -1,5 +1,6 @@
 package com.github.joern.kalz.doubleentry.services.accounts;
 
+import com.github.joern.kalz.doubleentry.services.AccountProvider;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.AccountsRepository;
@@ -15,6 +16,9 @@ public class AccountsConverter {
 
     @Autowired
     private PrincipalProvider principalProvider;
+
+    @Autowired
+    private AccountProvider accountProvider;
 
     public Account convertToAccount(CreateAccountRequest createAccountRequest) {
         Account account = new Account();
@@ -36,7 +40,7 @@ public class AccountsConverter {
     }
 
     private Account findParent(Long id) {
-        return accountsRepository.findById(id)
+        return accountProvider.find(id)
                 .orElseThrow(() -> new ParameterException("parent " + id + " not found"));
     }
 

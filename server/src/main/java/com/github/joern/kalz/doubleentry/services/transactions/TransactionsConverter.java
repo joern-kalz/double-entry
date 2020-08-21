@@ -1,5 +1,6 @@
 package com.github.joern.kalz.doubleentry.services.transactions;
 
+import com.github.joern.kalz.doubleentry.services.AccountProvider;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.AccountsRepository;
@@ -19,6 +20,9 @@ public class TransactionsConverter {
 
     @Autowired
     private AccountsRepository accountsRepository;
+
+    @Autowired
+    private AccountProvider accountProvider;
 
     public Transaction convertToTransaction(CreateTransactionRequest createRequest) {
         Transaction transaction = new Transaction();
@@ -47,7 +51,7 @@ public class TransactionsConverter {
 
     private Entry convertToTransactionEntry(RequestEntry entry, Transaction transaction) {
         boolean verified = entry.getVerified();
-        Account account = accountsRepository.findById(entry.getAccountId())
+        Account account = accountProvider.find(entry.getAccountId())
                 .orElseThrow(() -> new ParameterException("account " + entry.getAccountId() + " not found"));
 
         if (!account.getUser().equals(principalProvider.getPrincipal())) {

@@ -1,16 +1,16 @@
 package com.github.joern.kalz.doubleentry.services.accounts;
 
-import com.github.joern.kalz.doubleentry.services.exceptions.NotFoundException;
-import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.AccountsRepository;
+import com.github.joern.kalz.doubleentry.services.AccountProvider;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
+import com.github.joern.kalz.doubleentry.services.exceptions.NotFoundException;
+import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AccountsService {
@@ -27,12 +27,15 @@ public class AccountsService {
     @Autowired
     private AccountsValidator accountsValidator;
 
+    @Autowired
+    private AccountProvider accountProvider;
+
     public List<Account> findAll() {
         return accountsRepository.findByUser(principalProvider.getPrincipal());
     }
 
     public Account findById(long id) {
-        return findAccount(id)
+        return accountProvider.find(id)
                 .orElseThrow(() -> new NotFoundException("account " + id + " not found"));
     }
 
@@ -57,7 +60,7 @@ public class AccountsService {
             throw createException(validationResult, account);
         }
 
-        findAccount(account.getId())
+        accountProvider.find(account.getId())
                 .orElseThrow(() -> new NotFoundException("account " + account.getId() + " not found"));
 
         accountsRepository.save(account);
@@ -73,15 +76,5 @@ public class AccountsService {
             default:
                 throw new RuntimeException("unknown validation error " + validationResult);
         }
-    }
-
-    private Optional<Account> findAccount(long id) {
-        Optional<Account> account = accountsRepository.findById(id);
-
-        if (account.isEmpty() || !principalProvider.getPrincipal().equals(account.get().getUser())) {
-            return Optional.empty();
-        }
-
-        return account;
     }
 }
