@@ -9,6 +9,7 @@ tags:
   - name: accounts
   - name: balances
   - name: verifications
+  - name: repository
   - name: sign-up
   - name: me
 paths:
@@ -261,6 +262,42 @@ paths:
           description: Updated
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+  '/repository':
+    get:
+      operationId: exportRepository
+      tags: [repository]
+      summary: Performs a bulk export into a repository
+      responses:
+        '200':
+          description: Repository
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Repository'
+        '401':
+          description: Unauthorized
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    post:
+      operationId: importRepository
+      tags: [repository]
+      summary: Performs a bulk import
+      requestBody:
+        description: Repository
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Repository'
+      responses:
+        '204':
+          description: Imported
+        '400':
+          $ref: '#/components/responses/InvalidParameterResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
   '/sign-up':
     post:
       operationId: signUp
@@ -435,6 +472,17 @@ components:
               - accountId: 982753
                 amount: -10.12
                 verified: false
+    Repository:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetAccountResponse'
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetTransactionResponse'
     GetMeResponse:
       type: object
       properties:
