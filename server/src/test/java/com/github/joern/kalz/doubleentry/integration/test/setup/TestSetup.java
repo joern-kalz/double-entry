@@ -3,6 +3,7 @@ package com.github.joern.kalz.doubleentry.integration.test.setup;
 import com.github.joern.kalz.doubleentry.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -34,13 +35,16 @@ public class TestSetup {
     @Autowired
     private TransactionsRepository transactionsRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public void clearDatabase() {
         transactionsRepository.deleteAll();
         usersRepository.deleteAll();
     }
 
-    public User createUser(String name) {
-        return usersRepository.save(new User(name, null, true));
+    public User createUser(String name, String password) {
+        return usersRepository.save(new User(name, passwordEncoder.encode(password), true));
     }
 
     public Account createAccount(String name, User user, Account parent) {

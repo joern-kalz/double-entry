@@ -45,8 +45,8 @@ public class TransactionsApiTest {
     @BeforeEach
     public void setup() {
         testSetup.clearDatabase();
-        loggedInUser = testSetup.createUser("LOGGED_IN_USERNAME");
-        otherUser = testSetup.createUser("OTHER_USERNAME");
+        loggedInUser = testSetup.createUser("LOGGED_IN_USERNAME", "");
+        otherUser = testSetup.createUser("OTHER_USERNAME", "");
 
         mockMvc = testSetup.createAuthenticatedMockMvc(loggedInUser);
 

@@ -1,5 +1,6 @@
 package com.github.joern.kalz.doubleentry.integration.test;
 
+import com.github.joern.kalz.doubleentry.integration.test.setup.TestSetup;
 import com.github.joern.kalz.doubleentry.models.AuthoritiesRepository;
 import com.github.joern.kalz.doubleentry.models.Authority;
 import com.github.joern.kalz.doubleentry.models.User;
@@ -34,13 +35,10 @@ public class MeApiTest {
     private static final String PASSWORD = "PASSWORD";
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private TestSetup testSetup;
 
     @Autowired
     private UsersRepository usersRepository;
-
-    @Autowired
-    private AuthoritiesRepository authoritiesRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -49,19 +47,9 @@ public class MeApiTest {
 
     @BeforeEach
     public void setup() {
-        User testUser = new User();
-        testUser.setUsername(USERNAME);
-        testUser.setPassword(passwordEncoder.encode(PASSWORD));
-        testUser.setEnabled(true);
-
-        User createdTestUser = usersRepository.save(testUser);
-        authoritiesRepository.save(new Authority(createdTestUser, "USER"));
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(springSecurity())
-                .defaultRequest(get("/me").with(user(USERNAME)).with(csrf()))
-                .alwaysDo(MockMvcResultHandlers.print())
-                .build();
+        testSetup.clearDatabase();
+        User user = testSetup.createUser(USERNAME, PASSWORD);
+        mockMvc = testSetup.createAuthenticatedMockMvc(user);
     }
 
     @Test
