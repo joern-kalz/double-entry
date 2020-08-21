@@ -223,13 +223,13 @@ public class TransactionsApiTest {
                 foodAccount, "9.99", cashAccount, "-9.99");
     }
 
-    private Transaction createTransactionWithDate(String name, LocalDate date) {
-        return testSetup.createTransaction(name, loggedInUser, date,
+    private void createTransactionWithDate(String name, LocalDate date) {
+        testSetup.createTransaction(name, loggedInUser, date,
                 foodAccount, "9.99", cashAccount, "-9.99");
     }
 
-    private Transaction createTransactionWithAccounts(String name, Account debitAccount, Account creditAccount) {
-        return testSetup.createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1),
+    private void createTransactionWithAccounts(String name, Account debitAccount, Account creditAccount) {
+        testSetup.createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1),
                 debitAccount, "9.99", creditAccount, "-9.99");
     }
 }

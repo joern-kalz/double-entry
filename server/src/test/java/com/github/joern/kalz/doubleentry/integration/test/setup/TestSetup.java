@@ -80,4 +80,12 @@ public class TestSetup {
                 .build();
     }
 
+    public MockMvc createMockMvc() {
+        return MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .defaultRequest(get("/")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .alwaysDo(MockMvcResultHandlers.print())
+                .build();
+    }
 }
