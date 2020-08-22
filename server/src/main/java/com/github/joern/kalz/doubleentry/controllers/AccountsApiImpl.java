@@ -23,6 +23,9 @@ public class AccountsApiImpl implements AccountsApi {
     @Autowired
     private AccountsService accountsService;
 
+    @Autowired
+    private ResponseFactory responseFactory;
+
     @Override
     public ResponseEntity<CreatedResponse> createAccount(@Valid SaveAccountRequest saveAccountRequest) {
         CreateAccountRequest createAccountRequest = createCreateAccountRequest(saveAccountRequest);
@@ -34,11 +37,7 @@ public class AccountsApiImpl implements AccountsApi {
     @Override
     public ResponseEntity<List<GetAccountResponse>> getAccounts() {
         List<GetAccountResponse> responseBody = accountsService.findAll().stream()
-                .map(account -> new GetAccountResponse()
-                    .id(account.getId())
-                    .name(account.getName())
-                    .parentId(account.getParent() != null ? account.getParent().getId() : null)
-                    .active(account.isActive()))
+                .map(responseFactory::convertToResponse)
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(responseBody, HttpStatus.OK);

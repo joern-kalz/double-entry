@@ -41,6 +41,7 @@ public class TestSetup {
 
     public void clearDatabase() {
         transactionsRepository.deleteAll();
+        accountsRepository.deleteAll();
         usersRepository.deleteAll();
     }
 

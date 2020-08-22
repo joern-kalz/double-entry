@@ -36,6 +36,7 @@ public class VerificationsApiTest {
     private Account carAccount;
     private Account cashAccount;
     private Account foodAccountOfOtherUser;
+    private Account cashAccountOfOtherUser;
 
     @BeforeEach
     public void setup() {
@@ -49,13 +50,14 @@ public class VerificationsApiTest {
         carAccount = testSetup.createAccount("car", loggedInUser, null);
         cashAccount = testSetup.createAccount("cash", loggedInUser, null);
         foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser, null);
+        cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser, null);
     }
 
     @Test
     public void shouldGetVerifications() throws Exception {
-        createVerifiedTransaction("supermarket", loggedInUser, foodAccount, "1.59");
-        createVerifiedTransaction("beverage market", loggedInUser, foodAccount, "5.99");
-        createUnverifiedTransaction("baker", loggedInUser, foodAccount, "3.79");
+        createVerifiedTransaction("supermarket", loggedInUser, foodAccount, cashAccount, "1.59");
+        createVerifiedTransaction("beverage market", loggedInUser, foodAccount, cashAccount, "5.99");
+        createUnverifiedTransaction("baker", loggedInUser, foodAccount, cashAccount, "3.79");
 
         mockMvc.perform(get("/verifications/" + foodAccount.getId()))
                 .andExpect(status().isOk())
@@ -66,8 +68,8 @@ public class VerificationsApiTest {
 
     @Test
     public void shouldNotGetVerificationsOfOtherAccount() throws Exception {
-        createVerifiedTransaction("supermarket", loggedInUser, foodAccount, "1.59");
-        createUnverifiedTransaction("baker", loggedInUser, carAccount, "3.79");
+        createVerifiedTransaction("supermarket", loggedInUser, foodAccount, cashAccount, "1.59");
+        createUnverifiedTransaction("baker", loggedInUser, carAccount, cashAccount, "3.79");
 
         mockMvc.perform(get("/verifications/" + foodAccount.getId()))
                 .andExpect(status().isOk())
@@ -77,7 +79,8 @@ public class VerificationsApiTest {
 
     @Test
     public void shouldNotGetVerificationsOfOtherUser() throws Exception {
-        createUnverifiedTransaction("baker", otherUser, foodAccountOfOtherUser, "3.79");
+        createUnverifiedTransaction("baker", otherUser, foodAccountOfOtherUser, cashAccountOfOtherUser,
+                "3.79");
 
         mockMvc.perform(get("/verifications/" + foodAccountOfOtherUser.getId()))
                 .andExpect(status().isOk())
@@ -87,7 +90,7 @@ public class VerificationsApiTest {
     @Test
     @Transactional
     public void shouldUpdateVerifications() throws Exception {
-        Long id = createUnverifiedTransaction("baker", loggedInUser, foodAccount,
+        Long id = createUnverifiedTransaction("baker", loggedInUser, foodAccount, cashAccount,
                 "3.79").getId();
         String requestBody = "[" + id + "]";
 
@@ -106,7 +109,7 @@ public class VerificationsApiTest {
     @Test
     @Transactional
     public void shouldNotUpdateVerificationsIfTransactionNotFound() throws Exception {
-        Long id = createUnverifiedTransaction("baker", loggedInUser, foodAccount,
+        Long id = createUnverifiedTransaction("baker", loggedInUser, foodAccount, cashAccount,
                 "3.79").getId();
         transactionsRepository.deleteById(id);
         String requestBody = "[" + id + "]";
@@ -118,7 +121,7 @@ public class VerificationsApiTest {
     @Test
     @Transactional
     public void shouldUpdateVerificationsOfOtherUser() throws Exception {
-        Long id = createUnverifiedTransaction("baker", otherUser, foodAccount,
+        Long id = createUnverifiedTransaction("baker", otherUser, foodAccount, cashAccount,
                 "3.79").getId();
         String requestBody = "[" + id + "]";
 
@@ -137,7 +140,7 @@ public class VerificationsApiTest {
     @Test
     @Transactional
     public void shouldNotUpdateVerificationsIfNoEntryTouchesAccount() throws Exception {
-        Long id = createUnverifiedTransaction("baker", loggedInUser, foodAccount,
+        Long id = createUnverifiedTransaction("baker", loggedInUser, foodAccount, cashAccount,
                 "3.79").getId();
         String requestBody = "[" + id + "]";
 
@@ -151,16 +154,18 @@ public class VerificationsApiTest {
         assertFalse(transaction.get().getEntries().get(1).isVerified());
     }
 
-    public void createVerifiedTransaction(String name, User user, Account debitAccount, String debitAmount) {
+    public void createVerifiedTransaction(String name, User user, Account debitAccount, Account creditAccount,
+                                          String amount) {
         testSetup.createTransaction(name, user, LocalDate.EPOCH,
-                new TestTransactionEntry(debitAccount, debitAmount, true),
-                new TestTransactionEntry(cashAccount, "-" + debitAmount, true));
+                new TestTransactionEntry(debitAccount, amount, true),
+                new TestTransactionEntry(creditAccount, "-" + amount, true));
     }
 
-    public Transaction createUnverifiedTransaction(String name, User user, Account debitAccount, String debitAmount) {
+    public Transaction createUnverifiedTransaction(String name, User user, Account debitAccount, Account creditAccount,
+                                                   String amount) {
         return testSetup.createTransaction(name, user, LocalDate.EPOCH,
-                new TestTransactionEntry(debitAccount, debitAmount, false),
-                new TestTransactionEntry(cashAccount, "-" + debitAmount, false));
+                new TestTransactionEntry(debitAccount, amount, false),
+                new TestTransactionEntry(creditAccount, "-" + amount, false));
     }
 
 }

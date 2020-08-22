@@ -21,14 +21,14 @@ public class VerificationsApiImpl implements VerificationsApi {
     private VerificationsService verificationsService;
 
     @Autowired
-    private TransactionResponseFactory transactionResponseFactory;
+    private ResponseFactory responseFactory;
 
     @Override
     public ResponseEntity<GetVerificationResponse> getVerification(Long accountId) {
         VerificationState verificationState = verificationsService.getVerificationState(accountId);
 
         List<GetTransactionResponse> unverifiedTransactions = verificationState.getUnverifiedTransactions().stream()
-                .map(transactionResponseFactory::convertToResponse)
+                .map(responseFactory::convertToResponse)
                 .collect(Collectors.toList());
 
         GetVerificationResponse response = new GetVerificationResponse()

@@ -28,7 +28,7 @@ public class TransactionsApiImpl implements TransactionsApi {
     private TransactionsService transactionsService;
 
     @Autowired
-    private TransactionResponseFactory transactionResponseFactory;
+    private ResponseFactory responseFactory;
 
     @Override
     public ResponseEntity<CreatedResponse> createTransaction(@Valid SaveTransactionRequest saveTransactionRequest) {
@@ -47,7 +47,7 @@ public class TransactionsApiImpl implements TransactionsApi {
     @Override
     public ResponseEntity<GetTransactionResponse> getTransaction(Long transactionId) {
         Transaction transaction = transactionsService.findById(transactionId);
-        GetTransactionResponse getTransactionResponse = transactionResponseFactory.convertToResponse(transaction);
+        GetTransactionResponse getTransactionResponse = responseFactory.convertToResponse(transaction);
         return new ResponseEntity<>(getTransactionResponse, HttpStatus.OK);
     }
 
@@ -57,7 +57,7 @@ public class TransactionsApiImpl implements TransactionsApi {
                                                                         @Valid Long accountId) {
         List<GetTransactionResponse> responseBody = transactionsService.findByDateAndAccount(after, before, accountId)
                 .stream()
-                .map(transactionResponseFactory::convertToResponse)
+                .map(responseFactory::convertToResponse)
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(responseBody, HttpStatus.OK);
