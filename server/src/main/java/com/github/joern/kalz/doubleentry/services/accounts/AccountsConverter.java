@@ -40,7 +40,7 @@ public class AccountsConverter {
     }
 
     private Account findParent(Long id) {
-        return accountProvider.find(id)
+        return id == null ? null : accountProvider.find(id)
                 .orElseThrow(() -> new ParameterException("parent " + id + " not found"));
     }
 

@@ -3,7 +3,7 @@ package com.github.joern.kalz.doubleentry.services.accounts;
 public class CreateAccountRequest {
 
     private String name;
-    private long parentId;
+    private Long parentId;
     private boolean active;
 
     public String getName() {
@@ -14,11 +14,11 @@ public class CreateAccountRequest {
         this.name = name;
     }
 
-    public long getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(long parentId) {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 

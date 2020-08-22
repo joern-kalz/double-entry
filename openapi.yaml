@@ -427,7 +427,7 @@ components:
             verified: false
     SaveAccountRequest:
       type: object
-      required: [name, parentId]
+      required: [name]
       properties:
         name: {type: string, minLength: 1, maxLength: 200}
         parentId: {type: integer, format: int64}

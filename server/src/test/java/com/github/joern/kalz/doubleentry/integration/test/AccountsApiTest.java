@@ -44,6 +44,19 @@ public class AccountsApiTest {
 
     @Test
     public void shouldCreateAccount() throws Exception {
+        String requestBody = "{\"name\":\"cash\"}";
+
+        mockMvc.perform(post("/accounts").content(requestBody))
+                .andExpect(status().isCreated());
+
+        List<Account> accounts = accountsRepository.findByName("cash");
+        assertEquals(1, accounts.size());
+        Account account = accounts.get(0);
+        assertTrue(account.isActive());
+    }
+
+    @Test
+    public void shouldCreateChildAccount() throws Exception {
         Account parentAccount = testSetup.createAccount("parent", loggedInUser, null);
         String requestBody = "{\"name\":\"cash\",\"parentId\":" + parentAccount.getId() + "}";
 
@@ -54,7 +67,6 @@ public class AccountsApiTest {
         assertEquals(1, accounts.size());
         Account account = accounts.get(0);
         assertEquals(parentAccount.getId(), account.getParent().getId());
-        assertTrue(account.isActive());
     }
 
     @Test

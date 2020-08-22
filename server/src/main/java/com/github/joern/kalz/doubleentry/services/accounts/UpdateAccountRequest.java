@@ -4,7 +4,7 @@ public class UpdateAccountRequest {
 
     private long id;
     private String name;
-    private long parentId;
+    private Long parentId;
     private boolean active;
 
     public long getId() {
@@ -23,11 +23,11 @@ public class UpdateAccountRequest {
         this.name = name;
     }
 
-    public long getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(long parentId) {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 
