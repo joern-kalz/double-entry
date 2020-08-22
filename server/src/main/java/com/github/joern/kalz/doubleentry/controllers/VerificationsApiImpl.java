@@ -3,6 +3,7 @@ package com.github.joern.kalz.doubleentry.controllers;
 import com.github.joern.kalz.doubleentry.generated.api.VerificationsApi;
 import com.github.joern.kalz.doubleentry.generated.model.GetTransactionResponse;
 import com.github.joern.kalz.doubleentry.generated.model.GetVerificationResponse;
+import com.github.joern.kalz.doubleentry.services.verifications.UpdateVerificationStateRequest;
 import com.github.joern.kalz.doubleentry.services.verifications.VerificationState;
 import com.github.joern.kalz.doubleentry.services.verifications.VerificationsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,10 @@ public class VerificationsApiImpl implements VerificationsApi {
 
     @Override
     public ResponseEntity<Void> updateVerification(Long accountId, @Valid List<Long> requestBody) {
-        return null;
+        UpdateVerificationStateRequest updateVerificationStateRequest = new UpdateVerificationStateRequest();
+        updateVerificationStateRequest.setAccountId(accountId);
+        updateVerificationStateRequest.setTransactionIds(requestBody);
+        verificationsService.updateVerificationState(updateVerificationStateRequest);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

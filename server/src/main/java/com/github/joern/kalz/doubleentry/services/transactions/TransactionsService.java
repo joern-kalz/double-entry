@@ -1,18 +1,17 @@
 package com.github.joern.kalz.doubleentry.services.transactions;
 
-import com.github.joern.kalz.doubleentry.services.exceptions.NotFoundException;
-import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.models.Transaction;
 import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
 import com.github.joern.kalz.doubleentry.models.User;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
+import com.github.joern.kalz.doubleentry.services.exceptions.NotFoundException;
+import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.services.transactions.TransactionsValidator.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 

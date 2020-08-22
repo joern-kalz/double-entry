@@ -1,12 +1,11 @@
 package com.github.joern.kalz.doubleentry.services.transactions;
 
-import com.github.joern.kalz.doubleentry.services.AccountProvider;
-import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.models.Account;
-import com.github.joern.kalz.doubleentry.models.AccountsRepository;
 import com.github.joern.kalz.doubleentry.models.Entry;
 import com.github.joern.kalz.doubleentry.models.Transaction;
+import com.github.joern.kalz.doubleentry.services.AccountProvider;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
+import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +16,6 @@ public class TransactionsConverter {
 
     @Autowired
     private PrincipalProvider principalProvider;
-
-    @Autowired
-    private AccountsRepository accountsRepository;
 
     @Autowired
     private AccountProvider accountProvider;
