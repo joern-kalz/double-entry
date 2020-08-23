@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "double-entry-client"
+    }
+  },
+  "defaultProject": "double-entry-client",
+  "cli": {
+    "analytics": false
+  }
 }
