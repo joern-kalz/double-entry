@@ -3,7 +3,12 @@ import com.moowork.gradle.node.npm.NpmTask
 plugins {
     java
     id("org.openapi.generator") version "4.3.1"
-    id("com.moowork.node") version "1.3.1"
+    id("com.github.node-gradle.node") version "2.2.4"
+}
+
+node {
+    download = true
+    version = "14.8.0"
 }
 
 openApiGenerate {
