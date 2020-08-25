@@ -23,10 +23,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic().and()
                 .authorizeRequests()
-                    .antMatchers("/sign-up").permitAll()
+                    .antMatchers("/api/sign-up").permitAll()
                     .anyRequest().authenticated()
                 .and().csrf()
-                    .ignoringAntMatchers("/sign-up")
+                    .ignoringAntMatchers("/api/sign-up")
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 
     }
