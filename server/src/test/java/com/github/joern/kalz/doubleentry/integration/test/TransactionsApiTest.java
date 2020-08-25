@@ -64,7 +64,7 @@ public class TransactionsApiTest {
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":9.99}]}";
 
-        mockMvc.perform(post("/transactions").content(requestBody))
+        mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isCreated());
 
         List<Transaction> transactions = new ArrayList<>();
@@ -80,7 +80,7 @@ public class TransactionsApiTest {
     public void shouldNotCreateTransactionWithoutEntries() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[]}";
 
-        mockMvc.perform(post("/transactions").content(requestBody))
+        mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -90,7 +90,7 @@ public class TransactionsApiTest {
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":9.99}]}";
 
-        mockMvc.perform(post("/transactions").content(requestBody))
+        mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -100,7 +100,7 @@ public class TransactionsApiTest {
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.98}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":9.99}]}";
 
-        mockMvc.perform(post("/transactions").content(requestBody))
+        mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -110,28 +110,28 @@ public class TransactionsApiTest {
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
                 "{\"accountId\":" + accountOfOtherUser.getId() + ",\"amount\":9.99}]}";
 
-        mockMvc.perform(post("/transactions").content(requestBody))
+        mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void shouldDeleteTransaction() throws Exception {
         long id = createTransactionWithUser("shopping", loggedInUser).getId();
-        mockMvc.perform(delete("/transactions/" + id)).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/transactions/" + id)).andExpect(status().isNoContent());
         assertTrue(transactionsRepository.findById(id).isEmpty());
     }
 
     @Test
     public void shouldNotDeleteTransactionOfOtherUser() throws Exception {
         long id = createTransactionWithUser("shopping", otherUser).getId();
-        mockMvc.perform(delete("/transactions/" + id)).andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/transactions/" + id)).andExpect(status().isNotFound());
         assertFalse(transactionsRepository.findById(id).isEmpty());
     }
 
     @Test
     public void shouldGetTransaction() throws Exception {
         long id = createTransactionWithUser("supermarket", loggedInUser).getId();
-        mockMvc.perform(get("/transactions/" + id))
+        mockMvc.perform(get("/api/transactions/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("supermarket")));
     }
@@ -139,14 +139,14 @@ public class TransactionsApiTest {
     @Test
     public void shouldNotGetTransactionOfOtherUser() throws Exception {
         long id = createTransactionWithUser("supermarket", otherUser).getId();
-        mockMvc.perform(get("/transactions/" + id))
+        mockMvc.perform(get("/api/transactions/" + id))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void shouldGetTransactions() throws Exception {
         createTransactionWithUser("supermarket", loggedInUser);
-        mockMvc.perform(get("/transactions"))
+        mockMvc.perform(get("/api/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name", is("supermarket")));
     }
@@ -157,7 +157,7 @@ public class TransactionsApiTest {
         createTransactionWithDate("second", LocalDate.of(2020, 1, 2));
         createTransactionWithDate("third", LocalDate.of(2020, 1, 3));
 
-        mockMvc.perform(get("/transactions?after=2020-01-02&before=2020-01-02"))
+        mockMvc.perform(get("/api/transactions?after=2020-01-02&before=2020-01-02"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(1)))
                 .andExpect(jsonPath("$[0].name", is("second")));
@@ -165,7 +165,7 @@ public class TransactionsApiTest {
 
     @Test
     public void shouldNotGetTransactionsIfQueryInvalid() throws Exception {
-        mockMvc.perform(get("/transactions?after=2020-99-99"))
+        mockMvc.perform(get("/api/transactions?after=2020-99-99"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -174,7 +174,7 @@ public class TransactionsApiTest {
         createTransactionWithAccounts("food", foodAccount, cashAccount);
         createTransactionWithAccounts("car", carAccount, cashAccount);
 
-        mockMvc.perform(get("/transactions?accountId=" + carAccount.getId()))
+        mockMvc.perform(get("/api/transactions?accountId=" + carAccount.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(1)))
                 .andExpect(jsonPath("$[0].name", is("car")));
@@ -183,7 +183,7 @@ public class TransactionsApiTest {
     @Test
     public void shouldNotGetTransactionsOfOtherUser() throws Exception {
         createTransactionWithUser("supermarket", otherUser);
-        mockMvc.perform(get("/transactions"))
+        mockMvc.perform(get("/api/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(0)));
     }
@@ -196,7 +196,7 @@ public class TransactionsApiTest {
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-99.99}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":99.99}]}";
 
-        mockMvc.perform(put("/transactions/" + id).content(requestBody))
+        mockMvc.perform(put("/api/transactions/" + id).content(requestBody))
                 .andExpect(status().isNoContent());
 
         Optional<Transaction> transaction = transactionsRepository.findById(id);
@@ -215,7 +215,7 @@ public class TransactionsApiTest {
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-99.99}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":99.99}]}";
 
-        mockMvc.perform(put("/transactions/" + id).content(requestBody))
+        mockMvc.perform(put("/api/transactions/" + id).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 

@@ -59,7 +59,7 @@ public class VerificationsApiTest {
         createVerifiedTransaction("beverage market", loggedInUser, foodAccount, cashAccount, "5.99");
         createUnverifiedTransaction("baker", loggedInUser, foodAccount, cashAccount, "3.79");
 
-        mockMvc.perform(get("/verifications/" + foodAccount.getId()))
+        mockMvc.perform(get("/api/verifications/" + foodAccount.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.verifiedBalance", is(7.58)))
                 .andExpect(jsonPath("$.unverifiedTransactions.length()", is(1)))
@@ -71,7 +71,7 @@ public class VerificationsApiTest {
         createVerifiedTransaction("supermarket", loggedInUser, foodAccount, cashAccount, "1.59");
         createUnverifiedTransaction("baker", loggedInUser, carAccount, cashAccount, "3.79");
 
-        mockMvc.perform(get("/verifications/" + foodAccount.getId()))
+        mockMvc.perform(get("/api/verifications/" + foodAccount.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.verifiedBalance", is(1.59)))
                 .andExpect(jsonPath("$.unverifiedTransactions.length()", is(0)));
@@ -82,7 +82,7 @@ public class VerificationsApiTest {
         createUnverifiedTransaction("baker", otherUser, foodAccountOfOtherUser, cashAccountOfOtherUser,
                 "3.79");
 
-        mockMvc.perform(get("/verifications/" + foodAccountOfOtherUser.getId()))
+        mockMvc.perform(get("/api/verifications/" + foodAccountOfOtherUser.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.unverifiedTransactions.length()", is(0)));
     }
@@ -94,7 +94,7 @@ public class VerificationsApiTest {
                 "3.79").getId();
         String requestBody = "[" + id + "]";
 
-        mockMvc.perform(patch("/verifications/" + foodAccount.getId()).content(requestBody))
+        mockMvc.perform(patch("/api/verifications/" + foodAccount.getId()).content(requestBody))
                 .andExpect(status().isNoContent());
 
         Optional<Transaction> transaction = transactionsRepository.findById(id);
@@ -114,7 +114,7 @@ public class VerificationsApiTest {
         transactionsRepository.deleteById(id);
         String requestBody = "[" + id + "]";
 
-        mockMvc.perform(patch("/verifications/" + foodAccount.getId()).content(requestBody))
+        mockMvc.perform(patch("/api/verifications/" + foodAccount.getId()).content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -125,7 +125,7 @@ public class VerificationsApiTest {
                 "3.79").getId();
         String requestBody = "[" + id + "]";
 
-        mockMvc.perform(patch("/verifications/" + foodAccount.getId()).content(requestBody))
+        mockMvc.perform(patch("/api/verifications/" + foodAccount.getId()).content(requestBody))
                 .andExpect(status().isBadRequest());
 
         Optional<Transaction> transaction = transactionsRepository.findById(id);
@@ -144,7 +144,7 @@ public class VerificationsApiTest {
                 "3.79").getId();
         String requestBody = "[" + id + "]";
 
-        mockMvc.perform(patch("/verifications/" + carAccount.getId()).content(requestBody))
+        mockMvc.perform(patch("/api/verifications/" + carAccount.getId()).content(requestBody))
                 .andExpect(status().isBadRequest());
 
         Optional<Transaction> transaction = transactionsRepository.findById(id);

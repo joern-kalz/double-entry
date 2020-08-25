@@ -52,7 +52,7 @@ public class BalancesApiTest {
         createTransaction(foodAccount, "1.99", cashAccount, "-1.99");
         createTransaction(foodAccount, "2.49", cashAccount, "-2.49");
 
-        mockMvc.perform(get("/balances"))
+        mockMvc.perform(get("/api/balances"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 4.48)]")
                         .exists())
@@ -69,7 +69,7 @@ public class BalancesApiTest {
         createTransactionForDate(LocalDate.of(2021, 1, 1),
                 foodAccount, "2.49", cashAccount, "-2.49");
 
-        mockMvc.perform(get("/balances?after=2020-01-01&before=2020-01-01"))
+        mockMvc.perform(get("/api/balances?after=2020-01-01&before=2020-01-01"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 1.99)]")
                         .exists())
@@ -81,7 +81,7 @@ public class BalancesApiTest {
     public void shouldAddBalanceOfChildAccountToParentAccount() throws Exception {
         createTransaction(foodAccount, "1.99", cashAccount, "-1.99");
 
-        mockMvc.perform(get("/balances"))
+        mockMvc.perform(get("/api/balances"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.accountId == " + expenseAccount.getId() + " && @.balance == 1.99)]")
                         .exists())
@@ -98,7 +98,7 @@ public class BalancesApiTest {
         createTransactionForUser(otherUser,
                 foodAccountOfOtherUser, "2.49", cashAccountOfOtherUser, "-2.49");
 
-        mockMvc.perform(get("/balances"))
+        mockMvc.perform(get("/api/balances"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 1.89)]")
                         .exists())

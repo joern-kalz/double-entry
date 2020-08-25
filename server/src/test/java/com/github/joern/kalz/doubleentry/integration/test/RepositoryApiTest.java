@@ -57,7 +57,7 @@ public class RepositoryApiTest {
                 new TestTransactionEntry(foodAccount, "2.50", false),
                 new TestTransactionEntry(cashAccount, "-2.50", false));
 
-        mockMvc.perform(get("/repository"))
+        mockMvc.perform(get("/api/repository"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accounts.length()", is(3)))
                 .andExpect(jsonPath(buildAccountSearch(expenseAccount)).exists())
@@ -72,7 +72,7 @@ public class RepositoryApiTest {
         Account foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser, null);
         Account cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser, null);
 
-        mockMvc.perform(get("/repository"))
+        mockMvc.perform(get("/api/repository"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(buildAccountSearch(foodAccountOfOtherUser)).doesNotExist())
                 .andExpect(jsonPath(buildAccountSearch(cashAccountOfOtherUser)).doesNotExist());
@@ -86,7 +86,7 @@ public class RepositoryApiTest {
                 new TestTransactionEntry(foodAccountOfOtherUser, "2.50", false),
                 new TestTransactionEntry(cashAccountOfOtherUser, "-2.50", false));
 
-        mockMvc.perform(get("/repository"))
+        mockMvc.perform(get("/api/repository"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(buildTransactionSearch(transaction)).doesNotExist());
     }
@@ -97,11 +97,11 @@ public class RepositoryApiTest {
         Account expenseAccount = testSetup.createAccount("expense", loggedInUser, null);
         testSetup.createAccount("food", loggedInUser, expenseAccount);
         testSetup.createAccount("cash", loggedInUser, null);
-        String repository = mockMvc.perform(get("/repository"))
+        String repository = mockMvc.perform(get("/api/repository"))
                 .andReturn().getResponse().getContentAsString();
         accountsRepository.deleteAll();
 
-        mockMvc.perform(post("/repository").content(repository));
+        mockMvc.perform(post("/api/repository").content(repository));
 
         assertEquals(3, accountsRepository.findByUser(loggedInUser).size());
         assertTrue(isAccountRestored("cash", loggedInUser, null));
@@ -117,12 +117,12 @@ public class RepositoryApiTest {
         testSetup.createTransaction("baker", loggedInUser, LocalDate.EPOCH,
                 new TestTransactionEntry(foodAccount, "2.39", true),
                 new TestTransactionEntry(cashAccount, "-2.39", false));
-        String repository = mockMvc.perform(get("/repository"))
+        String repository = mockMvc.perform(get("/api/repository"))
                 .andReturn().getResponse().getContentAsString();
         transactionsRepository.deleteAll();
         accountsRepository.deleteAll();
 
-        mockMvc.perform(post("/repository").content(repository));
+        mockMvc.perform(post("/api/repository").content(repository));
 
         List<Transaction> transactions = transactionsRepository.findByUser(loggedInUser);
         assertEquals(1, transactions.size());

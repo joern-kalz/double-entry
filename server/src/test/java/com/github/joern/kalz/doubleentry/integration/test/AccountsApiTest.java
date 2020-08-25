@@ -46,7 +46,7 @@ public class AccountsApiTest {
     public void shouldCreateAccount() throws Exception {
         String requestBody = "{\"name\":\"cash\"}";
 
-        mockMvc.perform(post("/accounts").content(requestBody))
+        mockMvc.perform(post("/api/accounts").content(requestBody))
                 .andExpect(status().isCreated());
 
         List<Account> accounts = accountsRepository.findByName("cash");
@@ -60,7 +60,7 @@ public class AccountsApiTest {
         Account parentAccount = testSetup.createAccount("parent", loggedInUser, null);
         String requestBody = "{\"name\":\"cash\",\"parentId\":" + parentAccount.getId() + "}";
 
-        mockMvc.perform(post("/accounts").content(requestBody))
+        mockMvc.perform(post("/api/accounts").content(requestBody))
                 .andExpect(status().isCreated());
 
         List<Account> accounts = accountsRepository.findByName("cash");
@@ -74,7 +74,7 @@ public class AccountsApiTest {
         Account parentAccount = testSetup.createAccount("parent", loggedInUser, null);
         String requestBody = "{\"name\":\"\",\"parentId\":" + parentAccount.getId() + "}";
 
-        mockMvc.perform(post("/accounts").content(requestBody))
+        mockMvc.perform(post("/api/accounts").content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 
@@ -82,7 +82,7 @@ public class AccountsApiTest {
     public void shouldGetAccounts() throws Exception {
         testSetup.createAccount("food", loggedInUser, null);
 
-        mockMvc.perform(get("/accounts"))
+        mockMvc.perform(get("/api/accounts"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("length()", is(1)));
     }
@@ -91,7 +91,7 @@ public class AccountsApiTest {
     public void shouldNotGetAccountsOfOtherUser() throws Exception {
         testSetup.createAccount("food", otherUser, null);
 
-        mockMvc.perform(get("/accounts"))
+        mockMvc.perform(get("/api/accounts"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("length()", is(0)));
     }
@@ -102,7 +102,7 @@ public class AccountsApiTest {
         Account childAccount = testSetup.createAccount("lease", loggedInUser, parentAccount);
         String requestBody = "{\"name\":\"food\",\"parentId\":" + parentAccount.getId() + "}";
 
-        mockMvc.perform(put("/accounts/" + childAccount.getId()).content(requestBody))
+        mockMvc.perform(put("/api/accounts/" + childAccount.getId()).content(requestBody))
                 .andExpect(status().isNoContent());
 
         Optional<Account> account = accountsRepository.findById(childAccount.getId());
@@ -116,7 +116,7 @@ public class AccountsApiTest {
         Account childAccount = testSetup.createAccount("lease", otherUser, parentAccount);
         String requestBody = "{\"name\":\"food\",\"parentId\":" + parentAccount.getId() + "}";
 
-        mockMvc.perform(put("/accounts/" + childAccount.getId()).content(requestBody))
+        mockMvc.perform(put("/api/accounts/" + childAccount.getId()).content(requestBody))
                 .andExpect(status().isNotFound());
     }
 
@@ -126,7 +126,7 @@ public class AccountsApiTest {
         Account childAccount = testSetup.createAccount("lease", loggedInUser, parentAccount);
         String requestBody = "{\"name\":\"food\",\"parentId\":" + childAccount.getId() + "}";
 
-        mockMvc.perform(put("/accounts/" + parentAccount.getId()).content(requestBody))
+        mockMvc.perform(put("/api/accounts/" + parentAccount.getId()).content(requestBody))
                 .andExpect(status().isBadRequest());
     }
 }

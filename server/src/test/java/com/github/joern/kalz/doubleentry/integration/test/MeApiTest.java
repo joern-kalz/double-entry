@@ -47,7 +47,7 @@ public class MeApiTest {
 
     @Test
     public void shouldProvideUserInformation() throws Exception {
-        mockMvc.perform(get("/me").with(user(USERNAME)))
+        mockMvc.perform(get("/api/me").with(user(USERNAME)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is(USERNAME)));
     }
@@ -57,7 +57,7 @@ public class MeApiTest {
         String newPassword = "NEW_PASSWORD";
         String requestBody = "{\"oldPassword\":\"" + PASSWORD + "\",\"newPassword\":\"" + newPassword + "\"}";
 
-        mockMvc.perform(patch("/me").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        mockMvc.perform(patch("/api/me").contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isNoContent());
 
         Optional<User> user = usersRepository.findById(USERNAME);
@@ -70,7 +70,7 @@ public class MeApiTest {
         String newPassword = "NEW_PASSWORD";
         String requestBody = "{\"oldPassword\":\"" + newPassword + "\",\"newPassword\":\"" + newPassword + "\"}";
 
-        mockMvc.perform(patch("/me").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        mockMvc.perform(patch("/api/me").contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isBadRequest());
 
         Optional<User> user = usersRepository.findById(USERNAME);

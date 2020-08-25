@@ -37,7 +37,7 @@ public class SignUpApiTest {
     public void shouldSignUp() throws Exception {
         String requestBody = "{\"name\":\"joern\",\"password\":\"secret\"}";
 
-        mockMvc.perform(post("/sign-up")
+        mockMvc.perform(post("/api/sign-up")
                 .content(requestBody))
                 .andExpect(status().isCreated());
 
@@ -49,7 +49,7 @@ public class SignUpApiTest {
     public void shouldFailIfNameMissing() throws Exception {
         String requestBody = "{\"password\":\"secret\"}";
 
-        mockMvc.perform(post("/sign-up")
+        mockMvc.perform(post("/api/sign-up")
                 .content(requestBody))
                 .andExpect(status().isBadRequest());
 
@@ -61,11 +61,11 @@ public class SignUpApiTest {
     public void shouldFailIfUserAlreadyExists() throws Exception {
         String requestBody = "{\"name\":\"joern\",\"password\":\"secret\"}";
 
-        mockMvc.perform(post("/sign-up")
+        mockMvc.perform(post("/api/sign-up")
                 .content(requestBody))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(post("/sign-up")
+        mockMvc.perform(post("/api/sign-up")
                 .content(requestBody))
                 .andExpect(status().isConflict());
     }
