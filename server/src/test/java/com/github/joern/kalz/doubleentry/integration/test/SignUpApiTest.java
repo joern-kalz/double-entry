@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -24,6 +25,9 @@ public class SignUpApiTest {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private MockMvc mockMvc;
 
@@ -43,6 +47,7 @@ public class SignUpApiTest {
 
         Optional<User> user = usersRepository.findById("joern");
         assertTrue(user.isPresent());
+        assertTrue(passwordEncoder.matches("secret", user.get().getPassword()));
     }
 
     @Test

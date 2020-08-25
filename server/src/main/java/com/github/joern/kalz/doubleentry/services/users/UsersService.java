@@ -32,13 +32,13 @@ public class UsersService {
     @Transactional
     public void create(CreateUserRequest createUserRequest) {
         String name = createUserRequest.getName();
-        String password = createUserRequest.getPassword();
 
         if (usersRepository.findById(name).isPresent()) {
             throw new AlreadyExistsException("username already exists");
         }
 
-        User createdUser = usersRepository.save(new User(name, password, true));
+        String encodedPassword = passwordEncoder.encode(createUserRequest.getPassword());
+        User createdUser = usersRepository.save(new User(name, encodedPassword, true));
         authoritiesRepository.save(new Authority(createdUser, DEFAULT_AUTHORITY));
     }
 
