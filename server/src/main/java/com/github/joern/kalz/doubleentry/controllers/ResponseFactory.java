@@ -1,8 +1,8 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
-import com.github.joern.kalz.doubleentry.generated.model.GetAccountResponse;
-import com.github.joern.kalz.doubleentry.generated.model.GetTransactionResponse;
-import com.github.joern.kalz.doubleentry.generated.model.GetTransactionResponseEntries;
+import com.github.joern.kalz.doubleentry.generated.model.ApiAccount;
+import com.github.joern.kalz.doubleentry.generated.model.ApiTransaction;
+import com.github.joern.kalz.doubleentry.generated.model.ApiTransactionEntries;
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.Entry;
 import com.github.joern.kalz.doubleentry.models.Transaction;
@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ResponseFactory {
-    public GetTransactionResponse convertToResponse(Transaction transaction) {
-        return new GetTransactionResponse()
+    public ApiTransaction convertToResponse(Transaction transaction) {
+        return new ApiTransaction()
                 .id(transaction.getId())
                 .date(transaction.getDate())
                 .name(transaction.getName())
@@ -22,15 +22,15 @@ public class ResponseFactory {
                         .collect(Collectors.toList()));
     }
 
-    public GetTransactionResponseEntries convertToResponse(Entry entry) {
-        return new GetTransactionResponseEntries()
+    public ApiTransactionEntries convertToResponse(Entry entry) {
+        return new ApiTransactionEntries()
                 .accountId(entry.getId().getAccount().getId())
                 .amount(entry.getAmount())
                 .verified(entry.isVerified());
     }
 
-    public GetAccountResponse convertToResponse(Account account) {
-        return new GetAccountResponse()
+    public ApiAccount convertToResponse(Account account) {
+        return new ApiAccount()
                 .id(account.getId())
                 .name(account.getName())
                 .parentId(account.getParent() != null ? account.getParent().getId() : null)

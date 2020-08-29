@@ -32,13 +32,17 @@ public class RepositoryService {
         return getRepositoryResponse;
     }
 
-    @Transactional
     public void importRepository(ImportRepositoryRequest importRepositoryRequest) {
-        Map<Long, Account> databaseAccountsByImportId = importAccounts(importRepositoryRequest.getAccounts());
-        importTransactions(importRepositoryRequest.getTransactions(), databaseAccountsByImportId);
+        importRepository(principalProvider.getPrincipal(), importRepositoryRequest);
     }
 
-    private Map<Long, Account> importAccounts(List<ImportRepositoryRequestAccount> importAccounts) {
+    @Transactional
+    public void importRepository(User user, ImportRepositoryRequest importRepositoryRequest) {
+        Map<Long, Account> databaseAccountsByImportId = importAccounts(user, importRepositoryRequest.getAccounts());
+        importTransactions(user, importRepositoryRequest.getTransactions(), databaseAccountsByImportId);
+    }
+
+    private Map<Long, Account> importAccounts(User user, List<ImportRepositoryRequestAccount> importAccounts) {
         Map<Long, List<ImportRepositoryRequestAccount>> importAccountsByParentId = importAccounts.stream()
                 .filter(importAccount -> importAccount.getParentId() != null)
                 .collect(Collectors.groupingBy(ImportRepositoryRequestAccount::getParentId));
@@ -52,7 +56,7 @@ public class RepositoryService {
                 throw new ParameterException("cyclic parent child relationship in account list");
             }
 
-            Account databaseAccount = createAccount(importAccount, databaseAccountsByImportId);
+            Account databaseAccount = createAccount(user, importAccount, databaseAccountsByImportId);
             databaseAccountsByImportId.put(importAccount.getId(), databaseAccount);
             toBeAdded.addAll(getChildren(importAccount, importAccountsByParentId));
         }
@@ -79,12 +83,12 @@ public class RepositoryService {
         return rootAccounts;
     }
 
-    private Account createAccount(ImportRepositoryRequestAccount importAccount,
+    private Account createAccount(User user, ImportRepositoryRequestAccount importAccount,
               Map<Long, Account> databaseAccountsByImportId) {
         Account parentDatabaseAccount = databaseAccountsByImportId.get(importAccount.getParentId());
 
         Account databaseAccount = new Account();
-        databaseAccount.setUser(principalProvider.getPrincipal());
+        databaseAccount.setUser(user);
         databaseAccount.setName(importAccount.getName());
         databaseAccount.setActive(importAccount.isActive());
         databaseAccount.setParent(parentDatabaseAccount);
@@ -105,11 +109,11 @@ public class RepositoryService {
                 .collect(Collectors.toList());
     }
 
-    private void importTransactions(List<ImportRepositoryRequestTransaction> importTransactions,
+    private void importTransactions(User user, List<ImportRepositoryRequestTransaction> importTransactions,
                                     Map<Long, Account> databaseAccountsByImportId) {
         for (ImportRepositoryRequestTransaction importTransaction : importTransactions) {
             Transaction transaction = new Transaction();
-            transaction.setUser(principalProvider.getPrincipal());
+            transaction.setUser(user);
             transaction.setDate(importTransaction.getDate());
             transaction.setName(importTransaction.getName());
             transaction.setEntries(importTransaction.getEntries().stream()

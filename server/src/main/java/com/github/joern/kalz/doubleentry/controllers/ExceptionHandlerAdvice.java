@@ -1,6 +1,6 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
-import com.github.joern.kalz.doubleentry.generated.model.ErrorResponse;
+import com.github.joern.kalz.doubleentry.generated.model.ApiErrorResponse;
 import com.github.joern.kalz.doubleentry.services.exceptions.AlreadyExistsException;
 import com.github.joern.kalz.doubleentry.services.exceptions.NotFoundException;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
@@ -24,25 +24,26 @@ public class ExceptionHandlerAdvice {
 
     @ExceptionHandler(ParameterException.class)
     public ResponseEntity<Object> handleParameterException(ParameterException exception) {
-        ErrorResponse errorResponse = new ErrorResponse().message("parameter error: " + exception.getMessage());
+        ApiErrorResponse errorResponse = new ApiErrorResponse().message("parameter error: " + exception.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<Object> handleAlreadyExistsException(AlreadyExistsException exception) {
-        ErrorResponse errorResponse = new ErrorResponse().message("already exists error: " + exception.getMessage());
+        ApiErrorResponse errorResponse = new ApiErrorResponse().message("already exists error: " + exception.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(NotFoundException exception) {
-        ErrorResponse errorResponse = new ErrorResponse().message("not found error: " + exception.getMessage());
+        ApiErrorResponse errorResponse = new ApiErrorResponse().message("not found error: " + exception.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(HttpMessageConversionException.class)
     public ResponseEntity<Object> handleHttpMessageConversionException(HttpMessageConversionException exception) {
-        ErrorResponse errorResponse = new ErrorResponse().message("Request structure invalid");
+        String message = "Request structure invalid: " + exception.getMessage();
+        ApiErrorResponse errorResponse = new ApiErrorResponse().message(message);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -52,7 +53,7 @@ public class ExceptionHandlerAdvice {
                 .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                 .collect(Collectors.joining("; "));
 
-        ErrorResponse errorResponse = new ErrorResponse().message(message);
+        ApiErrorResponse errorResponse = new ApiErrorResponse().message(message);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -60,7 +61,7 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Object> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException exception) {
         String message = "Parameter " + exception.getParameter().getParameterName() + " has invalid type";
-        ErrorResponse errorResponse = new ErrorResponse().message(message);
+        ApiErrorResponse errorResponse = new ApiErrorResponse().message(message);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -74,7 +75,7 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUnexpectedException(Exception exception) {
         LOG.error("unexpected exception", exception);
-        ErrorResponse errorResponse = new ErrorResponse().message("internal error");
+        ApiErrorResponse errorResponse = new ApiErrorResponse().message("internal error");
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

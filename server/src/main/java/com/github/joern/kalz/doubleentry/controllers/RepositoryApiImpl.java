@@ -1,10 +1,10 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.RepositoryApi;
-import com.github.joern.kalz.doubleentry.generated.model.GetAccountResponse;
-import com.github.joern.kalz.doubleentry.generated.model.GetTransactionResponse;
-import com.github.joern.kalz.doubleentry.generated.model.Repository;
-import com.github.joern.kalz.doubleentry.services.repository.*;
+import com.github.joern.kalz.doubleentry.generated.model.ApiRepository;
+import com.github.joern.kalz.doubleentry.services.repository.GetRepositoryResponse;
+import com.github.joern.kalz.doubleentry.services.repository.ImportRepositoryRequest;
+import com.github.joern.kalz.doubleentry.services.repository.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +23,14 @@ public class RepositoryApiImpl implements RepositoryApi {
     @Autowired
     private ResponseFactory responseFactory;
 
+    @Autowired
+    private RequestFactory requestFactory;
+
     @Override
-    public ResponseEntity<Repository> exportRepository() {
+    public ResponseEntity<ApiRepository> exportRepository() {
         GetRepositoryResponse getRepositoryResponse = repositoryService.getRepository();
 
-        Repository responseBody = new Repository();
+        ApiRepository responseBody = new ApiRepository();
         responseBody.setAccounts(getRepositoryResponse.getAccounts().stream()
                 .map(responseFactory::convertToResponse)
                 .collect(Collectors.toList()));
@@ -39,47 +42,9 @@ public class RepositoryApiImpl implements RepositoryApi {
     }
 
     @Override
-    public ResponseEntity<Void> importRepository(@Valid Repository repository) {
-        ImportRepositoryRequest request = new ImportRepositoryRequest();
-
-        request.setAccounts(repository.getAccounts().stream()
-                .map(this::convertAccount)
-                .collect(Collectors.toList()));
-
-        request.setTransactions(repository.getTransactions().stream()
-                .map(this::convertTransaction)
-                .collect(Collectors.toList()));
-
+    public ResponseEntity<Void> importRepository(@Valid ApiRepository repository) {
+        ImportRepositoryRequest request = requestFactory.convertToRequest(repository);
         repositoryService.importRepository(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    private ImportRepositoryRequestAccount convertAccount(GetAccountResponse account) {
-        ImportRepositoryRequestAccount importAccount = new ImportRepositoryRequestAccount();
-        importAccount.setId(account.getId());
-        importAccount.setName(account.getName());
-        importAccount.setParentId(account.getParentId());
-        importAccount.setActive(account.getActive());
-        return importAccount;
-    }
-
-    private ImportRepositoryRequestTransaction convertTransaction(GetTransactionResponse transaction) {
-        ImportRepositoryRequestTransaction importTransaction = new ImportRepositoryRequestTransaction();
-        importTransaction.setId(transaction.getId());
-        importTransaction.setDate(transaction.getDate());
-        importTransaction.setName(transaction.getName());
-        importTransaction.setEntries(transaction.getEntries().stream()
-                .map(this::convertEntry)
-                .collect(Collectors.toList()));
-
-        return importTransaction;
-    }
-
-    private ImportRepositoryRequestEntry convertEntry(com.github.joern.kalz.doubleentry.generated.model.GetTransactionResponseEntries entry) {
-        ImportRepositoryRequestEntry importEntry = new ImportRepositoryRequestEntry();
-        importEntry.setAccountId(entry.getAccountId());
-        importEntry.setAmount(entry.getAmount());
-        importEntry.setVerified(entry.getVerified());
-        return importEntry;
     }
 }

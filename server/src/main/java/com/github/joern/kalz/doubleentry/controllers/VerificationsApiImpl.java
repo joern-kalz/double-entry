@@ -1,8 +1,8 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.VerificationsApi;
-import com.github.joern.kalz.doubleentry.generated.model.GetTransactionResponse;
-import com.github.joern.kalz.doubleentry.generated.model.GetVerificationResponse;
+import com.github.joern.kalz.doubleentry.generated.model.ApiTransaction;
+import com.github.joern.kalz.doubleentry.generated.model.ApiGetVerificationResponse;
 import com.github.joern.kalz.doubleentry.services.verifications.UpdateVerificationStateRequest;
 import com.github.joern.kalz.doubleentry.services.verifications.VerificationState;
 import com.github.joern.kalz.doubleentry.services.verifications.VerificationsService;
@@ -26,14 +26,14 @@ public class VerificationsApiImpl implements VerificationsApi {
     private ResponseFactory responseFactory;
 
     @Override
-    public ResponseEntity<GetVerificationResponse> getVerification(Long accountId) {
+    public ResponseEntity<ApiGetVerificationResponse> getVerification(Long accountId) {
         VerificationState verificationState = verificationsService.getVerificationState(accountId);
 
-        List<GetTransactionResponse> unverifiedTransactions = verificationState.getUnverifiedTransactions().stream()
+        List<ApiTransaction> unverifiedTransactions = verificationState.getUnverifiedTransactions().stream()
                 .map(responseFactory::convertToResponse)
                 .collect(Collectors.toList());
 
-        GetVerificationResponse response = new GetVerificationResponse()
+        ApiGetVerificationResponse response = new ApiGetVerificationResponse()
                 .verifiedBalance(verificationState.getVerifiedBalance())
                 .unverifiedTransactions(unverifiedTransactions);
 

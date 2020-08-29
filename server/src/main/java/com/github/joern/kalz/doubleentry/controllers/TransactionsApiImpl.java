@@ -1,10 +1,10 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.TransactionsApi;
-import com.github.joern.kalz.doubleentry.generated.model.CreatedResponse;
-import com.github.joern.kalz.doubleentry.generated.model.GetTransactionResponse;
-import com.github.joern.kalz.doubleentry.generated.model.SaveTransactionRequest;
-import com.github.joern.kalz.doubleentry.generated.model.SaveTransactionRequestEntries;
+import com.github.joern.kalz.doubleentry.generated.model.ApiCreatedResponse;
+import com.github.joern.kalz.doubleentry.generated.model.ApiTransaction;
+import com.github.joern.kalz.doubleentry.generated.model.ApiSaveTransactionRequest;
+import com.github.joern.kalz.doubleentry.generated.model.ApiSaveTransactionRequestEntries;
 import com.github.joern.kalz.doubleentry.models.Transaction;
 import com.github.joern.kalz.doubleentry.services.transactions.CreateTransactionRequest;
 import com.github.joern.kalz.doubleentry.services.transactions.RequestEntry;
@@ -33,10 +33,10 @@ public class TransactionsApiImpl implements TransactionsApi {
     private ResponseFactory responseFactory;
 
     @Override
-    public ResponseEntity<CreatedResponse> createTransaction(@Valid SaveTransactionRequest saveTransactionRequest) {
+    public ResponseEntity<ApiCreatedResponse> createTransaction(@Valid ApiSaveTransactionRequest saveTransactionRequest) {
         CreateTransactionRequest createTransactionRequest = convertToCreateTransactionRequest(saveTransactionRequest);
         Transaction transaction = transactionsService.create(createTransactionRequest);
-        CreatedResponse createdResponse = new CreatedResponse().createdId(transaction.getId());
+        ApiCreatedResponse createdResponse = new ApiCreatedResponse().createdId(transaction.getId());
         return new ResponseEntity<>(createdResponse, HttpStatus.CREATED);
     }
 
@@ -47,17 +47,17 @@ public class TransactionsApiImpl implements TransactionsApi {
     }
 
     @Override
-    public ResponseEntity<GetTransactionResponse> getTransaction(Long transactionId) {
+    public ResponseEntity<ApiTransaction> getTransaction(Long transactionId) {
         Transaction transaction = transactionsService.findById(transactionId);
-        GetTransactionResponse getTransactionResponse = responseFactory.convertToResponse(transaction);
+        ApiTransaction getTransactionResponse = responseFactory.convertToResponse(transaction);
         return new ResponseEntity<>(getTransactionResponse, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<List<GetTransactionResponse>> getTransactions(@Valid LocalDate after,
+    public ResponseEntity<List<ApiTransaction>> getTransactions(@Valid LocalDate after,
                                                                         @Valid LocalDate before,
                                                                         @Valid Long accountId) {
-        List<GetTransactionResponse> responseBody = transactionsService.findByDateAndAccount(after, before, accountId)
+        List<ApiTransaction> responseBody = transactionsService.findByDateAndAccount(after, before, accountId)
                 .stream()
                 .map(responseFactory::convertToResponse)
                 .collect(Collectors.toList());
@@ -67,14 +67,14 @@ public class TransactionsApiImpl implements TransactionsApi {
 
     @Override
     public ResponseEntity<Void> updateTransaction(Long transactionId,
-                                                  @Valid SaveTransactionRequest saveTransactionRequest) {
+                                                  @Valid ApiSaveTransactionRequest saveTransactionRequest) {
         UpdateTransactionRequest updateTransactionRequest = convertToUpdateTransactionRequest(transactionId,
                 saveTransactionRequest);
         transactionsService.update(updateTransactionRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private CreateTransactionRequest convertToCreateTransactionRequest(SaveTransactionRequest saveTransactionRequest) {
+    private CreateTransactionRequest convertToCreateTransactionRequest(ApiSaveTransactionRequest saveTransactionRequest) {
         CreateTransactionRequest createTransactionRequest = new CreateTransactionRequest();
         createTransactionRequest.setDate(saveTransactionRequest.getDate());
         createTransactionRequest.setName(saveTransactionRequest.getName());
@@ -83,7 +83,7 @@ public class TransactionsApiImpl implements TransactionsApi {
     }
 
     private UpdateTransactionRequest convertToUpdateTransactionRequest(long id,
-                                                                       SaveTransactionRequest saveTransactionRequest) {
+                                                                       ApiSaveTransactionRequest saveTransactionRequest) {
         UpdateTransactionRequest updateTransactionRequest = new UpdateTransactionRequest();
         updateTransactionRequest.setId(id);
         updateTransactionRequest.setDate(saveTransactionRequest.getDate());
@@ -92,7 +92,7 @@ public class TransactionsApiImpl implements TransactionsApi {
         return updateTransactionRequest;
     }
 
-    private List<RequestEntry> convertToRequestEntries(List<SaveTransactionRequestEntries> entries) {
+    private List<RequestEntry> convertToRequestEntries(List<ApiSaveTransactionRequestEntries> entries) {
         return entries.stream()
                 .map(entry -> {
                     RequestEntry requestEntry = new RequestEntry();

@@ -39,6 +39,7 @@ openApiGenerate {
     apiPackage.set("com.github.joern.kalz.doubleentry.generated.api")
     modelPackage.set("com.github.joern.kalz.doubleentry.generated.model")
     outputDir.set("$buildDir/generated/openapi")
+    modelNamePrefix.set("Api")
     configOptions.set(mapOf(
             "dateLibrary" to "java8",
             "interfaceOnly" to "true",

@@ -1,9 +1,9 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.AccountsApi;
-import com.github.joern.kalz.doubleentry.generated.model.CreatedResponse;
-import com.github.joern.kalz.doubleentry.generated.model.GetAccountResponse;
-import com.github.joern.kalz.doubleentry.generated.model.SaveAccountRequest;
+import com.github.joern.kalz.doubleentry.generated.model.ApiCreatedResponse;
+import com.github.joern.kalz.doubleentry.generated.model.ApiAccount;
+import com.github.joern.kalz.doubleentry.generated.model.ApiSaveAccountRequest;
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.services.accounts.AccountsService;
 import com.github.joern.kalz.doubleentry.services.accounts.CreateAccountRequest;
@@ -29,16 +29,16 @@ public class AccountsApiImpl implements AccountsApi {
     private ResponseFactory responseFactory;
 
     @Override
-    public ResponseEntity<CreatedResponse> createAccount(@Valid SaveAccountRequest saveAccountRequest) {
+    public ResponseEntity<ApiCreatedResponse> createAccount(@Valid ApiSaveAccountRequest saveAccountRequest) {
         CreateAccountRequest createAccountRequest = createCreateAccountRequest(saveAccountRequest);
         Account account = accountsService.createAccount(createAccountRequest);
-        CreatedResponse createdResponse = new CreatedResponse().createdId(account.getId());
+        ApiCreatedResponse createdResponse = new ApiCreatedResponse().createdId(account.getId());
         return new ResponseEntity<>(createdResponse, HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<List<GetAccountResponse>> getAccounts() {
-        List<GetAccountResponse> responseBody = accountsService.findAll().stream()
+    public ResponseEntity<List<ApiAccount>> getAccounts() {
+        List<ApiAccount> responseBody = accountsService.findAll().stream()
                 .map(responseFactory::convertToResponse)
                 .collect(Collectors.toList());
 
@@ -46,13 +46,13 @@ public class AccountsApiImpl implements AccountsApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateAccount(Long accountId, @Valid SaveAccountRequest saveAccountRequest) {
+    public ResponseEntity<Void> updateAccount(Long accountId, @Valid ApiSaveAccountRequest saveAccountRequest) {
         UpdateAccountRequest updateAccountRequest = createUpdateAccountRequest(accountId, saveAccountRequest);
         accountsService.updateAccount(updateAccountRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private CreateAccountRequest createCreateAccountRequest(SaveAccountRequest saveAccountRequest) {
+    private CreateAccountRequest createCreateAccountRequest(ApiSaveAccountRequest saveAccountRequest) {
         CreateAccountRequest createAccountRequest = new CreateAccountRequest();
         createAccountRequest.setName(saveAccountRequest.getName());
         createAccountRequest.setParentId(saveAccountRequest.getParentId());
@@ -60,7 +60,7 @@ public class AccountsApiImpl implements AccountsApi {
         return createAccountRequest;
     }
 
-    private UpdateAccountRequest createUpdateAccountRequest(long id, SaveAccountRequest saveAccountRequest) {
+    private UpdateAccountRequest createUpdateAccountRequest(long id, ApiSaveAccountRequest saveAccountRequest) {
         UpdateAccountRequest updateAccountRequest = new UpdateAccountRequest();
         updateAccountRequest.setId(id);
         updateAccountRequest.setName(saveAccountRequest.getName());

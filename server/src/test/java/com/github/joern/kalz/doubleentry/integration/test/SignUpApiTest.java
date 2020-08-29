@@ -39,7 +39,8 @@ public class SignUpApiTest {
 
     @Test
     public void shouldSignUp() throws Exception {
-        String requestBody = "{\"name\":\"joern\",\"password\":\"secret\"}";
+        String requestBody = "{\"name\":\"joern\",\"password\":\"secret\"," +
+                "\"repository\":{\"accounts\":[{\"id\":1,\"name\":\"root\",\"active\":true}],\"transactions\":[]}}";
 
         mockMvc.perform(post("/api/sign-up")
                 .content(requestBody))
@@ -52,7 +53,8 @@ public class SignUpApiTest {
 
     @Test
     public void shouldFailIfNameMissing() throws Exception {
-        String requestBody = "{\"password\":\"secret\"}";
+        String requestBody = "{\"password\":\"secret\"," +
+                "\"repository\":{\"accounts\":[{\"id\":1,\"name\":\"root\",\"active\":true}],\"transactions\":[]}}";
 
         mockMvc.perform(post("/api/sign-up")
                 .content(requestBody))
@@ -64,7 +66,8 @@ public class SignUpApiTest {
 
     @Test
     public void shouldFailIfUserAlreadyExists() throws Exception {
-        String requestBody = "{\"name\":\"joern\",\"password\":\"secret\"}";
+        String requestBody = "{\"name\":\"joern\",\"password\":\"secret\"," +
+                "\"repository\":{\"accounts\":[{\"id\":1,\"name\":\"root\",\"active\":true}],\"transactions\":[]}}";
 
         mockMvc.perform(post("/api/sign-up")
                 .content(requestBody))

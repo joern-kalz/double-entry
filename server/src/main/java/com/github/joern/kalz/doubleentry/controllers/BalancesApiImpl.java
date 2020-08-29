@@ -1,7 +1,7 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.BalancesApi;
-import com.github.joern.kalz.doubleentry.generated.model.GetBalanceResponse;
+import com.github.joern.kalz.doubleentry.generated.model.ApiGetBalanceResponse;
 import com.github.joern.kalz.doubleentry.services.balances.BalancesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,9 +22,9 @@ public class BalancesApiImpl implements BalancesApi {
     private BalancesService balancesService;
 
     @Override
-    public ResponseEntity<List<GetBalanceResponse>> getBalances(@Valid LocalDate after, @Valid LocalDate before) {
-        List<GetBalanceResponse> balances = balancesService.getBalances(after, before).entrySet().stream()
-                .map(balance -> new GetBalanceResponse()
+    public ResponseEntity<List<ApiGetBalanceResponse>> getBalances(@Valid LocalDate after, @Valid LocalDate before) {
+        List<ApiGetBalanceResponse> balances = balancesService.getBalances(after, before).entrySet().stream()
+                .map(balance -> new ApiGetBalanceResponse()
                         .accountId(balance.getKey())
                         .balance(balance.getValue()))
                 .collect(Collectors.toList());

@@ -7,6 +7,7 @@ import com.github.joern.kalz.doubleentry.models.Authority;
 import com.github.joern.kalz.doubleentry.models.User;
 import com.github.joern.kalz.doubleentry.models.UsersRepository;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
+import com.github.joern.kalz.doubleentry.services.repository.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,9 @@ public class UsersService {
     @Autowired
     private PrincipalProvider principalProvider;
 
+    @Autowired
+    private RepositoryService repositoryService;
+
     @Transactional
     public void create(CreateUserRequest createUserRequest) {
         String name = createUserRequest.getName();
@@ -40,6 +44,8 @@ public class UsersService {
         String encodedPassword = passwordEncoder.encode(createUserRequest.getPassword());
         User createdUser = usersRepository.save(new User(name, encodedPassword, true));
         authoritiesRepository.save(new Authority(createdUser, DEFAULT_AUTHORITY));
+
+        repositoryService.importRepository(createdUser, createUserRequest.getImportRepositoryRequest());
     }
 
     public User getMe() {
