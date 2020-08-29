@@ -1,0 +1,16 @@
+<ng-container *ngFor="let level of levelArray">&nbsp;</ng-container>
+
+<ng-container [ngSwitch]="account">
+    <ng-container *ngSwitchCase="accountsHierarchy.assetAccount">
+        Bestand
+    </ng-container>
+    <ng-container *ngSwitchCase="accountsHierarchy.expenseAccount">
+        Ausgaben
+    </ng-container>
+    <ng-container *ngSwitchCase="accountsHierarchy.revenueAccount">
+        Einnahmen
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+        {{account.name}}
+    </ng-container>
+</ng-container>

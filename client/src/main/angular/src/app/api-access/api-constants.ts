@@ -1,0 +1,1 @@
+export const API_DATE = 'YYYY-MM-DD';

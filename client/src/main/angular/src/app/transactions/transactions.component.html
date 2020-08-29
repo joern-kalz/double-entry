@@ -1,0 +1,89 @@
+<form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors">
+    <select formControlName="dateSelectionType">
+        <option [value]="INTERVAL">Zeitraum</option>
+        <option [value]="MONTH">Monat</option>
+    </select>
+    <ng-container [ngSwitch]="dateSelectionType.value">
+        <div *ngSwitchCase="INTERVAL">
+            <label>
+                <span>von</span>
+                <input formControlName="after" #after>
+            </label>
+            <label>
+                <span>bis</span>
+                <input formControlName="before">
+            </label>
+        </div>
+        <div *ngSwitchCase="MONTH">
+            <button type="button" (click)="decrementMonth()">&lt;</button>
+            <span>{{month < 10 ? '0' + month : month}} / {{year}}</span>
+            <button type="button" (click)="incrementMonth()">&gt;</button>
+        </div>
+    </ng-container>
+    <select formControlName="account">
+        <option [value]="null">Alle Konten</option>
+        <option *ngFor="let account of accountsHierarchy?.accountsList" [value]="account.id">
+            <app-account-name [account]="account" [accountsHierarchy]="accountsHierarchy" [indented]="true">
+            </app-account-name>
+        </option>
+    </select>
+    <button type="submit">Suchen</button>
+</form>
+
+<div *ngFor="let transaction of transactions" (click)="select(transaction)">
+    <div>{{transaction.date | date}}</div>
+    <div>{{transaction.name}}</div>
+    <div>
+        von
+        <ng-container *ngFor="let entry of transaction.creditEntries; last as last">
+            <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
+            <ng-container *ngIf="!last">, </ng-container>
+        </ng-container>
+    </div>
+    <div>
+        nach
+        <ng-container *ngFor="let entry of transaction.debitEntries; last as last">
+            <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
+            <ng-container *ngIf="!last">, </ng-container>
+        </ng-container>
+    </div>
+    <div>{{transaction.total | amount}}</div>
+</div>
+
+<div *ngIf="selectedTransaction">
+    <div>
+        <div>Datum</div>
+        <div>{{selectedTransaction.date | date}}</div>
+    </div>
+    <div>
+        <div>Beschreibung</div>
+        <div>{{selectedTransaction.name}}</div>
+    </div>
+    <div>
+        <div>Von</div>
+        <div *ngFor="let entry of selectedTransaction.creditEntries">
+            <div>
+                <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
+            </div>
+            <div>
+                <ng-container *ngIf="entry.verified">verifiziert</ng-container>
+            </div>
+            <div>{{entry.amount | amount}}</div>
+        </div>
+        <div>Nach</div>
+        <div *ngFor="let entry of selectedTransaction.debitEntries">
+            <div>
+                <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
+            </div>
+            <div>
+                <ng-container *ngIf="entry.verified">verifiziert</ng-container>
+            </div>
+            <div>{{entry.amount | amount}}</div>
+        </div>
+    </div>
+    <div>
+        <button (click)="delete()">Löschen</button>
+        <button (click)="edit()">Bearbeiten</button>
+        <button (click)="select(null)">Schließen</button>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+<h1>Anmeldung</h1>
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <label>
+        <span>Name</span>
+        <input formControlName="username">
+    </label>
+    <label>
+        <span>Passwort</span>
+        <input formControlName="password" type="password">
+    </label>
+    <div>
+        <button type="button" (click)="signUp()">Registrieren</button>
+        <button type="submit">Anmelden</button>
+    </div>
+</form>

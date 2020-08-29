@@ -1,0 +1,18 @@
+<h1>Registrierung</h1>
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <label>
+        <span>Name</span>
+        <input formControlName="username">
+    </label>
+    <label>
+        <span>Passwort</span>
+        <input formControlName="password" type="password">
+    </label>
+    <label>
+        <span>Backup wiederherstellen</span>
+        <input formControlName="file" type="file" (change)="fileChanged($event)">
+    </label>
+    <div>
+        <button type="submit">Registrieren</button>
+    </div>
+</form>

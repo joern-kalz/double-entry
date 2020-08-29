@@ -1,0 +1,40 @@
+<div *ngIf="message != null">
+    <div>
+        <div [ngSwitch]="message">
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_SERVER">
+                Fehler bei der Verbindung zum Server.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_SESSION_EXPIRED">
+                Sitzung abgelaufen. Erneute Anmeldung erforderlich.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_USERNAME_AND_PASSWORD_REQUIRED">
+                Bitte geben Sie Benutzername und Passwort ein.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_AUTHENTICATION">
+                Benutzername oder Passwort ungültig.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_USER_ALREADY_EXITS">
+                Benutzername {{parameters.username}} ist bereits vergeben. Bitte wählen Sie einen anderen Benutzernamen.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_USERNAME">
+                Der Benutzername muss zwischen 5 und 50 Zeichen lang sein.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_PASSWORD">
+                Das Passwort muss zwischen 10 und 50 Zeichen lang sein.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_REPOSITORY">
+                Das Backup ist beschädigt und kann nicht wiederhergestellt werden.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.REGISTRATION_SUCCESS">
+                Sie wurden erfolgreich registriert. Bitte melden Sie sich nun mit Ihrem Benutzername und Passwort an.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.REMOVE_TRANSACTION">
+                Wollen Sie die Transaktion löschen?
+            </ng-container>
+        </div>
+        <div>
+            <button (click)="ok()">OK</button>
+            <button *ngIf="showCancel" (cancel)="cancel()">Abbrechen</button>
+        </div>
+    </div>
+</div>
