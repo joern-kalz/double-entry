@@ -1,0 +1,104 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    
+    <div class="field">
+        <label>
+            <span>Datum</span>
+            <input formControlName="date">
+        </label>
+        <div *ngIf="showErrors && date.invalid">
+            Gültiges Datum erforderlich
+        </div>
+    </div>
+
+    <div class="field">
+        <label>
+            <span>Beschreibung</span>
+            <input formControlName="name">
+        </label>
+        <div *ngIf="showErrors && name.invalid">
+            Beschreibung erforderlich
+        </div>
+    </div>
+
+    <div formArrayName="creditEntries" class="list">
+        <div *ngFor="let entry of creditEntries.controls; let i = index; first as first" [formGroupName]="i">
+            <div class="field">
+                <label>
+                    <span *ngIf="first">Nach Konto</span>
+                    <span *ngIf="!first">Und Konto</span>
+                    <select formControlName="account">
+                        <option *ngFor="let account of creditAccountList" [ngValue]="account.id">
+                            <app-account-name [account]="account" [accountsHierarchy]="accountHierarchy" 
+                                [indented]="true">
+                            </app-account-name>
+                        </option>
+                    </select>
+                </label>
+                <div *ngIf="showErrors && entry.get('account').invalid">
+                    Konto erforderlich
+                </div>
+            </div>
+            <div class="field">
+                <label>
+                    <span>Betrag</span>
+                    <input formControlName="amount">
+                </label>
+                <div *ngIf="showErrors && entry.get('amount').invalid">
+                    Gültiger Betrag erforderlich
+                </div>
+            </div>
+            <button type="button" (click)="deleteCreditEntry(i)" [disabled]="creditEntries.length < 2">Löschen</button>
+        </div>
+        <button type="button" (click)="addCreditEntry()">Hinzufügen</button>
+    </div>
+
+    <div formArrayName="debitEntries" class="list">
+        <div *ngFor="let entry of debitEntries.controls; let i = index; first as first" [formGroupName]="i">
+            <div class="field">
+                <label>
+                    <span *ngIf="first">Nach Konto</span>
+                    <span *ngIf="!first">Und Konto</span>
+                    <select formControlName="account">
+                        <option *ngFor="let account of debitAccountList" [ngValue]="account.id">
+                            <app-account-name [account]="account" [accountsHierarchy]="accountHierarchy" 
+                                [indented]="true">
+                            </app-account-name>
+                        </option>
+                    </select>
+                </label>
+                <div *ngIf="showErrors && entry.get('account').invalid">
+                    Konto erforderlich
+                </div>
+            </div>
+            <div class="field">
+                <label>
+                    <span>Betrag</span>
+                    <input formControlName="amount">
+                </label>
+                <div *ngIf="showErrors && entry.get('amount').invalid">
+                    Gültiger Betrag erforderlich
+                </div>
+            </div>
+            <button type="button" (click)="deleteDebitEntry(i)" [disabled]="debitEntries.length < 2">Löschen</button>
+        </div>
+        <button type="button" (click)="addDebitEntry()">Hinzufügen</button>
+    </div>
+
+    <div>
+        <div *ngIf="showErrors && form.errors?.accountsUnique">
+            Konto doppelt erfasst: 
+            <app-account-name [account]="accountHierarchy.accountsById.get(form.errors.accountsUnique.duplicate)" 
+                [accountsHierarchy]="accountHierarchy">
+            </app-account-name>
+        </div>
+        <div *ngIf="showErrors && form.errors?.totalIsZero">
+            Summe der Beträge muss Null ergeben
+        </div>
+    </div>
+    
+    <div>
+        <button type="button" (click)="cancel()">Abbrechen</button>
+        <button [disabled]="submitted">Speichern</button>
+    </div>
+    
+</form>

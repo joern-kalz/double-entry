@@ -1,7 +1,7 @@
 <form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors">
     <select formControlName="dateSelectionType">
-        <option [value]="INTERVAL">Zeitraum</option>
         <option [value]="MONTH">Monat</option>
+        <option [value]="INTERVAL">Zeitraum</option>
     </select>
     <ng-container [ngSwitch]="dateSelectionType.value">
         <div *ngSwitchCase="INTERVAL">
@@ -22,7 +22,7 @@
     </ng-container>
     <select formControlName="account">
         <option [value]="null">Alle Konten</option>
-        <option *ngFor="let account of accountsHierarchy?.accountsList" [value]="account.id">
+        <option *ngFor="let account of accountsHierarchy?.accountsList" [ngValue]="account.id">
             <app-account-name [account]="account" [accountsHierarchy]="accountsHierarchy" [indented]="true">
             </app-account-name>
         </option>
@@ -37,14 +37,14 @@
         von
         <ng-container *ngFor="let entry of transaction.creditEntries; last as last">
             <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
-            <ng-container *ngIf="!last">, </ng-container>
+            <ng-container *ngIf="!last">/</ng-container>
         </ng-container>
     </div>
     <div>
         nach
         <ng-container *ngFor="let entry of transaction.debitEntries; last as last">
             <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
-            <ng-container *ngIf="!last">, </ng-container>
+            <ng-container *ngIf="!last">/</ng-container>
         </ng-container>
     </div>
     <div>{{transaction.total | amount}}</div>

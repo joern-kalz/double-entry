@@ -15,6 +15,7 @@ import { DialogService } from '../dialogs/dialog.service';
 import { DialogMessage } from '../dialogs/dialog-message.enum';
 import { DialogButton } from '../dialogs/dialog-button.enum';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
+import { ContextService } from '../context/context.service';
 
 @Component({
   selector: 'app-transactions',
@@ -55,6 +56,7 @@ export class TransactionsComponent implements OnInit {
     private accountsHierarchyService: AccountHierarchyService,
     private dialogService: DialogService,
     private apiErrorHandlerService: ApiErrorHandlerService,
+    private contextService: ContextService
   ) { }
 
   ngOnInit() {
@@ -92,7 +94,7 @@ export class TransactionsComponent implements OnInit {
     const after = moment().startOf('month');
     const before = after.clone().endOf('month');
 
-    this.dateSelectionType.setValue(this.INTERVAL);
+    this.dateSelectionType.setValue(this.MONTH);
     this.after.setValue(this.localService.formatDate(after));
     this.before.setValue(this.localService.formatDate(before));
     this.month = moment().month();
@@ -119,13 +121,13 @@ export class TransactionsComponent implements OnInit {
   }
 
   private createViewTransaction(transaction: Transaction): ViewTransaction {
-    const debitEntries = transaction.entries
-      .filter(entry => entry.amount >= 0)
-      .map(entry => this.createViewEntry(entry));
-
     const creditEntries = transaction.entries
       .filter(entry => entry.amount < 0)
-      .map(entry => this.createViewEntry(entry));
+      .map(entry => this.createViewEntry(entry, true));
+
+    const debitEntries = transaction.entries
+      .filter(entry => entry.amount >= 0)
+      .map(entry => this.createViewEntry(entry, false));
 
     const totalCents = transaction.entries
       .filter(entry => entry.amount >= 0)
@@ -141,10 +143,10 @@ export class TransactionsComponent implements OnInit {
     }
   }
 
-  private createViewEntry(entry: TransactionEntries): ViewTransactionEntry {
+  private createViewEntry(entry: TransactionEntries, isCredit: boolean): ViewTransactionEntry {
     return {
-      amount: entry.amount,
-      account:this.accountsHierarchy.accountsById.get(entry.accountId),
+      amount: (isCredit ? -1 : 1) * entry.amount,
+      account: this.accountsHierarchy.accountsById.get(entry.accountId),
       verified: entry.verified
     }
   }
@@ -213,7 +215,21 @@ export class TransactionsComponent implements OnInit {
   }
 
   edit() {
+    this.contextService.setTransaction({
+      id: this.selectedTransaction.id,
+      date: this.localService.formatDate(this.selectedTransaction.date),
+      name: this.selectedTransaction.name,
+      creditEntries: this.selectedTransaction.creditEntries.map(entry => ({
+        amount: this.localService.formatAmount(entry.amount),
+        account: entry.account,
+      })),
+      debitEntries: this.selectedTransaction.debitEntries.map(entry => ({
+        amount: this.localService.formatAmount(entry.amount),
+        account: entry.account,
+      })),
+    });
 
+    this.router.navigate(['/transaction']);
   }
 
   delete() {

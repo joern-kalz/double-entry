@@ -8,7 +8,7 @@ import { FormControl } from '@angular/forms';
 export class LocalService {
 
   private readonly DATE_FORMAT = 'DD.MM.YYYY';
-  private readonly AMOUNT_FORMAT = /^([-+]?)(\d+)(\,\d+)?$/;
+  private readonly AMOUNT_FORMAT = /^([-+]?)(\d+)(\,(\d+))?$/;
 
   constructor() { }
 
@@ -28,9 +28,10 @@ export class LocalService {
   parseAmount(value: string): number {
     if (this.isEmpty(value)) return null;
     const matcher = value.match(this.AMOUNT_FORMAT);
+    if (!matcher) return null;
     const sign = matcher[1] == '-' ? -1 : 1;
     const integerPart = +matcher[2];
-    const fractionalPart = matcher[3] ? +matcher[3] / Math.pow(10, matcher[3].length) : 0;
+    const fractionalPart = matcher[3] ? +matcher[4] / Math.pow(10, matcher[4].length) : 0;
     return sign * (integerPart + fractionalPart);
   }
 
