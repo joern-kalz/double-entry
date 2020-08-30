@@ -17,14 +17,21 @@ openApiGenerate {
     outputDir.set("$projectDir/src/main/angular/src/app/generated/openapi")
 }
 
-val buildAngular by tasks.registering(NpmTask::class) {
+val angularNpmInstall by tasks.registering(NpmTask::class) {
     dependsOn(tasks.named("openApiGenerate"))
-    setArgs(listOf("--prefix", "src/main/angular", "run", "build"))
+    setWorkingDir(file("src/main/angular"))
+    setArgs(listOf("install"))
+}
+
+val angularNpmBuild by tasks.registering(NpmTask::class) {
+    dependsOn(angularNpmInstall)
+    setWorkingDir(file("src/main/angular"))
+    setArgs(listOf("run", "build"))
 }
 
 tasks {
     named("jar", Jar::class).configure {
-        dependsOn(buildAngular)
+        dependsOn(angularNpmBuild)
         from("$buildDir/generated-resources/main")
         into("static/ui")
     }
