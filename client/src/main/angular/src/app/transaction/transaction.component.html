@@ -34,6 +34,7 @@
                         </option>
                     </select>
                 </label>
+                <button type="button" (click)="createCreditAccount(i)">Neu</button>
                 <div *ngIf="showErrors && entry.get('account').invalid">
                     Konto erforderlich
                 </div>
@@ -66,6 +67,7 @@
                         </option>
                     </select>
                 </label>
+                <button type="button" (click)="createDebitAccount(i)">Neu</button>
                 <div *ngIf="showErrors && entry.get('account').invalid">
                     Konto erforderlich
                 </div>

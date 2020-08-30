@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ContextTransaction } from '../context/context-transaction';
+import { ContextTransaction, EntryType } from '../context/context-transaction';
 import { ContextService } from '../context/context.service';
 import { Router } from '@angular/router';
 import { FormBuilder, Validators, FormControl, ValidatorFn, FormArray, FormGroup, AbstractControl } from '@angular/forms';
@@ -63,11 +63,11 @@ export class TransactionComponent implements OnInit {
       name: transaction.name, 
       date: transaction.date,
       creditEntries: transaction.creditEntries.map(entry => ({
-        account: entry.account.id, 
+        account: entry.account, 
         amount: entry.amount
       })),
       debitEntries: transaction.debitEntries.map(entry => ({
-        account: entry.account.id, 
+        account: entry.account, 
         amount: entry.amount
       })),
     });
@@ -134,6 +134,32 @@ export class TransactionComponent implements OnInit {
     for (let control of debitEntries) {
       callback(control as FormGroup, false);
     }
+  }
+
+  createCreditAccount(index: number) {
+    this.createAccount(EntryType.CREDIT_ACCOUNTS, index);
+  }
+
+  createDebitAccount(index: number) {
+    this.createAccount(EntryType.DEBIT_ACCOUNTS, index);
+  }
+
+  private createAccount(entry: string, index: number) {
+    this.contextService.setTransaction({
+      id: this.contextService.transaction.id,
+      date: this.date.value,
+      name: this.name.value,
+      creditEntries: this.creditEntries.controls.map(control => ({
+        amount: control.get('amount').value,
+        account: control.get('account').value,
+      })),
+      debitEntries: this.debitEntries.controls.map(control => ({
+        amount: control.get('amount').value,
+        account: control.get('account').value,
+      })),
+    });
+
+    this.router.navigate(['/transaction', entry, index, 'new']);
   }
 
   addCreditEntry() {

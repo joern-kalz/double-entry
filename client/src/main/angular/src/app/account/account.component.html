@@ -1,0 +1,34 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    
+    <div class="field">
+        <label>
+            <span>Bezeichnung</span>
+            <input formControlName="name">
+        </label>
+        <div *ngIf="showErrors && name.invalid">
+            Bezeichnung erforderlich
+        </div>
+    </div>
+
+    <div class="field">
+        <label>
+            <span>Gruppe</span>
+            <select formControlName="parent">
+                <option *ngFor="let account of parentAccountList" [ngValue]="account.id">
+                    <app-account-name [account]="account" [accountsHierarchy]="accountHierarchy" 
+                        [indented]="true">
+                    </app-account-name>
+                </option>
+            </select>
+        </label>
+        <div *ngIf="showErrors && parent.invalid">
+            Gruppe erforderlich
+        </div>
+    </div>
+    
+    <div>
+        <button type="button" (click)="cancel()">Abbrechen</button>
+        <button [disabled]="submitted">Speichern</button>
+    </div>
+    
+</form>

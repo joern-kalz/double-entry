@@ -221,11 +221,11 @@ export class TransactionsComponent implements OnInit {
       name: this.selectedTransaction.name,
       creditEntries: this.selectedTransaction.creditEntries.map(entry => ({
         amount: this.localService.formatAmount(entry.amount),
-        account: entry.account,
+        account: entry.account.id,
       })),
       debitEntries: this.selectedTransaction.debitEntries.map(entry => ({
         amount: this.localService.formatAmount(entry.amount),
-        account: entry.account,
+        account: entry.account.id,
       })),
     });
 

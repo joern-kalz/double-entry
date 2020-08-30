@@ -16,6 +16,7 @@ import { DatePipe } from './local/date.pipe';
 import { AmountPipe } from './local/amount.pipe';
 import { AccountNameComponent } from './account-name/account-name.component';
 import { TransactionComponent } from './transaction/transaction.component';
+import { AccountComponent } from './account/account.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { TransactionComponent } from './transaction/transaction.component';
     AmountPipe,
     AccountNameComponent,
     TransactionComponent,
+    AccountComponent,
   ],
   imports: [
     BrowserModule,
