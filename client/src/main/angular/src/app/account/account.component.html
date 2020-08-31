@@ -15,7 +15,7 @@
             <span>Gruppe</span>
             <select formControlName="parent">
                 <option *ngFor="let account of parentAccountList" [ngValue]="account.id">
-                    <app-account-name [account]="account" [accountsHierarchy]="accountHierarchy" 
+                    <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
                         [indented]="true">
                     </app-account-name>
                 </option>

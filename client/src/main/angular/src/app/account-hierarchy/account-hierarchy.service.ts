@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Account } from '../generated/openapi/model/models';
-import { AccountHierarchy } from './account-hierarchy';
+import { AccountHierarchy, AccountType } from './account-hierarchy';
 import { AccountHierarchyNode } from './account-hierarchy-node';
 
 @Injectable({
@@ -27,27 +27,20 @@ export class AccountHierarchyService {
     const accountsById = this.createAccounts(accounts);
     this.updateHierarchyLevels(accountsById);
 
-    const assetAccount = this.getRootAccount(accountsById, this.ASSET);
-    const equityAccount = this.getRootAccount(accountsById, this.EQUITY);
-    const expenseAccount = this.getRootAccount(accountsById, this.EXPENSE);
-    const revenueAccount = this.getRootAccount(accountsById, this.REVENUE);
+    const root = new Map<AccountType, AccountHierarchyNode>();
+    root[AccountType.ASSET] = this.getRootAccount(accountsById, AccountType.ASSET);
+    root[AccountType.EQUITY] = this.getRootAccount(accountsById, AccountType.EQUITY);
+    root[AccountType.EXPENSE] = this.getChildAccount(root[AccountType.EQUITY], AccountType.EXPENSE);
+    root[AccountType.REVENUE] = this.getChildAccount(root[AccountType.EQUITY], AccountType.REVENUE);
 
-    const assetAccountsList = this.createAccountsList(assetAccount);
-    const expenseAccountsList = this.createAccountsList(expenseAccount);
-    const revenueAccountsList = this.createAccountsList(revenueAccount);
-    const accountsList = [...assetAccountsList, ...expenseAccountsList, ...revenueAccountsList];
+    const list = new Map<AccountType, AccountHierarchyNode[]>();
+    list[AccountType.ASSET] = this.createAccountsList(root[AccountType.ASSET]);
+    list[AccountType.EQUITY] = this.createAccountsList(root[AccountType.EQUITY]);
+    list[AccountType.EXPENSE] = this.createAccountsList(root[AccountType.EXPENSE]);
+    list[AccountType.REVENUE] = this.createAccountsList(root[AccountType.REVENUE]);
+    list[AccountType.ALL] = [...list[AccountType.ASSET], ...list[AccountType.EQUITY]];
 
-    return { 
-      accountsById,
-      assetAccount,
-      equityAccount,
-      expenseAccount,
-      revenueAccount,
-      accountsList,
-      assetAccountsList,
-      expenseAccountsList,
-      revenueAccountsList,
-    };
+    return {accountsById, root, list};
   }
 
   private createAccounts(accounts: Account[]): Map<number, AccountHierarchyNode> {
@@ -100,6 +93,11 @@ export class AccountHierarchyService {
   private getRootAccount(accountsById: Map<number, AccountHierarchyNode>, name: string) {
     return Array.from(accountsById.values())
       .find(account => account.parentId == null && account.name == name);
+  }
+
+  private getChildAccount(parent: AccountHierarchyNode, name: string) {
+    return Array.from(parent.children)
+      .find(account => account.name == name);
   }
 
   private createAccountsList(rootAccount: AccountHierarchyNode): AccountHierarchyNode[]

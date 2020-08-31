@@ -10,12 +10,13 @@ import { FormBuilder, FormControl } from '@angular/forms';
 import { LocalService } from '../local/local.service';
 import { API_DATE } from '../api-access/api-constants'
 import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.service';
-import { AccountHierarchy } from '../account-hierarchy/account-hierarchy';
+import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
 import { DialogService } from '../dialogs/dialog.service';
 import { DialogMessage } from '../dialogs/dialog-message.enum';
 import { DialogButton } from '../dialogs/dialog-button.enum';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
 import { ContextService } from '../context/context.service';
+import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
 
 @Component({
   selector: 'app-transactions',
@@ -42,7 +43,7 @@ export class TransactionsComponent implements OnInit {
 
   showErrors = false;
 
-  accountsHierarchy: AccountHierarchy;
+  accountHierarchy: AccountHierarchy;
   transactions: ViewTransaction[];
   selectedTransaction: ViewTransaction;
 
@@ -53,7 +54,7 @@ export class TransactionsComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private localService: LocalService,
-    private accountsHierarchyService: AccountHierarchyService,
+    private accountHierarchyService: AccountHierarchyService,
     private dialogService: DialogService,
     private apiErrorHandlerService: ApiErrorHandlerService,
     private contextService: ContextService
@@ -97,7 +98,7 @@ export class TransactionsComponent implements OnInit {
     this.dateSelectionType.setValue(this.MONTH);
     this.after.setValue(this.localService.formatDate(after));
     this.before.setValue(this.localService.formatDate(before));
-    this.month = moment().month();
+    this.month = moment().month() + 1;
     this.year = moment().year();
     this.account.setValue(null);
 
@@ -113,7 +114,7 @@ export class TransactionsComponent implements OnInit {
       ),
       this.accountsService.getAccounts()
     ).subscribe(([transactions, accounts]) => {
-      this.accountsHierarchy = this.accountsHierarchyService.createAccountHierarchy(accounts);
+      this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
 
       this.transactions = transactions
         .map(transaction => this.createViewTransaction(transaction));
@@ -146,7 +147,7 @@ export class TransactionsComponent implements OnInit {
   private createViewEntry(entry: TransactionEntries, isCredit: boolean): ViewTransactionEntry {
     return {
       amount: (isCredit ? -1 : 1) * entry.amount,
-      account: this.accountsHierarchy.accountsById.get(entry.accountId),
+      account: this.accountHierarchy.accountsById.get(entry.accountId),
       verified: entry.verified
     }
   }
@@ -249,5 +250,7 @@ export class TransactionsComponent implements OnInit {
     });
   }
 
-
+  get accountsList(): AccountHierarchyNode[] {
+    return this.accountHierarchy == null ? [] : this.accountHierarchy.list[AccountType.ALL];
+  }
 }

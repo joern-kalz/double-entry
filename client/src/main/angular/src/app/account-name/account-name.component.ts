@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
-import { AccountHierarchy } from '../account-hierarchy/account-hierarchy';
+import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
 
 @Component({
   selector: 'app-account-name',
@@ -10,8 +10,10 @@ import { AccountHierarchy } from '../account-hierarchy/account-hierarchy';
 export class AccountNameComponent {
 
   @Input() account: AccountHierarchyNode;
-  @Input() accountsHierarchy: AccountHierarchy;
+  @Input() accountHierarchy: AccountHierarchy;
   @Input() indented: boolean;
+
+  AccountType = AccountType;
 
   get levelArray() {
     if (!this.indented) {

@@ -3,6 +3,7 @@ import { Validators, FormBuilder, FormControl } from '@angular/forms';
 import { AccountHierarchy } from '../account-hierarchy/account-hierarchy';
 import { ContextService } from '../context/context.service';
 import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.service';
+import { AccountType } from '../account-hierarchy/account-hierarchy';
 import { AccountsService } from '../generated/openapi/api/accounts.service';
 import { Location } from '@angular/common';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
@@ -27,6 +28,7 @@ export class AccountComponent implements OnInit, OnDestroy {
   accountHierarchy: AccountHierarchy;
 
   contextTransactionEntry: ContextTransactionEntry;
+  accountType: AccountType;
 
   subscription: Subscription;
 
@@ -50,10 +52,11 @@ export class AccountComponent implements OnInit, OnDestroy {
         this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
 
         this.contextTransactionEntry = this.getContextTransactionEntry(param);
+        this.accountType = this.getAccountType(param);
 
         this.form.setValue({
           name: '',
-          parent: this.accountHierarchy.assetAccount.id
+          parent: this.accountType == AccountType.ALL ? null : this.accountHierarchy.root[this.accountType].id
         });
       },
       error => this.apiErrorHandlerService.handle(error)
@@ -88,6 +91,19 @@ export class AccountComponent implements OnInit, OnDestroy {
     }
 
     return entries[entryIndex];
+  }
+
+  private getAccountType(param: ParamMap): AccountType {
+    if (param.get('accountType') == null) return AccountType.ALL;
+
+    const accountType = AccountType[param.get('accountType')];
+
+    if (accountType == null) {
+      this.router.navigate(['/dashboard']);
+      return AccountType.ALL;
+    }
+
+    return accountType;
   }
 
   ngOnDestroy(): void {
@@ -137,6 +153,7 @@ export class AccountComponent implements OnInit, OnDestroy {
   }
 
   get parentAccountList() {
-    return this.accountHierarchy ? this.accountHierarchy.accountsList : [];
+    if (this.accountHierarchy == null) return;
+    return this.accountHierarchy.list[this.accountType];
   }
 }

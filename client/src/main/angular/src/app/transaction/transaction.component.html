@@ -24,11 +24,11 @@
         <div *ngFor="let entry of creditEntries.controls; let i = index; first as first" [formGroupName]="i">
             <div class="field">
                 <label>
-                    <span *ngIf="first">Nach Konto</span>
+                    <span *ngIf="first">Von Konto</span>
                     <span *ngIf="!first">Und Konto</span>
                     <select formControlName="account">
                         <option *ngFor="let account of creditAccountList" [ngValue]="account.id">
-                            <app-account-name [account]="account" [accountsHierarchy]="accountHierarchy" 
+                            <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
                                 [indented]="true">
                             </app-account-name>
                         </option>
@@ -48,9 +48,12 @@
                     Gültiger Betrag erforderlich
                 </div>
             </div>
-            <button type="button" (click)="deleteCreditEntry(i)" [disabled]="creditEntries.length < 2">Löschen</button>
+            <button type="button" *ngIf="variableEntries" (click)="deleteCreditEntry(i)" 
+                [disabled]="creditEntries.length < 2">
+                Löschen
+            </button>
         </div>
-        <button type="button" (click)="addCreditEntry()">Hinzufügen</button>
+        <button type="button" *ngIf="variableEntries" (click)="addCreditEntry()">Hinzufügen</button>
     </div>
 
     <div formArrayName="debitEntries" class="list">
@@ -61,7 +64,7 @@
                     <span *ngIf="!first">Und Konto</span>
                     <select formControlName="account">
                         <option *ngFor="let account of debitAccountList" [ngValue]="account.id">
-                            <app-account-name [account]="account" [accountsHierarchy]="accountHierarchy" 
+                            <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
                                 [indented]="true">
                             </app-account-name>
                         </option>
@@ -81,16 +84,19 @@
                     Gültiger Betrag erforderlich
                 </div>
             </div>
-            <button type="button" (click)="deleteDebitEntry(i)" [disabled]="debitEntries.length < 2">Löschen</button>
+            <button type="button" *ngIf="variableEntries" (click)="deleteDebitEntry(i)" 
+                [disabled]="debitEntries.length < 2">
+                Löschen
+            </button>
         </div>
-        <button type="button" (click)="addDebitEntry()">Hinzufügen</button>
+        <button type="button" *ngIf="variableEntries" (click)="addDebitEntry()">Hinzufügen</button>
     </div>
 
     <div>
         <div *ngIf="showErrors && form.errors?.accountsUnique">
             Konto doppelt erfasst: 
             <app-account-name [account]="accountHierarchy.accountsById.get(form.errors.accountsUnique.duplicate)" 
-                [accountsHierarchy]="accountHierarchy">
+                [accountHierarchy]="accountHierarchy">
             </app-account-name>
         </div>
         <div *ngIf="showErrors && form.errors?.totalIsZero">

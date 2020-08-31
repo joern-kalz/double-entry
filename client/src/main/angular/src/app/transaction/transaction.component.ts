@@ -1,23 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { ContextTransaction, EntryType } from '../context/context-transaction';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ContextTransaction, EntryType, TransactionType } from '../context/context-transaction';
 import { ContextService } from '../context/context.service';
 import { Router } from '@angular/router';
 import { FormBuilder, Validators, FormControl, ValidatorFn, FormArray, FormGroup, AbstractControl } from '@angular/forms';
 import { LocalService } from '../local/local.service';
 import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.service';
-import { AccountHierarchy } from '../account-hierarchy/account-hierarchy';
+import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
 import { AccountsService } from '../generated/openapi/api/accounts.service';
 import { Location } from '@angular/common';
 import { TransactionsService } from '../generated/openapi/api/transactions.service';
 import { API_DATE } from '../api-access/api-constants';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
+import { Subscription } from 'rxjs';
+import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
 
 @Component({
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
   styleUrls: ['./transaction.component.scss']
 })
-export class TransactionComponent implements OnInit {
+export class TransactionComponent implements OnInit, OnDestroy {
 
   form = this.formBuilder.group({
     date: ['', [Validators.required, this.localService.createDateValidator()]],
@@ -32,6 +34,8 @@ export class TransactionComponent implements OnInit {
   submitted = false;
 
   accountHierarchy: AccountHierarchy;
+
+  subscription = new Subscription();
 
   constructor(
     private contextService: ContextService,
@@ -53,6 +57,10 @@ export class TransactionComponent implements OnInit {
 
     this.loadTransaction(this.contextService.transaction);
     this.loadAccountHierarchy();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   private loadTransaction(transaction: ContextTransaction) {
@@ -84,14 +92,26 @@ export class TransactionComponent implements OnInit {
 
   private adjustFormArrayLength(formArray: FormArray, length: number) {
     while (formArray.length > length) formArray.removeAt(0);
-    while (formArray.length < length) formArray.push(this.createEntry());
+    while (formArray.length < length) formArray.push(this.createEntry(formArray == this.creditEntries));
   }
 
-  createEntry() {
-    return this.formBuilder.group({
+  createEntry(isCredit: boolean) {
+    const group = this.formBuilder.group({
       account: ['', Validators.required],
       amount: ['', [this.localService.createAmountValidator(), Validators.required]]
     });
+
+    if (isCredit) {
+      this.subscription.add(group.get('amount').valueChanges.subscribe(() => this.copyCreditAmountToDebitAmount()));
+    }
+
+    return group;
+  }
+
+  private copyCreditAmountToDebitAmount() {
+    if (this.creditEntries.length == 1 && this.debitEntries.length == 1) {
+      this.debitEntries.at(0).get('amount').setValue(this.creditEntries.at(0).get('amount').value);
+    }
   }
 
   private createAccountsUniqueValidator(): ValidatorFn {
@@ -137,16 +157,17 @@ export class TransactionComponent implements OnInit {
   }
 
   createCreditAccount(index: number) {
-    this.createAccount(EntryType.CREDIT_ACCOUNTS, index);
+    this.createAccount(EntryType.CREDIT_ACCOUNTS, index, this.creditAccountType);
   }
 
   createDebitAccount(index: number) {
-    this.createAccount(EntryType.DEBIT_ACCOUNTS, index);
+    this.createAccount(EntryType.DEBIT_ACCOUNTS, index, this.debitAccountType);
   }
 
-  private createAccount(entry: string, index: number) {
+  private createAccount(entry: string, index: number, accountType: AccountType) {
     this.contextService.setTransaction({
       id: this.contextService.transaction.id,
+      type: this.contextService.transaction.type,
       date: this.date.value,
       name: this.name.value,
       creditEntries: this.creditEntries.controls.map(control => ({
@@ -159,12 +180,12 @@ export class TransactionComponent implements OnInit {
       })),
     });
 
-    this.router.navigate(['/transaction', entry, index, 'new']);
+    this.router.navigate(['/transaction', entry, index, 'new', accountType]);
   }
 
   addCreditEntry() {
     this.showErrors = false;
-    this.creditEntries.push(this.createEntry());
+    this.creditEntries.push(this.createEntry(true));
   }
 
   deleteCreditEntry(index: number) {
@@ -174,7 +195,7 @@ export class TransactionComponent implements OnInit {
 
   addDebitEntry() {
     this.showErrors = false;
-    this.debitEntries.push(this.createEntry());
+    this.debitEntries.push(this.createEntry(false));
   }
 
   deleteDebitEntry(index: number) {
@@ -201,7 +222,12 @@ export class TransactionComponent implements OnInit {
       entries: [...creditEntries, ...debitEntries]
     };
 
-    this.transactionService.updateTransaction(this.contextService.transaction.id, saveTransactionRequest).subscribe(
+    const id = this.contextService.transaction.id;
+    const apiCall = id == null ? 
+      this.transactionService.createTransaction(saveTransactionRequest) :
+      this.transactionService.updateTransaction(id, saveTransactionRequest);
+    
+    apiCall.subscribe(
       () => this.location.back(),
       error => {
         this.apiErrorHandlerService.handle(error);
@@ -236,11 +262,50 @@ export class TransactionComponent implements OnInit {
     return this.form.get('debitEntries') as FormArray;
   }
 
-  get creditAccountList() {
-    return this.accountHierarchy == null? [] : this.accountHierarchy.accountsList;
+  get creditAccountList(): AccountHierarchyNode[] {
+    if (this.accountHierarchy == null) return [];
+    return this.accountHierarchy.list[this.creditAccountType];
   }
 
-  get debitAccountList() {
-    return this.accountHierarchy == null? [] : this.accountHierarchy.accountsList;
+  get debitAccountList(): AccountHierarchyNode[] {
+    if (this.accountHierarchy == null) return [];
+    return this.accountHierarchy.list[this.debitAccountType];
+  }
+
+  get variableEntries(): boolean {
+    switch (this.contextService.transaction.type) {
+      case TransactionType.TRANSFER:
+      case TransactionType.EXPENSE:
+      case TransactionType.REVENUE:
+        return false;
+      default:
+        return true;
+    }
+  }
+
+  get creditAccountType(): AccountType {
+    switch (this.contextService.transaction.type) {
+      case TransactionType.TRANSFER:
+        return AccountType.ASSET;
+      case TransactionType.EXPENSE:
+        return AccountType.ASSET;
+      case TransactionType.REVENUE:
+        return AccountType.REVENUE;
+      default:
+        return AccountType.ALL;
+    }
+  }
+
+  get debitAccountType(): AccountType {
+    switch (this.contextService.transaction.type) {
+      case TransactionType.TRANSFER:
+        return AccountType.ASSET;
+      case TransactionType.EXPENSE:
+        return AccountType.EXPENSE;
+      case TransactionType.REVENUE:
+        return AccountType.ASSET;
+      default:
+        return AccountType.ALL;
+    }
   }
 }

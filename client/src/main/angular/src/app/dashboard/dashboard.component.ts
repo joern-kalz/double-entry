@@ -1,4 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { ContextService } from '../context/context.service';
+import * as moment from 'moment';
+import { LocalService } from '../local/local.service';
+import { TransactionType } from '../context/context-transaction';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,9 +13,45 @@ import { Component, OnInit } from '@angular/core';
 export class DashboardComponent implements OnInit {
 
   constructor(
+    private contextService: ContextService,
+    private localService: LocalService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
   }
 
+  createGenericTransaction() {
+    this.createTransaction(TransactionType.GENERIC);
+  }
+
+  createTransferTransaction() {
+    this.createTransaction(TransactionType.TRANSFER);
+  }
+
+  createExpenseTransaction() {
+    this.createTransaction(TransactionType.EXPENSE);
+  }
+
+  createRevenueTransaction() {
+    this.createTransaction(TransactionType.REVENUE);
+  }
+
+  createTransaction(type: TransactionType) {
+    this.contextService.setTransaction({
+      type,
+      date: this.localService.formatDate(moment()),
+      name: '',
+      creditEntries: [{
+        account: null,
+        amount: ''
+      }],
+      debitEntries: [{
+        account: null,
+        amount: ''
+      }],
+    });
+
+    this.router.navigate(['/transaction']);
+  }
 }

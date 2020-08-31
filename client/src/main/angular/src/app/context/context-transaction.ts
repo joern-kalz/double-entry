@@ -7,13 +7,21 @@ export enum EntryType {
     DEBIT_ACCOUNTS = 'debit-accounts',
 }
 
+export enum TransactionType {
+    GENERIC,
+    TRANSFER,
+    EXPENSE,
+    REVENUE,
+}
+
 export interface ContextTransactionEntry {
     amount: string;
     account: number;
 }
 
 export interface ContextTransaction {
-    id: number;
+    id?: number;
+    type?: TransactionType;
     date: string;
     name: string;
     creditEntries: ContextTransactionEntry[];

@@ -21,9 +21,9 @@
         </div>
     </ng-container>
     <select formControlName="account">
-        <option [value]="null">Alle Konten</option>
-        <option *ngFor="let account of accountsHierarchy?.accountsList" [ngValue]="account.id">
-            <app-account-name [account]="account" [accountsHierarchy]="accountsHierarchy" [indented]="true">
+        <option [value]="null">(Alle Konten)</option>
+        <option *ngFor="let account of accountsList" [ngValue]="account.id">
+            <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" [indented]="true">
             </app-account-name>
         </option>
     </select>
@@ -36,14 +36,14 @@
     <div>
         von
         <ng-container *ngFor="let entry of transaction.creditEntries; last as last">
-            <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
+            <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
             <ng-container *ngIf="!last">/</ng-container>
         </ng-container>
     </div>
     <div>
         nach
         <ng-container *ngFor="let entry of transaction.debitEntries; last as last">
-            <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
+            <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
             <ng-container *ngIf="!last">/</ng-container>
         </ng-container>
     </div>
@@ -63,7 +63,7 @@
         <div>Von</div>
         <div *ngFor="let entry of selectedTransaction.creditEntries">
             <div>
-                <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
+                <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
             </div>
             <div>
                 <ng-container *ngIf="entry.verified">verifiziert</ng-container>
@@ -73,7 +73,7 @@
         <div>Nach</div>
         <div *ngFor="let entry of selectedTransaction.debitEntries">
             <div>
-                <app-account-name [account]="entry.account" [accountsHierarchy]="accountsHierarchy"></app-account-name>
+                <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
             </div>
             <div>
                 <ng-container *ngIf="entry.verified">verifiziert</ng-container>

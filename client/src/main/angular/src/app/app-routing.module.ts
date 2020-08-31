@@ -15,7 +15,7 @@ const routes: Routes = [
   { path: 'sign-up', component: SignUpComponent },
   { path: 'transactions', component: TransactionsComponent },
   { path: 'transaction', component: TransactionComponent },
-  { path: 'transaction/:entryType/:entryIndex/new', component: AccountComponent },
+  { path: 'transaction/:entryType/:entryIndex/new/:accountType', component: AccountComponent },
 ];
 
 @NgModule({
