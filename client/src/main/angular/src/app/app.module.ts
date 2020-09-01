@@ -17,6 +17,7 @@ import { AmountPipe } from './local/amount.pipe';
 import { AccountNameComponent } from './account-name/account-name.component';
 import { TransactionComponent } from './transaction/transaction.component';
 import { AccountComponent } from './account/account.component';
+import { AssetsComponent } from './assets/assets.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { AccountComponent } from './account/account.component';
     AccountNameComponent,
     TransactionComponent,
     AccountComponent,
+    AssetsComponent,
   ],
   imports: [
     BrowserModule,

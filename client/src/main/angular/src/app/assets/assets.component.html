@@ -1,0 +1,22 @@
+<form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors">
+    <label>
+        <span>Kontostände zum</span>
+        <input formControlName="date">
+    </label>
+    <button>Berechnen</button>
+</form>
+
+<div>
+    <div>Summe</div>
+    <div>{{total}}</div>
+</div>
+<div *ngFor="let asset of assets">
+    <div>
+        <app-account-name [account]="asset.account" 
+            [accountHierarchy]="accountHierarchy" 
+            [indented]="true"
+            [indentationOffset]="-1">
+        </app-account-name>
+    </div>
+    <div>{{asset.balance}}</div>
+</div>

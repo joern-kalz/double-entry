@@ -12,6 +12,7 @@ export class AccountNameComponent {
   @Input() account: AccountHierarchyNode;
   @Input() accountHierarchy: AccountHierarchy;
   @Input() indented: boolean;
+  @Input() indentationOffset: number = 0;
 
   AccountType = AccountType;
 
@@ -22,7 +23,7 @@ export class AccountNameComponent {
 
     const result = [];
     
-    for (let i = 0; i < this.account.hierarchyLevel; i++) {
+    for (let i = 0; i < this.account.hierarchyLevel + this.indentationOffset; i++) {
       result.push(i);
     }
 
