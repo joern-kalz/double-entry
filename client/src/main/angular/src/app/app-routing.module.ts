@@ -8,6 +8,7 @@ import { TransactionsComponent } from './transactions/transactions.component';
 import { TransactionComponent } from './transaction/transaction.component';
 import { AccountComponent } from './account/account.component';
 import { AssetsComponent } from './assets/assets.component';
+import { EarningsComponent } from './earnings/earnings.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -18,6 +19,8 @@ const routes: Routes = [
   { path: 'transaction', component: TransactionComponent },
   { path: 'transaction/:entryType/:entryIndex/new/:accountType', component: AccountComponent },
   { path: 'assets', component: AssetsComponent },
+  { path: 'earnings/:earningType', component: EarningsComponent },
+  { path: 'accounts/:accountId', component: AccountComponent },
 ];
 
 @NgModule({

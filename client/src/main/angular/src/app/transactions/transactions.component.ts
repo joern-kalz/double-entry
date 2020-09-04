@@ -26,6 +26,7 @@ import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-nod
 export class TransactionsComponent implements OnInit {
 
   readonly INTERVAL = 'interval';
+  readonly YEAR = 'year';
   readonly MONTH = 'month';
 
   form = this.formBuilder.group({
@@ -83,12 +84,15 @@ export class TransactionsComponent implements OnInit {
 
     if (this.dateSelectionType.value == this.INTERVAL) {
       this.load(after, before, this.account.value);
-    } else {
+    } else if (this.dateSelectionType.value == this.MONTH) {
       const startOfMonth = moment().year(this.year).month(this.month - 1).startOf('month');
       const endOfMonth = startOfMonth.clone().endOf('month');
       this.load(startOfMonth, endOfMonth, this.account.value);
+    } else {
+      const startOfYear = moment([this.year, 0, 1]);
+      const endOfYear = moment([this.year, 11, 31]);
+      this.load(startOfYear, endOfYear, this.account.value);
     }
-
   }
 
   private loadDefault() {
@@ -176,7 +180,7 @@ export class TransactionsComponent implements OnInit {
         year: this.year,
         account: this.account.value,
       }
-    })
+    });
   }
 
   incrementMonth() {
@@ -193,6 +197,14 @@ export class TransactionsComponent implements OnInit {
       this.month = 12;
       this.year--;
     }
+  }
+
+  incrementYear() {
+    this.year++;
+  }
+
+  decrementYear() {
+    this.year--;
   }
 
   get dateSelectionType() {
@@ -251,6 +263,6 @@ export class TransactionsComponent implements OnInit {
   }
 
   get accountsList(): AccountHierarchyNode[] {
-    return this.accountHierarchy == null ? [] : this.accountHierarchy.list[AccountType.ALL];
+    return this.accountHierarchy == null ? [] : this.accountHierarchy.list.get(AccountType.ALL);
   }
 }

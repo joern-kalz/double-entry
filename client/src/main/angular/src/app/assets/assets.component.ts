@@ -11,6 +11,9 @@ import { forkJoin } from 'rxjs';
 import { API_DATE } from '../api-access/api-constants';
 import { GetBalanceResponse } from '../generated/openapi/model/models';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
+import { DialogService } from '../dialogs/dialog.service';
+import { DialogMessage } from '../dialogs/dialog-message.enum';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-assets',
@@ -29,6 +32,7 @@ export class AssetsComponent implements OnInit {
   assets: ViewAsset[];
   accountHierarchy: AccountHierarchy;
   showErrors = false;
+  selectedAsset: ViewAsset;
   
   constructor(
     private formBuilder: FormBuilder,
@@ -37,6 +41,8 @@ export class AssetsComponent implements OnInit {
     private balancesService: BalancesService,
     private localService: LocalService,
     private apiErrorHandlerService: ApiErrorHandlerService,
+    private dialogService: DialogService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -44,22 +50,25 @@ export class AssetsComponent implements OnInit {
   }
 
   private load() {
+    const balancesDate = this.localService.parseDate(this.date.value);
+
     forkJoin([
       this.accountsService.getAccounts(),
-      this.balancesService.getBalances(null, this.localService.parseDate(this.date.value).format(API_DATE))
+      this.balancesService.getBalances(null, balancesDate.format(API_DATE))
     ]).subscribe(([accounts, balances]) => {
       this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
       const balancesById = this.getBalancesById(balances);
       this.total = 0;
       this.assets = [];
 
-      for (let asset of this.accountHierarchy.list[AccountType.ASSET]) {
-        if (asset.id == this.accountHierarchy.root[AccountType.ASSET].id) {
-          this.total = asset.balance;
+      for (let asset of this.accountHierarchy.list.get(AccountType.ASSET)) {
+        if (asset.id == this.accountHierarchy.root.get(AccountType.ASSET).id) {
+          this.total = balancesById.get(asset.id);
         } else if (balancesById.has(asset.id)) {
           this.assets.push({
             account: asset,
-            balance: balancesById.get(asset.id)
+            balance: balancesById.get(asset.id),
+            date: balancesDate,
           });
         }
       }
@@ -89,5 +98,29 @@ export class AssetsComponent implements OnInit {
 
   get date() {
     return this.form.get('date') as FormControl;
+  }
+
+  select(asset: ViewAsset) {
+    this.selectedAsset = asset;
+  }
+
+  setActive(active: boolean) {
+    this.accountsService.updateAccount(this.selectedAsset.account.id, {
+      name: this.selectedAsset.account.name,
+      parentId: this.selectedAsset.account.parentId,
+      active
+    }).subscribe(
+      () => {
+        const message = active ? DialogMessage.ACCOUNT_ACTIVATED : DialogMessage.ACCOUNT_DEACTIVATED;
+        this.dialogService.show(message, {name: this.selectedAsset.account.name});
+        this.selectedAsset.account.active = active;
+        this.selectedAsset = null;
+      },
+      error => this.apiErrorHandlerService.handle(error),
+    )
+  }
+
+  edit() {
+    this.router.navigate(['/accounts', this.selectedAsset.account.id]);
   }
 }

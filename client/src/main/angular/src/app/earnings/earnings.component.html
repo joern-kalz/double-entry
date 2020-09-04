@@ -1,0 +1,78 @@
+<div>
+    <div>
+        <select [formControl]="intervalType">
+            <ng-container *ngIf="accountType == AccountType.EXPENSE">
+                <option [ngValue]="IntervalType.MONTH">Ausgaben für Monat</option>
+                <option [ngValue]="IntervalType.YEAR">Ausgaben für Jahr</option>
+            </ng-container>
+            <ng-container *ngIf="accountType == AccountType.REVENUE">
+                <option [ngValue]="IntervalType.MONTH">Einnahmen für Monat</option>
+                <option [ngValue]="IntervalType.YEAR">Einnahmen für Jahr</option>
+            </ng-container>
+        </select>
+    </div>
+    <div *ngFor="let interval of intervals">
+        <button (click)="decrementInterval(interval)">&lt;</button>
+        <span>
+            <ng-container *ngIf="interval.month">
+                {{interval.month}} /
+            </ng-container>
+            {{interval.year}}
+        </span>
+        <button (click)="incrementInterval(interval)">&gt;</button>
+    </div>
+</div>
+
+<div *ngIf="totals">
+    <div>Summe</div>
+    <div *ngFor="let total of totals">{{total | amount}}</div>
+</div>
+
+<div *ngFor="let earning of earnings" (click)="select(earning)">
+    <div>
+        <app-account-name [account]="earning.account" 
+            [accountHierarchy]="accountHierarchy" 
+            [indented]="true"
+            [indentationOffset]="-2">
+        </app-account-name>
+    </div>
+    <div *ngFor="let balance of earning.balances">{{balance.amount | amount}}</div>
+</div>
+
+<div *ngIf="selection">
+    <div>
+        <div>
+            <div>Name</div>
+            <div>{{selection.account.name}}</div>
+        </div>
+        <div>
+            <div>Gruppe</div>
+            <div>
+                <app-account-name [account]="selection.account.parent" 
+                    [accountHierarchy]="accountHierarchy">
+                </app-account-name>
+            </div>
+        </div>
+        <div>
+            <div>Aktiv</div>
+            <div *ngIf="selection.account.active">Ja</div>
+            <div *ngIf="!selection.account.active">Nein</div>
+        </div>
+        <div *ngFor="let balance of selection.balances">
+            <div>
+                <ng-container *ngIf="balance.interval.month">
+                    {{balance.interval.month}} /
+                </ng-container>
+                {{balance.interval.year}}
+            </div>
+            <div>{{balance.amount | amount}}</div>
+            <button (click)="showTransactions(balance.interval)">Transaktionen</button>
+        </div>
+        <div>
+            <button *ngIf="selection.account.active" (click)="setActive(false)">Deaktivieren</button>
+            <button *ngIf="!selection.account.active" (click)="setActive(true)">Aktivieren</button>
+            <a [routerLink]="['/accounts', selection.account.id]">Bearbeiten</a>
+            <button (click)="select(null)">Schließen</button>
+        </div>
+    </div>
+</div>

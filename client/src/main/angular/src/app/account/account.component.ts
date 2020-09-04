@@ -10,6 +10,8 @@ import { ApiErrorHandlerService } from '../api-access/api-error-handler.service'
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { combineLatest, Subscription } from 'rxjs';
 import { ContextTransactionEntry, EntryType } from '../context/context-transaction';
+import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
+import { SaveAccountRequest } from '../generated/openapi/model/models';
 
 @Component({
   selector: 'app-account',
@@ -27,6 +29,7 @@ export class AccountComponent implements OnInit, OnDestroy {
 
   accountHierarchy: AccountHierarchy;
 
+  account: AccountHierarchyNode;
   contextTransactionEntry: ContextTransactionEntry;
   accountType: AccountType;
 
@@ -50,29 +53,54 @@ export class AccountComponent implements OnInit, OnDestroy {
     ).subscribe(
       ([accounts, param]) => {
         this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
-
-        this.contextTransactionEntry = this.getContextTransactionEntry(param);
-        this.accountType = this.getAccountType(param);
-
-        this.form.setValue({
-          name: '',
-          parent: this.accountType == AccountType.ALL ? null : this.accountHierarchy.root[this.accountType].id
-        });
+        const accountId = param.get('accountId');
+        const success = accountId == null ? this.loadNewAccount(param) : this.loadExistingAccount(+accountId);
+        if (!success) this.router.navigate(['/dashboard']);
       },
       error => this.apiErrorHandlerService.handle(error)
     );
   }
 
-  private getContextTransactionEntry(param: ParamMap): ContextTransactionEntry {
+  loadExistingAccount(accountId: number): boolean {
+    this.account = this.accountHierarchy.accountsById.get(accountId);
+    if (this.account == null) return false;
+    this.accountType = AccountType.ALL;
+
+    this.form.setValue({
+      name: this.account.name,
+      parent: this.account.parentId
+    });
+
+    return true;
+  }
+
+  loadNewAccount(param: ParamMap): boolean {
     const entryType = param.get('entryType');
     const entryIndex = +param.get('entryIndex');
+    const accountType = param.get('accountType');
 
-    if (entryType == null) return null;
-
-    if (this.contextService.transaction == null) {
-      this.router.navigate(['/dashboard']);
-      return null;
+    if (entryType != null) {
+      this.contextTransactionEntry = this.getContextTransactionEntry(entryType, entryIndex);
+      if (this.contextTransactionEntry == null) return false;
     }
+
+    if (accountType != null) {
+      this.accountType = AccountType[accountType];
+      if (this.accountType == null) return false;
+    } else {
+      this.accountType = AccountType.ALL;
+    }
+
+    this.form.setValue({
+      name: '',
+      parent: this.accountType == AccountType.ALL ? null : this.accountHierarchy.root.get(this.accountType).id
+    });
+
+    return true;
+  }
+
+  private getContextTransactionEntry(entryType: string, entryIndex: number): ContextTransactionEntry {
+    if (this.contextService.transaction == null) return null;
 
     let entries: ContextTransactionEntry[];
 
@@ -81,29 +109,10 @@ export class AccountComponent implements OnInit, OnDestroy {
     } else if (entryType == EntryType.DEBIT_ACCOUNTS) {
       entries = this.contextService.transaction.debitEntries;
     } else {
-      this.router.navigate(['/dashboard']);
       return null;
     }
 
-    if (entryIndex >= entries.length) {
-      this.router.navigate(['/dashboard']);
-      return null;
-    }
-
-    return entries[entryIndex];
-  }
-
-  private getAccountType(param: ParamMap): AccountType {
-    if (param.get('accountType') == null) return AccountType.ALL;
-
-    const accountType = AccountType[param.get('accountType')];
-
-    if (accountType == null) {
-      this.router.navigate(['/dashboard']);
-      return AccountType.ALL;
-    }
-
-    return accountType;
+    return entryIndex >= entries.length ? null : entries[entryIndex];
   }
 
   ngOnDestroy(): void {
@@ -125,18 +134,38 @@ export class AccountComponent implements OnInit, OnDestroy {
       parentId: this.parent.value
     };
 
-    this.accountsService.createAccount(saveAccountRequest).subscribe(
-      createdResponse => this.handleSuccess(createdResponse.createdId),
+    if (this.account) {
+      this.updateAccount(this.account.id, saveAccountRequest);
+    } else {
+      this.createAccount(saveAccountRequest);
+    }
+  }
+
+  private updateAccount(id: number, saveAccountRequest: SaveAccountRequest) {
+    this.submitted = true;
+
+    this.accountsService.updateAccount(id, saveAccountRequest).subscribe(
+      () => this.location.back(),
       error => {
         this.apiErrorHandlerService.handle(error);
         this.submitted = false;
       }
-    )
-
-    this.submitted = true;
+    );
   }
 
-  private handleSuccess(id: number) {
+  private createAccount(saveAccountRequest: SaveAccountRequest) {
+    this.submitted = true;
+
+    this.accountsService.createAccount(saveAccountRequest).subscribe(
+      createdResponse => this.handleCreated(createdResponse.createdId),
+      error => {
+        this.apiErrorHandlerService.handle(error);
+        this.submitted = false;
+      }
+    );
+  }
+
+  private handleCreated(id: number) {
     if (this.contextTransactionEntry) {
       this.contextTransactionEntry.account = id;
     }
@@ -154,6 +183,17 @@ export class AccountComponent implements OnInit, OnDestroy {
 
   get parentAccountList() {
     if (this.accountHierarchy == null) return;
-    return this.accountHierarchy.list[this.accountType];
+    return this.accountHierarchy.list.get(this.accountType)
+      .filter(account => this.account == null || !this.checkChildParentRelationship(account, this.account));
+  }
+
+  private checkChildParentRelationship(child: AccountHierarchyNode, parent: AccountHierarchyNode): boolean {
+    for (let account = child; account != null; account = account.parent) {
+      if (account == parent) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

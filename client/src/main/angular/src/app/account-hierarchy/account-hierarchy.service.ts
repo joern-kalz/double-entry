@@ -28,17 +28,17 @@ export class AccountHierarchyService {
     this.updateHierarchyLevels(accountsById);
 
     const root = new Map<AccountType, AccountHierarchyNode>();
-    root[AccountType.ASSET] = this.getRootAccount(accountsById, AccountType.ASSET);
-    root[AccountType.EQUITY] = this.getRootAccount(accountsById, AccountType.EQUITY);
-    root[AccountType.EXPENSE] = this.getChildAccount(root[AccountType.EQUITY], AccountType.EXPENSE);
-    root[AccountType.REVENUE] = this.getChildAccount(root[AccountType.EQUITY], AccountType.REVENUE);
+    root.set(AccountType.ASSET, this.getRootAccount(accountsById, AccountType.ASSET));
+    root.set(AccountType.EQUITY, this.getRootAccount(accountsById, AccountType.EQUITY));
+    root.set(AccountType.EXPENSE, this.getChildAccount(root.get(AccountType.EQUITY), AccountType.EXPENSE));
+    root.set(AccountType.REVENUE, this.getChildAccount(root.get(AccountType.EQUITY), AccountType.REVENUE));
 
     const list = new Map<AccountType, AccountHierarchyNode[]>();
-    list[AccountType.ASSET] = this.createAccountsList(root[AccountType.ASSET]);
-    list[AccountType.EQUITY] = this.createAccountsList(root[AccountType.EQUITY]);
-    list[AccountType.EXPENSE] = this.createAccountsList(root[AccountType.EXPENSE]);
-    list[AccountType.REVENUE] = this.createAccountsList(root[AccountType.REVENUE]);
-    list[AccountType.ALL] = [...list[AccountType.ASSET], ...list[AccountType.EQUITY]];
+    list.set(AccountType.ASSET, this.createAccountsList(root.get(AccountType.ASSET)));
+    list.set(AccountType.EQUITY, this.createAccountsList(root.get(AccountType.EQUITY)));
+    list.set(AccountType.EXPENSE, this.createAccountsList(root.get(AccountType.EXPENSE)));
+    list.set(AccountType.REVENUE, this.createAccountsList(root.get(AccountType.REVENUE)));
+    list.set(AccountType.ALL, [...list.get(AccountType.ASSET), ...list.get(AccountType.EQUITY)]);
 
     return {accountsById, root, list};
   }
@@ -53,15 +53,16 @@ export class AccountHierarchyService {
         active: account.active,
         parentId: account.parentId,
         hierarchyLevel: 0,
+        parent: null,
         children: [],
       });
     }
 
     accountsById.forEach(account => {
-      const parent = accountsById.get(account.parentId);
+      account.parent = accountsById.get(account.parentId);
 
-      if (parent) {
-        parent.children.push(account);
+      if (account.parent) {
+        account.parent.children.push(account);
       }
     });
 

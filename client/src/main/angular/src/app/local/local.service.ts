@@ -8,11 +8,14 @@ import { FormControl } from '@angular/forms';
 export class LocalService {
 
   private readonly DATE_FORMAT = 'DD.MM.YYYY';
+  private readonly MONTH_FORMAT = 'MM / YYYY';
+  private readonly YEAR_FORMAT = 'YYYY';
   private readonly AMOUNT_FORMAT = /^([-+]?)(\d+)(\,(\d+))?$/;
 
   constructor() { }
 
   formatAmount(value: number): string {
+    if (value == null) return "";
     const sign = value < 0 ? '-' : '';
     const absoluteValue = Math.abs(value);
     const integerPart = Math.trunc(absoluteValue)
@@ -21,8 +24,16 @@ export class LocalService {
     return sign + integerPart + ',' + paddedFractionalPart;
   }
 
-  formatDate(value: moment.Moment): string {
-    return value.format(this.DATE_FORMAT);
+  formatDate(value: moment.Moment, format?: string): string {
+    if (value == null) return "";
+    switch (format) {
+      case 'year':
+        return value.format(this.YEAR_FORMAT);
+      case 'month':
+        return value.format(this.MONTH_FORMAT);
+      default:
+        return value.format(this.DATE_FORMAT);
+    }
   }
 
   parseAmount(value: string): number {

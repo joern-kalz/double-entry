@@ -1,16 +1,16 @@
 <ng-container *ngFor="let level of levelArray">&nbsp;</ng-container>
 
 <ng-container [ngSwitch]="account">
-    <ng-container *ngSwitchCase="accountHierarchy.root[AccountType.ASSET]">
+    <ng-container *ngSwitchCase="accountHierarchy.root.get(AccountType.ASSET)">
         Bestand
     </ng-container>
-    <ng-container *ngSwitchCase="accountHierarchy.root[AccountType.EQUITY]">
+    <ng-container *ngSwitchCase="accountHierarchy.root.get(AccountType.EQUITY)">
         Eigenkapital
     </ng-container>
-    <ng-container *ngSwitchCase="accountHierarchy.root[AccountType.EXPENSE]">
+    <ng-container *ngSwitchCase="accountHierarchy.root.get(AccountType.EXPENSE)">
         Ausgaben
     </ng-container>
-    <ng-container *ngSwitchCase="accountHierarchy.root[AccountType.REVENUE]">
+    <ng-container *ngSwitchCase="accountHierarchy.root.get(AccountType.REVENUE)">
         Einnahmen
     </ng-container>
     <ng-container *ngSwitchDefault>

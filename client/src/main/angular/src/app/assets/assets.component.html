@@ -10,7 +10,7 @@
     <div>Summe</div>
     <div>{{total}}</div>
 </div>
-<div *ngFor="let asset of assets">
+<div *ngFor="let asset of assets" (click)="select(asset)">
     <div>
         <app-account-name [account]="asset.account" 
             [accountHierarchy]="accountHierarchy" 
@@ -19,4 +19,35 @@
         </app-account-name>
     </div>
     <div>{{asset.balance}}</div>
+</div>
+
+<div *ngIf="selectedAsset">
+    <div>
+        <div>
+            <div>Name</div>
+            <div>{{selectedAsset.account.name}}</div>
+        </div>
+        <div>
+            <div>Gruppe</div>
+            <div>
+                <app-account-name [account]="selectedAsset.account.parent" [accountHierarchy]="accountHierarchy">
+                </app-account-name>
+            </div>
+        </div>
+        <div>
+            <div>Aktiv</div>
+            <div *ngIf="selectedAsset.account.active">Ja</div>
+            <div *ngIf="!selectedAsset.account.active">Nein</div>
+        </div>
+        <div>
+            <div>Kontostand zum {{selectedAsset.date | date}}</div>
+            <div>{{selectedAsset.balance}}</div>
+        </div>
+        <div>
+            <button *ngIf="selectedAsset.account.active" (click)="setActive(false)">Deaktivieren</button>
+            <button *ngIf="!selectedAsset.account.active" (click)="setActive(true)">Aktivieren</button>
+            <a [routerLink]="['/accounts', selectedAsset.account.id]">Bearbeiten</a>
+            <button (click)="select(null)">Schließen</button>
+        </div>
+    </div>
 </div>

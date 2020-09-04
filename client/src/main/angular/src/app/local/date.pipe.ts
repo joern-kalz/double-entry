@@ -10,8 +10,8 @@ export class DatePipe implements PipeTransform {
     private localService: LocalService
   ) { }
 
-  transform(value: moment.Moment, ...args: unknown[]): string {
-    return this.localService.formatDate(value);
+  transform(value: moment.Moment, format?: string): string {
+    return this.localService.formatDate(value, format);
   }
 
 }

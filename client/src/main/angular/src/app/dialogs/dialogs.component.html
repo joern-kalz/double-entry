@@ -31,6 +31,12 @@
             <ng-container *ngSwitchCase="DialogMessage.REMOVE_TRANSACTION">
                 Wollen Sie die Transaktion löschen?
             </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.ACCOUNT_DEACTIVATED">
+                {{parameters.name}} wurde deaktiviert.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.ACCOUNT_ACTIVATED">
+                {{parameters.name}} wurde aktiviert.
+            </ng-container>
         </div>
         <div>
             <button (click)="ok()">OK</button>

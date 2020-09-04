@@ -264,12 +264,12 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
   get creditAccountList(): AccountHierarchyNode[] {
     if (this.accountHierarchy == null) return [];
-    return this.accountHierarchy.list[this.creditAccountType];
+    return this.accountHierarchy.list.get(this.creditAccountType);
   }
 
   get debitAccountList(): AccountHierarchyNode[] {
     if (this.accountHierarchy == null) return [];
-    return this.accountHierarchy.list[this.debitAccountType];
+    return this.accountHierarchy.list.get(this.debitAccountType);
   }
 
   get variableEntries(): boolean {

@@ -4,6 +4,7 @@ import * as moment from 'moment';
 import { LocalService } from '../local/local.service';
 import { TransactionType } from '../context/context-transaction';
 import { Router } from '@angular/router';
+import { AccountType } from '../account-hierarchy/account-hierarchy';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,6 +12,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+  AccountType = AccountType;
 
   constructor(
     private contextService: ContextService,

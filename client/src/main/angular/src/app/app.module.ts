@@ -18,6 +18,7 @@ import { AccountNameComponent } from './account-name/account-name.component';
 import { TransactionComponent } from './transaction/transaction.component';
 import { AccountComponent } from './account/account.component';
 import { AssetsComponent } from './assets/assets.component';
+import { EarningsComponent } from './earnings/earnings.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { AssetsComponent } from './assets/assets.component';
     TransactionComponent,
     AccountComponent,
     AssetsComponent,
+    EarningsComponent,
   ],
   imports: [
     BrowserModule,
