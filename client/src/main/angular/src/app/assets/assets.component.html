@@ -47,6 +47,7 @@
             <button *ngIf="selectedAsset.account.active" (click)="setActive(false)">Deaktivieren</button>
             <button *ngIf="!selectedAsset.account.active" (click)="setActive(true)">Aktivieren</button>
             <a [routerLink]="['/accounts', selectedAsset.account.id]">Bearbeiten</a>
+            <button (click)="verify()">Verifizieren</button>
             <button (click)="select(null)">Schließen</button>
         </div>
     </div>

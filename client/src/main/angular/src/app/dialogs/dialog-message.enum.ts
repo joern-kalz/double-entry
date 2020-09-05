@@ -11,4 +11,5 @@ export enum DialogMessage {
     REMOVE_TRANSACTION,
     ACCOUNT_DEACTIVATED,
     ACCOUNT_ACTIVATED,
+    VERIFIED,
 }

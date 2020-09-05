@@ -14,6 +14,7 @@ import { ApiErrorHandlerService } from '../api-access/api-error-handler.service'
 import { DialogService } from '../dialogs/dialog.service';
 import { DialogMessage } from '../dialogs/dialog-message.enum';
 import { Router } from '@angular/router';
+import { ContextService } from '../context/context.service';
 
 @Component({
   selector: 'app-assets',
@@ -43,6 +44,7 @@ export class AssetsComponent implements OnInit {
     private apiErrorHandlerService: ApiErrorHandlerService,
     private dialogService: DialogService,
     private router: Router,
+    private contextService: ContextService,
   ) { }
 
   ngOnInit(): void {
@@ -122,5 +124,14 @@ export class AssetsComponent implements OnInit {
 
   edit() {
     this.router.navigate(['/accounts', this.selectedAsset.account.id]);
+  }
+
+  verify() {
+    this.contextService.setVerification({
+      accountId: this.selectedAsset.account.id,
+      verifiedTransactionIds: new Set<number>(),
+    });
+
+    this.router.navigate(['/verification']);
   }
 }

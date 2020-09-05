@@ -19,6 +19,8 @@ import { TransactionComponent } from './transaction/transaction.component';
 import { AccountComponent } from './account/account.component';
 import { AssetsComponent } from './assets/assets.component';
 import { EarningsComponent } from './earnings/earnings.component';
+import { VerificationComponent } from './verification/verification.component';
+import { TransactionDetailsComponent } from './transaction-details/transaction-details.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +37,8 @@ import { EarningsComponent } from './earnings/earnings.component';
     AccountComponent,
     AssetsComponent,
     EarningsComponent,
+    VerificationComponent,
+    TransactionDetailsComponent,
   ],
   imports: [
     BrowserModule,

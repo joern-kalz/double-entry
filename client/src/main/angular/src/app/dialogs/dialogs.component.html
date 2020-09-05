@@ -37,6 +37,9 @@
             <ng-container *ngSwitchCase="DialogMessage.ACCOUNT_ACTIVATED">
                 {{parameters.name}} wurde aktiviert.
             </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.VERIFIED">
+                {{parameters.count}} Transaktionen wurde verifiziert. Der neue verifizierte Kontostand beträgt {{parameters.newVerifiedBalance | amount}}.
+            </ng-container>
         </div>
         <div>
             <button (click)="ok()">OK</button>

@@ -56,40 +56,9 @@
     <div>{{transaction.total | amount}}</div>
 </div>
 
-<div *ngIf="selectedTransaction">
-    <div>
-        <div>Datum</div>
-        <div>{{selectedTransaction.date | date}}</div>
-    </div>
-    <div>
-        <div>Beschreibung</div>
-        <div>{{selectedTransaction.name}}</div>
-    </div>
-    <div>
-        <div>Von</div>
-        <div *ngFor="let entry of selectedTransaction.creditEntries">
-            <div>
-                <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
-            </div>
-            <div>
-                <ng-container *ngIf="entry.verified">verifiziert</ng-container>
-            </div>
-            <div>{{entry.amount | amount}}</div>
-        </div>
-        <div>Nach</div>
-        <div *ngFor="let entry of selectedTransaction.debitEntries">
-            <div>
-                <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
-            </div>
-            <div>
-                <ng-container *ngIf="entry.verified">verifiziert</ng-container>
-            </div>
-            <div>{{entry.amount | amount}}</div>
-        </div>
-    </div>
-    <div>
-        <button (click)="delete()">Löschen</button>
-        <button (click)="edit()">Bearbeiten</button>
-        <button (click)="select(null)">Schließen</button>
-    </div>
-</div>
+<app-transaction-details *ngIf="selectedTransaction" 
+    [transaction]="selectedTransaction"
+    [accountHierarchy]="accountHierarchy"
+    (deleted)="delete()"
+    (closed)="select(null)">
+</app-transaction-details>

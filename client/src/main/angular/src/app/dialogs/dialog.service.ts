@@ -13,7 +13,7 @@ export class DialogService {
 
   constructor() { }
 
-  show(message: DialogMessage, parameters: { [key: string]: string } = null,
+  show(message: DialogMessage, parameters: { [key: string]: any } = null,
     callback: (button: DialogButton) => void = null) {
 
     this.message = message;
