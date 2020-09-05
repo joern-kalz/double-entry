@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TransactionsService {
@@ -30,9 +29,15 @@ public class TransactionsService {
     @Autowired
     private TransactionsValidator transactionsValidator;
 
-    public Set<Transaction> findByDateAndAccount(LocalDate after, LocalDate before, Long accountId) {
+    public List<Transaction> findByDateAndAccount(LocalDate after, LocalDate before, Long accountId) {
         User principal = principalProvider.getPrincipal();
-        return transactionsRepository.findByUserAndDateAndAccount(principal, after, before, accountId);
+
+        Set<Transaction> transactionsSet = transactionsRepository
+                .findByUserAndDateAndAccount(principal, after, before, accountId);
+
+        List<Transaction> transactions = new ArrayList<>(transactionsSet);
+        transactions.sort(Comparator.comparing(Transaction::getDate));
+        return transactions;
     }
 
     public Transaction findById(long id) {

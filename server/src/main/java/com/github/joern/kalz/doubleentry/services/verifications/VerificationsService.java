@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class VerificationsService {
@@ -23,8 +21,11 @@ public class VerificationsService {
     private PrincipalProvider principalProvider;
 
     public VerificationState getVerificationState(Long accountId) {
-        Set<Transaction> transactions = transactionsRepository
+        Set<Transaction> transactionsSet = transactionsRepository
                 .findByUserAndDateAndAccount(principalProvider.getPrincipal(), null, null, accountId);
+
+        List<Transaction> transactions = new ArrayList<>(transactionsSet);
+        transactions.sort(Comparator.comparing(Transaction::getDate));
 
         VerificationState verificationState = new VerificationState();
         verificationState.setVerifiedBalance(BigDecimal.ZERO);
