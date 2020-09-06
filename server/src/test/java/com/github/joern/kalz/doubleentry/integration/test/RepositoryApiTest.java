@@ -50,9 +50,10 @@ public class RepositoryApiTest {
 
     @Test
     public void shouldGetRepository() throws Exception {
-        Account expenseAccount = testSetup.createAccount("expense", loggedInUser, null);
-        Account foodAccount = testSetup.createAccount("food", loggedInUser, expenseAccount);
-        Account cashAccount = testSetup.createAccount("cash", loggedInUser, null);
+        Account foodAccount = testSetup.createAccount("food", loggedInUser);
+        Account expenseAccount = testSetup.createAccount("expense", loggedInUser);
+        testSetup.createParentChildRelationship(expenseAccount, foodAccount);
+        Account cashAccount = testSetup.createAccount("cash", loggedInUser);
         Transaction transaction = testSetup.createTransaction("baker", loggedInUser, LocalDate.EPOCH,
                 new TestTransactionEntry(foodAccount, "2.50", false),
                 new TestTransactionEntry(cashAccount, "-2.50", false));
@@ -69,8 +70,8 @@ public class RepositoryApiTest {
 
     @Test
     public void shouldGetRepositoryWithoutAccountsOfOtherUser() throws Exception {
-        Account foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser, null);
-        Account cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser, null);
+        Account foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser);
+        Account cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser);
 
         mockMvc.perform(get("/api/repository"))
                 .andExpect(status().isOk())
@@ -80,8 +81,8 @@ public class RepositoryApiTest {
 
     @Test
     public void shouldGetRepositoryWithoutTransactionsOfOtherUser() throws Exception {
-        Account foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser, null);
-        Account cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser, null);
+        Account foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser);
+        Account cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser);
         Transaction transaction = testSetup.createTransaction("baker", otherUser, LocalDate.EPOCH,
                 new TestTransactionEntry(foodAccountOfOtherUser, "2.50", false),
                 new TestTransactionEntry(cashAccountOfOtherUser, "-2.50", false));
@@ -94,9 +95,10 @@ public class RepositoryApiTest {
     @Test
     @Transactional
     public void shouldRestoreAccountsFromRepository() throws Exception {
-        Account expenseAccount = testSetup.createAccount("expense", loggedInUser, null);
-        testSetup.createAccount("food", loggedInUser, expenseAccount);
-        testSetup.createAccount("cash", loggedInUser, null);
+        Account foodAccount = testSetup.createAccount("food", loggedInUser);
+        Account expenseAccount = testSetup.createAccount("expense", loggedInUser);
+        testSetup.createParentChildRelationship(expenseAccount, foodAccount);
+        testSetup.createAccount("cash", loggedInUser);
         String repository = mockMvc.perform(get("/api/repository"))
                 .andReturn().getResponse().getContentAsString();
         accountsRepository.deleteAll();
@@ -112,8 +114,8 @@ public class RepositoryApiTest {
     @Test
     @Transactional
     public void shouldRestoreTransactionFromRepository() throws Exception {
-        Account foodAccount = testSetup.createAccount("food", loggedInUser, null);
-        Account cashAccount = testSetup.createAccount("cash", loggedInUser, null);
+        Account foodAccount = testSetup.createAccount("food", loggedInUser);
+        Account cashAccount = testSetup.createAccount("cash", loggedInUser);
         testSetup.createTransaction("baker", loggedInUser, LocalDate.EPOCH,
                 new TestTransactionEntry(foodAccount, "2.39", true),
                 new TestTransactionEntry(cashAccount, "-2.39", false));

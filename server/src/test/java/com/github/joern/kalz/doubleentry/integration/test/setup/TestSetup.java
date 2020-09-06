@@ -49,12 +49,16 @@ public class TestSetup {
         return usersRepository.save(new User(name, passwordEncoder.encode(password), true));
     }
 
-    public Account createAccount(String name, User user, Account parent) {
+    public Account createAccount(String name, User user) {
         Account account = new Account();
         account.setUser(user);
         account.setName(name);
-        account.setParent(parent);
         return accountsRepository.save(account);
+    }
+
+    public Account createParentChildRelationship(Account parent, Account child) {
+        child.setParent(parent);
+        return accountsRepository.save(child);
     }
 
     public Transaction createTransaction(String name, User user, LocalDate date, TestTransactionEntry... entries) {

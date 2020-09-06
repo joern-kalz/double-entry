@@ -46,11 +46,11 @@ public class VerificationsApiTest {
 
         mockMvc = testSetup.createAuthenticatedMockMvc(loggedInUser);
 
-        foodAccount = testSetup.createAccount("food", loggedInUser, null);
-        carAccount = testSetup.createAccount("car", loggedInUser, null);
-        cashAccount = testSetup.createAccount("cash", loggedInUser, null);
-        foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser, null);
-        cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser, null);
+        foodAccount = testSetup.createAccount("food", loggedInUser);
+        carAccount = testSetup.createAccount("car", loggedInUser);
+        cashAccount = testSetup.createAccount("cash", loggedInUser);
+        foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser);
+        cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser);
     }
 
     @Test

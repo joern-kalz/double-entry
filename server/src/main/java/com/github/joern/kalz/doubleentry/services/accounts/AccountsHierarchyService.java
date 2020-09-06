@@ -2,6 +2,7 @@ package com.github.joern.kalz.doubleentry.services.accounts;
 
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.AccountsRepository;
+import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,9 @@ public class AccountsHierarchyService {
 
     @Autowired
     private AccountsRepository accountsRepository;
+
+    @Autowired
+    private PrincipalProvider principalProvider;
 
     public void walkDepthFirst(AccountsVisitor accountsVisitor) {
         List<Account> rootAccounts = getRootAccounts();
@@ -50,8 +54,10 @@ public class AccountsHierarchyService {
     private List<Account> getRootAccounts() {
         List<Account> rootAccounts = new ArrayList<>();
 
-        for (Account account : accountsRepository.findAll()) {
-            rootAccounts.add(account);
+        for (Account account : accountsRepository.findByUser(principalProvider.getPrincipal())) {
+            if (account.getParent() == null) {
+                rootAccounts.add(account);
+            }
         }
 
         return rootAccounts;

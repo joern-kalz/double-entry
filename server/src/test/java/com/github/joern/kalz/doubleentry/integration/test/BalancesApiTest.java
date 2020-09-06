@@ -40,11 +40,12 @@ public class BalancesApiTest {
 
         mockMvc = testSetup.createAuthenticatedMockMvc(loggedInUser);
 
-        cashAccount = testSetup.createAccount("cash", loggedInUser, null);
-        expenseAccount = testSetup.createAccount("expenses", loggedInUser, null);
-        foodAccount = testSetup.createAccount("food", loggedInUser, expenseAccount);
-        foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser, null);
-        cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser, null);
+        cashAccount = testSetup.createAccount("cash", loggedInUser);
+        foodAccount = testSetup.createAccount("food", loggedInUser);
+        expenseAccount = testSetup.createAccount("expenses", loggedInUser);
+        testSetup.createParentChildRelationship(expenseAccount, foodAccount);
+        foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser);
+        cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser);
     }
 
     @Test
