@@ -48,7 +48,7 @@ public class BalancesService {
     private Map<Long, BigDecimal> getAddedUpBalances(Map<Long, BigDecimal> balances) {
         Map<Long, BigDecimal> addedUpBalances = new HashMap<>();
 
-        accountsHierarchyService.walkDepthFirst(account -> {
+        accountsHierarchyService.walkDepthFirstFromRoots(account -> {
             BigDecimal amount = balances.getOrDefault(account.getId(), BigDecimal.ZERO);
             boolean childBalanceFound = false;
 

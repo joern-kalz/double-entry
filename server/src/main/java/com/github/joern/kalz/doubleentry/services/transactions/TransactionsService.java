@@ -4,6 +4,7 @@ import com.github.joern.kalz.doubleentry.models.Transaction;
 import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
 import com.github.joern.kalz.doubleentry.models.User;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
+import com.github.joern.kalz.doubleentry.services.accounts.AccountsHierarchyService;
 import com.github.joern.kalz.doubleentry.services.exceptions.NotFoundException;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.services.transactions.TransactionsValidator.Result;
@@ -29,11 +30,20 @@ public class TransactionsService {
     @Autowired
     private TransactionsValidator transactionsValidator;
 
+    @Autowired
+    private AccountsHierarchyService accountsHierarchyService;
+
     public List<Transaction> findByDateAndAccount(LocalDate after, LocalDate before, Long accountId) {
         User principal = principalProvider.getPrincipal();
+        List<Long> accounts = null;
+
+        if (accountId != null) {
+            accounts = new ArrayList<>(accountsHierarchyService.getChildrenById(accountId).keySet());
+            accounts.add(accountId);
+        }
 
         Set<Transaction> transactionsSet = transactionsRepository
-                .findByUserAndDateAndAccount(principal, after, before, accountId);
+                .findByUserAndDateAndAccount(principal, after, before, accounts);
 
         List<Transaction> transactions = new ArrayList<>(transactionsSet);
         transactions.sort(Comparator.comparing(Transaction::getDate));

@@ -22,7 +22,8 @@ public class VerificationsService {
 
     public VerificationState getVerificationState(Long accountId) {
         Set<Transaction> transactionsSet = transactionsRepository
-                .findByUserAndDateAndAccount(principalProvider.getPrincipal(), null, null, accountId);
+                .findByUserAndDateAndAccount(principalProvider.getPrincipal(), null, null,
+                        Collections.singletonList(accountId));
 
         List<Transaction> transactions = new ArrayList<>(transactionsSet);
         transactions.sort(Comparator.comparing(Transaction::getDate));

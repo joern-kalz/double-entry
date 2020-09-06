@@ -39,7 +39,7 @@ public class TransactionsApiTest {
     private User loggedInUser;
     private User otherUser;
     private Account foodAccount;
-    private Account carAccount;
+    private Account expenseAccount;
     private Account cashAccount;
     private Account accountOfOtherUser;
 
@@ -52,7 +52,8 @@ public class TransactionsApiTest {
         mockMvc = testSetup.createAuthenticatedMockMvc(loggedInUser);
 
         foodAccount = testSetup.createAccount("food", loggedInUser);
-        carAccount = testSetup.createAccount("car", loggedInUser);
+        expenseAccount = testSetup.createAccount("expense", loggedInUser);
+        testSetup.createParentChildRelationship(expenseAccount, foodAccount);
         cashAccount = testSetup.createAccount("cash", loggedInUser);
         accountOfOtherUser = testSetup.createAccount("account of other user", otherUser);
     }
@@ -172,12 +173,24 @@ public class TransactionsApiTest {
     @Test
     public void shouldGetTransactionsByAccount() throws Exception {
         createTransactionWithAccounts("food", foodAccount, cashAccount);
-        createTransactionWithAccounts("car", carAccount, cashAccount);
+        createTransactionWithAccounts("expense", expenseAccount, cashAccount);
 
-        mockMvc.perform(get("/api/transactions?accountId=" + carAccount.getId()))
+        mockMvc.perform(get("/api/transactions?accountId=" + foodAccount.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(1)))
-                .andExpect(jsonPath("$[0].name", is("car")));
+                .andExpect(jsonPath("$[0].name", is("food")));
+    }
+
+    @Test
+    public void shouldGetTransactionsOfChildAccounts() throws Exception {
+        createTransactionWithAccounts("food", foodAccount, cashAccount);
+        createTransactionWithAccounts("expense", expenseAccount, cashAccount);
+
+        mockMvc.perform(get("/api/transactions?accountId=" + expenseAccount.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[?(@.name == 'expense')]").exists())
+                .andExpect(jsonPath("$[?(@.name == 'food')]").exists());
     }
 
     @Test

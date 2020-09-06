@@ -3,10 +3,12 @@ package com.github.joern.kalz.doubleentry.services.accounts;
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.AccountsRepository;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
+import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,13 +20,49 @@ public class AccountsHierarchyService {
     @Autowired
     private PrincipalProvider principalProvider;
 
-    public void walkDepthFirst(AccountsVisitor accountsVisitor) {
-        List<Account> rootAccounts = getRootAccounts();
+    public Map<Long, Account> getChildrenById(Long accountId) {
+        List<Account> accounts = accountsRepository.findByUser(principalProvider.getPrincipal());
 
-        Set<Long> knownIds = rootAccounts.stream()
+        Map<Long, Account> accountsById = accounts.stream()
+                .collect(Collectors.toMap(Account::getId, Function.identity()));
+        Map<Long, List<Account>> accountsByParentId = accounts.stream()
+                .filter(account -> account.getParent() != null)
+                .collect(Collectors.groupingBy(account -> account.getParent().getId()));
+        Map<Long, Account> childrenById = new HashMap<>();
+
+        if (!accountsById.containsKey(accountId)) {
+            throw new ParameterException("account " + accountId + " not found");
+        }
+
+        Deque<Account> stack = new ArrayDeque<>(Collections.singletonList(accountsById.get(accountId)));
+
+        while (!stack.isEmpty()) {
+            Account account = stack.removeFirst();
+
+            if (!accountsByParentId.containsKey(account.getId())) {
+                continue;
+            }
+
+            for (Account child : accountsByParentId.get(account.getId())) {
+                if (!childrenById.containsKey(child.getId())) {
+                    childrenById.put(child.getId(), child);
+                    stack.addLast(child);
+                }
+            }
+        }
+
+        return childrenById;
+    }
+
+    public void walkDepthFirstFromRoots(AccountsVisitor accountsVisitor) {
+        walkDepthFirst(getRootAccounts(), accountsVisitor);
+    }
+
+    private void walkDepthFirst(List<Account> startingPoints, AccountsVisitor accountsVisitor) {
+        Set<Long> knownIds = startingPoints.stream()
                 .map(Account::getId)
                 .collect(Collectors.toSet());
-        Deque<State> stateStack = rootAccounts.stream()
+        Deque<State> stateStack = startingPoints.stream()
                 .map(State::new)
                 .collect(Collectors.toCollection(ArrayDeque::new));
 

@@ -16,11 +16,12 @@ public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepos
 
     @Override
     public Set<Transaction> findByUserAndDateAndAccount(User user, LocalDate after, LocalDate before,
-                                                        Long accountId) {
+                                                        List<Long> accountIds) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Transaction> query = cb.createQuery(Transaction.class);
         Root<Transaction> transaction = query.from(Transaction.class);
         List<Predicate> predicates = new ArrayList<>();
+        transaction.fetch("entries", JoinType.INNER);
 
         if (user != null) {
             predicates.add(cb.equal(transaction.get("user"), user));
@@ -34,9 +35,11 @@ public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepos
             predicates.add(cb.lessThanOrEqualTo(transaction.get("date"), before));
         }
 
-        if (accountId != null) {
+        if (accountIds != null) {
             Join<Object, Entry> entry = transaction.join("entries");
-            predicates.add(cb.equal(entry.get("id").get("account").get("id"), accountId));
+            CriteriaBuilder.In<Object> in = cb.in(entry.get("id").get("account").get("id"));
+            accountIds.forEach(in::value);
+            predicates.add(in);
         }
 
         Predicate[] predicateArray = predicates.toArray(new Predicate[0]);
