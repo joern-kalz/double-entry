@@ -1,16 +1,16 @@
-<form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors">
+<form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors" class="search">
     <label>
         <span>Kontostände zum</span>
         <input formControlName="date">
     </label>
-    <button>Berechnen</button>
+    <button type="submit">Berechnen</button>
 </form>
 
-<div>
+<div class="total">
     <div>Summe</div>
     <div>{{total}}</div>
 </div>
-<div *ngFor="let asset of assets" (click)="select(asset)">
+<div *ngFor="let asset of assets" (click)="select(asset)" class="asset">
     <div>
         <app-account-name [account]="asset.account" 
             [accountHierarchy]="accountHierarchy" 
@@ -21,7 +21,7 @@
     <div>{{asset.balance}}</div>
 </div>
 
-<div *ngIf="selectedAsset">
+<div *ngIf="selectedAsset" class="details">
     <div>
         <div>
             <div>Name</div>

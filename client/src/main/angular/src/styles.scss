@@ -1,1 +1,211 @@
-/* You can add global styles to this file, and also import other style files */
+* { 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: "Open Sans", sans-serif;
+    font-size: 14px;
+    margin: 0;
+    overflow-y: scroll;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+input, select, button {
+    font: inherit;
+}
+
+button {
+    background: unset;
+    color: inherit;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+input, select {
+    border: 1px solid #bbb;
+    height: 29px;
+}
+
+input {
+    padding: 0 4px;
+}
+
+select {
+    font: inherit;
+    background: unset;
+    padding: 0 2px;
+    cursor: pointer;
+}
+
+h1 {
+    font-size: 1.3em;
+    font-weight: normal;
+    margin: 20px 0;
+}
+
+button.light, a.light {
+    border: 1px solid #bbb;
+
+    &:hover {
+        background: #f2f2f2;
+    }
+
+    &:disabled, &:disabled:hover {
+        color: #888;
+        background: #fff;
+    }
+}
+
+button.heavy, a.heavy {
+    background: #000;
+    color: #fff;
+
+    &:hover {
+        background: #555;
+    }
+}
+
+.field {
+    margin-bottom: 20px;
+
+    span {
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    input, select {
+        width: 100%;
+    }
+}
+
+.show-errors {
+    .ng-invalid {
+        background: #fff2f4;
+        border-color: #e30000;
+    }
+    .ng-invalid:focus {
+        background: unset;
+        border-color: #bbb;
+    }
+    .error {
+        color: #e30000;
+    }
+}
+
+.buttons {
+    text-align: right;
+    margin-top: 30px;
+    button {
+        background: #000;
+        color: #fff;
+        width: 120px;
+        margin-left: 20px;
+        padding: 4px 0;
+    }
+    button:hover {
+        background: #555;
+    }
+}
+
+.search {
+    input, select, button {
+        height: 25px;
+        &:hover {
+            background: #f2f2f2;
+        }
+    }
+
+    input, select {
+        padding: 0;
+    }
+
+    button[type=button] {
+        border: 1px solid #bbb;
+    }
+
+    button[type=submit] {
+        background: #000;
+        color: #fff;
+        padding: 0 10px;
+        &:hover {
+            background: #555;
+        }
+    }
+}
+
+.details, .overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px;
+}
+
+.details {
+    & > div {
+        background: #fff;
+        border: 1px solid #bbb;
+        padding: 15px;
+        max-width: 400px;
+        margin: 20px auto;
+
+        & > div {
+            margin-bottom: 20px;
+
+            & > div:first-child {
+                font-size: 0.9em;
+            }
+        }
+
+        & > div:last-child {
+            margin-bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+
+            button, a {
+                margin-top: 10px;
+                background: #000;
+                color: #fff;
+                width: 100%;
+                padding: 4px 0;
+                text-align: center;
+            }
+            button:hover, a:hover {
+                background: #555;
+            }
+        }
+    }
+}
+
+@media(min-width: 400px) {
+    .details > div > div:last-child {
+        button, a {
+            width: calc(25% - 5px);
+        }
+    }
+}
+
+.startup {
+    max-width: 200px;
+    margin: 20px auto 0 auto;
+
+    button {
+        width: 100%;
+        margin-top: 5px;
+        padding: 4px 0;
+        background: #000;
+        color: #fff;
+    }
+    button:hover {
+        background: #555;
+    }
+}

@@ -1,44 +1,34 @@
-<div *ngIf="account">
-    <div>
-        <div>
-            Letzter verifizierter Kontostand
-            <app-account-name [account]="account" [accountHierarchy]="accountHierarchy"></app-account-name>
-        </div>
-        <div>{{lastVerifiedBalance | amount}}</div>
-    </div>
-    <div>
-        <div>
-            Neuer verifizierter Kontostand
-            <app-account-name [account]="account" [accountHierarchy]="accountHierarchy"></app-account-name>
-        </div>
-        <div>
-            {{newVerifiedBalance | amount}}
-        </div>
-    </div>
-    <button (click)="save()" [disabled]="isSaveDisabled">Verifikation speichern</button>
+<div class="account">
+    Verifikation
+    <app-account-name *ngIf="account" [account]="account" [accountHierarchy]="accountHierarchy"></app-account-name>
+</div>
+<div class="balance">
+    Letzter verifizierter Kontostand: {{lastVerifiedBalance | amount}}
+</div>
+<div class="balance">
+    Neuer verifizierter Kontostand: {{newVerifiedBalance | amount}}
+</div>
+<div class="save">
+    <button (click)="save()" [disabled]="isSaveDisabled" class="heavy">Speichern</button>
+</div>
+<div class="create">
+    <button (click)="createExpenseTransaction()" class="light">Ausgabe</button>
+    <button (click)="createRevenueTransaction()" class="light">Einnahme</button>
+    <button (click)="createTransferTransaction()" class="light">Transfer</button>
+    <button (click)="createGenericTransaction()" class="light">Transaktion</button>
 </div>
 
-<div>
-    <button (click)="createExpenseTransaction()">Ausgabe buchen</button>
-    <button (click)="createRevenueTransaction()">Einnahme buchen</button>
-    <button (click)="createGenericTransaction()">Freie Transaktion buchen</button>
-    <button (click)="createTransferTransaction()">Transfer buchen</button>
-</div>
-
-<div *ngFor="let transaction of transactions">
-    <label>
+<div *ngFor="let transaction of transactions" class="transaction">
+    <label [class.selected]="isVerified(transaction)">
         <input type="checkbox" [checked]="isVerified(transaction)" (change)="toggleVerified(transaction)">
         <div>{{transaction.date | date}}</div>
         <div>{{transaction.name}}</div>
         <div>
-            von
             <ng-container *ngFor="let entry of transaction.creditEntries; last as last">
                 <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
                 <ng-container *ngIf="!last">/</ng-container>
             </ng-container>
-        </div>
-        <div>
-            nach
+            &gt;
             <ng-container *ngFor="let entry of transaction.debitEntries; last as last">
                 <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
                 <ng-container *ngIf="!last">/</ng-container>
@@ -46,7 +36,9 @@
         </div>
         <div>{{getAmount(transaction) | amount}}</div>
     </label>
-    <button (click)="select(transaction)">Details</button>
+    <div>
+        <button (click)="select(transaction)" class="light">Details</button>
+    </div>
 </div>
 
 <app-transaction-details *ngIf="selectedTransaction" 

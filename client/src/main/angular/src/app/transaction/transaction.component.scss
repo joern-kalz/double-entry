@@ -1,0 +1,56 @@
+.add, .entry {
+    button {
+        height: 29px;
+        padding: 0 5px;
+    }
+}
+
+.entry-label {
+    margin-bottom: 3px;
+}
+
+.entry {
+    display: flex;
+    margin-bottom: 5px;
+
+    .account {
+        flex-grow: 1;
+        display: flex;
+
+        span {
+            display: none;
+        }
+
+        select {
+            flex-grow: 1;
+            width: 50px;
+        }
+    }
+
+    .amount {
+        flex-grow: 1;
+        display: flex;
+        align-items: baseline;
+
+        input {
+            flex-grow: 1;
+            width: 50px;
+        }
+    }
+
+    button, span, input {
+        margin-left: 2px;
+    }
+}
+
+.add {
+    margin: 0 0 20px 0;
+}
+
+@media(min-width: 500px) {
+    .entry {
+        button, span, input {
+            margin-left: 10px;
+        }
+    }    
+}

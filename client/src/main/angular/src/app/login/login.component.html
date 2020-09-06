@@ -1,15 +1,20 @@
-<h1>Anmeldung</h1>
-<form [formGroup]="form" (ngSubmit)="submit()">
-    <label>
-        <span>Name</span>
-        <input formControlName="username">
-    </label>
-    <label>
-        <span>Passwort</span>
-        <input formControlName="password" type="password">
-    </label>
-    <div>
-        <button type="button" (click)="signUp()">Registrieren</button>
+<div class="startup">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="field">
+            <label class="field">
+                <span>Name</span>
+                <input formControlName="username">
+            </label>
+        </div>
+        <div class="field">
+            <label class="field">
+                <span>Passwort</span>
+                <input formControlName="password" type="password">
+            </label>
+        </div>
         <button type="submit">Anmelden</button>
-    </div>
-</form>
+        <div class="sign-up">
+            <button type="button" (click)="signUp()">Neues Konto erstellen</button>
+        </div>
+    </form>
+</div>

@@ -1,18 +1,28 @@
-<h1>Registrierung</h1>
-<form [formGroup]="form" (ngSubmit)="submit()">
-    <label>
-        <span>Name</span>
-        <input formControlName="username">
-    </label>
-    <label>
-        <span>Passwort</span>
-        <input formControlName="password" type="password">
-    </label>
-    <label>
-        <span>Backup wiederherstellen</span>
-        <input formControlName="file" type="file" (change)="fileChanged($event)">
-    </label>
-    <div>
-        <button type="submit">Registrieren</button>
-    </div>
-</form>
+<div class="startup">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+        <h1>Registrierung</h1>
+        <div class="field">
+            <label>
+                <span>Name</span>
+                <input formControlName="username">
+            </label>
+        </div>
+        <div class="field">
+            <label>
+                <span>Passwort</span>
+                <input formControlName="password" type="password">
+            </label>
+        </div>
+        <div class="field">
+            <label class="file">
+                <span>Backup wiederherstellen</span>
+                <input formControlName="file" type="file" (change)="fileChanged($event)">
+                <span *ngIf="!file" class="file-picker">Auswählen</span>
+                <span *ngIf="file" class="file-picker">Ausgewählt: {{file.name}}</span>
+            </label>
+        </div>
+        <div>
+            <button type="submit" [disabled]="submitted">Registrieren</button>
+        </div>
+    </form>
+</div>

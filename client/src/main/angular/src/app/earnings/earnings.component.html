@@ -1,4 +1,4 @@
-<div>
+<div class="search">
     <div>
         <select [formControl]="intervalType">
             <ng-container *ngIf="accountType == AccountType.EXPENSE">
@@ -12,23 +12,23 @@
         </select>
     </div>
     <div *ngFor="let interval of intervals">
-        <button (click)="decrementInterval(interval)">&lt;</button>
+        <button (click)="decrementInterval(interval)" class="light">&lt;</button>
         <span>
             <ng-container *ngIf="interval.month">
                 {{interval.month}} /
             </ng-container>
             {{interval.year}}
         </span>
-        <button (click)="incrementInterval(interval)">&gt;</button>
+        <button (click)="incrementInterval(interval)" class="light">&gt;</button>
     </div>
 </div>
 
-<div *ngIf="totals">
+<div *ngIf="totals" class="row">
     <div>Summe</div>
     <div *ngFor="let total of totals">{{total | amount}}</div>
 </div>
 
-<div *ngFor="let earning of earnings" (click)="select(earning)">
+<div *ngFor="let earning of earnings" (click)="select(earning)" class="row earning">
     <div>
         <app-account-name [account]="earning.account" 
             [accountHierarchy]="accountHierarchy" 
@@ -39,7 +39,7 @@
     <div *ngFor="let balance of earning.balances">{{balance.amount | amount}}</div>
 </div>
 
-<div *ngIf="selection">
+<div *ngIf="selection" class="details">
     <div>
         <div>
             <div>Name</div>
@@ -58,8 +58,9 @@
             <div *ngIf="selection.account.active">Ja</div>
             <div *ngIf="!selection.account.active">Nein</div>
         </div>
-        <div *ngFor="let balance of selection.balances">
+        <div *ngFor="let balance of selection.balances" class="balance">
             <div>
+                Stand
                 <ng-container *ngIf="balance.interval.month">
                     {{balance.interval.month}} /
                 </ng-container>

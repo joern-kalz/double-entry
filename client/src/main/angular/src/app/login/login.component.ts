@@ -52,6 +52,7 @@ export class LoginComponent implements OnInit {
 
   private handleSuccess() {
     this.authenticationService.password = null;
+    this.authenticationService.isLoggedIn = true;
     this.router.navigate(['/dashboard']);
   }
 

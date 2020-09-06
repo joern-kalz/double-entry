@@ -1,42 +1,44 @@
-<form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors">
-    <select formControlName="dateSelectionType">
+<form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors" class="search">
+    <select formControlName="dateSelectionType" class="type">
         <option [value]="MONTH">Monat</option>
         <option [value]="YEAR">Jahr</option>
         <option [value]="INTERVAL">Zeitraum</option>
     </select>
     <ng-container [ngSwitch]="dateSelectionType.value">
-        <div *ngSwitchCase="INTERVAL">
+        <div *ngSwitchCase="INTERVAL" class="dates">
             <label>
                 <span>von</span>
                 <input formControlName="after" #after>
             </label>
             <label>
                 <span>bis</span>
-                <input formControlName="before">
+                <input formControlName="before" #before>
             </label>
         </div>
-        <div *ngSwitchCase="MONTH">
+        <div *ngSwitchCase="MONTH" class="month">
             <button type="button" (click)="decrementMonth()">&lt;</button>
             <span>{{month < 10 ? '0' + month : month}} / {{year}}</span>
             <button type="button" (click)="incrementMonth()">&gt;</button>
         </div>
-        <div *ngSwitchCase="YEAR">
+        <div *ngSwitchCase="YEAR" class="year">
             <button type="button" (click)="decrementYear()">&lt;</button>
             <span>{{year}}</span>
             <button type="button" (click)="incrementYear()">&gt;</button>
         </div>
     </ng-container>
-    <select formControlName="account">
+    <select formControlName="account" class="account">
         <option [value]="null">(Alle Konten)</option>
         <option *ngFor="let account of accountsList" [ngValue]="account.id">
             <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" [indented]="true">
             </app-account-name>
         </option>
     </select>
-    <button type="submit">Suchen</button>
+    <div class="submit">
+        <button type="submit">Suchen</button>
+    </div>
 </form>
 
-<div *ngFor="let transaction of transactions" (click)="select(transaction)">
+<div *ngFor="let transaction of transactions" (click)="select(transaction)" class="transaction">
     <div>{{transaction.date | date}}</div>
     <div>{{transaction.name}}</div>
     <div>

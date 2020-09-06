@@ -273,6 +273,8 @@ export class TransactionComponent implements OnInit, OnDestroy {
   }
 
   get variableEntries(): boolean {
+    if (!this.contextService.transaction) return true;
+    
     switch (this.contextService.transaction.type) {
       case TransactionType.TRANSFER:
       case TransactionType.EXPENSE:

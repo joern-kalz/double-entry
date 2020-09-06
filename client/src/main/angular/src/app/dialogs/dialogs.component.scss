@@ -1,0 +1,19 @@
+.dialog {
+    background: #fff;
+    border: 1px solid #bbb;
+    padding: 30px 20px 25px 20px;
+    margin: 30px auto 0 auto;
+    max-width: 400px;
+    text-align: center;
+
+    button {
+        border: 1px solid #bbb;
+        margin: 30px 20px 0 20px;
+        padding: 4px 0;
+        width: 100px;
+    }
+    button:hover {
+        background: #f2f2f2;
+    }
+   
+}

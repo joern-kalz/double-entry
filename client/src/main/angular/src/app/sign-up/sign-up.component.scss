@@ -1,0 +1,16 @@
+.file {
+    input {
+        display: none;
+    }
+}
+
+.file-picker {
+    border: 1px solid #bbb;
+    cursor: pointer;
+    padding: 4px 0;
+    text-align: center;
+}
+
+.file-picker:hover {
+    background: #f2f2f2;
+}

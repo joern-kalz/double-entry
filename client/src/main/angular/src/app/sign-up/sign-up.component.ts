@@ -31,6 +31,7 @@ export class SignUpComponent implements OnInit {
   });
 
   file: any;
+  submitted: boolean;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -87,6 +88,8 @@ export class SignUpComponent implements OnInit {
   }
 
   private signUp(username: string, password: string, repository: Repository) {
+    this.submitted = true;
+
     this.signUpService.signUp({name: username, password, repository}).subscribe(
       () => this.handleSuccess(),
       error => this.handleError(error)
@@ -100,6 +103,8 @@ export class SignUpComponent implements OnInit {
   }
 
   private handleError(error) {
+    this.submitted = false;
+
     if (error && error.status == 409) {
       this.dialogService.show(DialogMessage.ERROR_USER_ALREADY_EXITS, {
         username: this.username.value

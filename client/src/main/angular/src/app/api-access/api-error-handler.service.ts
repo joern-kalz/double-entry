@@ -32,12 +32,13 @@ export class ApiErrorHandlerService {
   }
 
   private handleUnauthorized() {
-    if (!this.authenticationService.username) {
+    if (!this.authenticationService.isLoggedIn) {
       this.router.navigate(['/login']);
       return;
     }
 
     this.dialogService.show(DialogMessage.ERROR_SESSION_EXPIRED, null, () => {
+      this.authenticationService.isLoggedIn = false;
       this.router.navigate(['/login']);
     });
 }

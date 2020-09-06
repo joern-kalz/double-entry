@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ApiErrorHandlerService } from './api-access/api-error-handler.service';
 import { AuthenticationService } from './api-access/authentication.service';
 import { HttpClient } from '@angular/common/http';
+import { AccountType } from './account-hierarchy/account-hierarchy';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  AccountType = AccountType;
 
   constructor(
     private meService: MeService,
@@ -22,7 +24,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.meService.getMe().subscribe(
-      getMeResponse => this.authenticationService.username = getMeResponse.name,
+      getMeResponse => this.authenticationService.isLoggedIn = true,
       error => this.apiErrorHandlerService.handle(error)
     );
   }
@@ -35,11 +37,11 @@ export class AppComponent implements OnInit {
   }
 
   private handleLogoutSuccess() {
-    this.authenticationService.username = '';
+    this.authenticationService.isLoggedIn = false;
     this.router.navigate(['/login']);
   }
 
-  get username() {
-    return this.authenticationService.username;
+  get isLoggedIn() {
+    return this.authenticationService.isLoggedIn;
   }
 }

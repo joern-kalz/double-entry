@@ -1,3 +1,44 @@
+span, input {
+    margin-right: 5px;
+}
+
+input {
+    width: 90px;
+}
+
+.search {
+    margin-bottom: 20px;
+}
+
 .show-errors .ng-invalid {
     background: red;
+}
+
+.asset, .total {
+    display: flex;
+    padding: 5px 0;
+
+    div {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    div:first-child {
+        width: 70%;
+    }
+
+    div:last-child {
+        width: 30%;
+        text-align: right;
+    }
+}
+
+.asset {
+    border-top: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.asset:hover {
+    background: #f2f2f2;
 }

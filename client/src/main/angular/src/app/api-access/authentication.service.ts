@@ -7,6 +7,7 @@ export class AuthenticationService {
 
   username: string;
   password: string;
+  isLoggedIn: boolean;
   
   constructor() { }
 }

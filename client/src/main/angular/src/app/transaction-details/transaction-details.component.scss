@@ -1,0 +1,13 @@
+.entries {
+    display: flex;
+    justify-content: space-between;
+    & > div {
+        width: 49%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    & > div:last-child {
+        text-align: right;
+    }
+}

@@ -1,5 +1,5 @@
-<div *ngIf="message != null">
-    <div>
+<div *ngIf="message != null" class="overlay">
+    <div class="dialog">
         <div [ngSwitch]="message">
             <ng-container *ngSwitchCase="DialogMessage.ERROR_SERVER">
                 Fehler bei der Verbindung zum Server.
@@ -43,7 +43,7 @@
         </div>
         <div>
             <button (click)="ok()">OK</button>
-            <button *ngIf="showCancel" (cancel)="cancel()">Abbrechen</button>
+            <button *ngIf="showCancel" (click)="cancel()">Abbrechen</button>
         </div>
     </div>
 </div>

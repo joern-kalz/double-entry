@@ -7,19 +7,14 @@ import { AccountHierarchyNode } from './account-hierarchy-node';
   providedIn: 'root'
 })
 export class AccountHierarchyService {
-  private readonly ASSET = "[ASSET]";
-  private readonly EQUITY = "[EQUITY]";
-  private readonly EXPENSE = "[EXPENSE]";
-  private readonly REVENUE = "[REVENUE]";
-
   constructor() { }
 
   createRootAccounts(): Account[] {
     return [
-      { id: 1, name: this.ASSET, active: true },
-      { id: 2, name: this.EQUITY, active: true },
-      { id: 3, name: this.EXPENSE, active: true, parentId: 2 },
-      { id: 4, name: this.REVENUE, active: true, parentId: 2 },
+      { id: 1, name: AccountType.ASSET, active: true },
+      { id: 2, name: AccountType.EQUITY, active: true },
+      { id: 3, name: AccountType.EXPENSE, active: true, parentId: 2 },
+      { id: 4, name: AccountType.REVENUE, active: true, parentId: 2 },
     ]
   }
 

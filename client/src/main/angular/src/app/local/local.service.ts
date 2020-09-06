@@ -48,7 +48,8 @@ export class LocalService {
 
   parseDate(value: string): moment.Moment {
     if (this.isEmpty(value)) return null;
-    return moment(value, this.DATE_FORMAT);
+    const date = moment(value, this.DATE_FORMAT);
+    return date.isValid() ? date : null;
   }
 
   createDateValidator() {

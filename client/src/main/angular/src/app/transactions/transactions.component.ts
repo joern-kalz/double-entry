@@ -4,7 +4,7 @@ import { TransactionsService } from '../generated/openapi/api/transactions.servi
 import { AccountsService } from '../generated/openapi/api/accounts.service'
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { forkJoin, } from 'rxjs';
-import { Transaction, TransactionEntries } from '../generated/openapi/model/models';
+import { Transaction, TransactionEntries, Account } from '../generated/openapi/model/models';
 import * as moment from 'moment';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { LocalService } from '../local/local.service';
@@ -13,6 +13,7 @@ import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.
 import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
 import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
 import { ViewTransactionFactoryService } from '../transaction-details/view-transaction-factory.service';
+import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
 
 @Component({
   selector: 'app-transactions',
@@ -52,7 +53,8 @@ export class TransactionsComponent implements OnInit {
     private router: Router,
     private localService: LocalService,
     private accountHierarchyService: AccountHierarchyService,
-    private viewTransactionFactoryService: ViewTransactionFactoryService
+    private viewTransactionFactoryService: ViewTransactionFactoryService,
+    private apiErrorHandlerService: ApiErrorHandlerService
   ) { }
 
   ngOnInit() {
@@ -111,12 +113,17 @@ export class TransactionsComponent implements OnInit {
         accountId
       ),
       this.accountsService.getAccounts()
-    ).subscribe(([transactions, accounts]) => {
-      this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
+    ).subscribe(
+      ([transactions, accounts]) => this.handleLoadSuccess(transactions, accounts),
+      error => this.apiErrorHandlerService.handle(error)
+    );
+  }
 
-      this.transactions = transactions
-        .map(transaction => this.viewTransactionFactoryService.create(transaction, this.accountHierarchy));
-    });
+  private handleLoadSuccess(transactions: Transaction[], accounts: Account[]) {
+    this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
+
+    this.transactions = transactions
+      .map(transaction => this.viewTransactionFactoryService.create(transaction, this.accountHierarchy));
   }
 
   submit() {
@@ -132,13 +139,16 @@ export class TransactionsComponent implements OnInit {
       return this.beforeElement.nativeElement.focus();
     }
 
+    const after = this.localService.parseDate(this.after.value);
+    const before = this.localService.parseDate(this.before.value);
+
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       replaceUrl: true,
       queryParams: {
         type: this.dateSelectionType.value,
-        after: this.localService.parseDate(this.after.value).format(API_DATE),
-        before: this.localService.parseDate(this.before.value).format(API_DATE),
+        after: after ? after.format(API_DATE) : null,
+        before: before ? before.format(API_DATE) : null,
         month: this.month,
         year: this.year,
         account: this.account.value,

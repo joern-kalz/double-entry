@@ -5,7 +5,7 @@
             <span>Datum</span>
             <input formControlName="date">
         </label>
-        <div *ngIf="showErrors && date.invalid">
+        <div *ngIf="showErrors && date.invalid" class="error">
             Gültiges Datum erforderlich
         </div>
     </div>
@@ -15,96 +15,99 @@
             <span>Beschreibung</span>
             <input formControlName="name">
         </label>
-        <div *ngIf="showErrors && name.invalid">
+        <div *ngIf="showErrors && name.invalid" class="error">
             Beschreibung erforderlich
         </div>
     </div>
 
     <div formArrayName="creditEntries" class="list">
-        <div *ngFor="let entry of creditEntries.controls; let i = index; first as first" [formGroupName]="i">
-            <div class="field">
-                <label>
-                    <span *ngIf="first">Von Konto</span>
-                    <span *ngIf="!first">Und Konto</span>
-                    <select formControlName="account">
-                        <option *ngFor="let account of creditAccountList" [ngValue]="account.id">
-                            <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
-                                [indented]="true">
-                            </app-account-name>
-                        </option>
-                    </select>
-                </label>
-                <button type="button" (click)="createCreditAccount(i)">Neu</button>
-                <div *ngIf="showErrors && entry.get('account').invalid">
-                    Konto erforderlich
-                </div>
-            </div>
-            <div class="field">
-                <label>
-                    <span>Betrag</span>
-                    <input formControlName="amount">
-                </label>
-                <div *ngIf="showErrors && entry.get('amount').invalid">
-                    Gültiger Betrag erforderlich
-                </div>
-            </div>
+        <div class="entry-label">Von Konto</div>
+        <div *ngFor="let entry of creditEntries.controls; let i = index; first as first" 
+            [formGroupName]="i" class="entry">
+            <label class="account">
+                <span>Konto</span>
+                <select formControlName="account">
+                    <option *ngFor="let account of creditAccountList" [ngValue]="account.id">
+                        <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
+                            [indented]="true">
+                        </app-account-name>
+                    </option>
+                </select>
+                <button type="button" (click)="createCreditAccount(i)" class="light">Neu</button>
+            </label>
+            <label class="amount">
+                <span>Betrag</span>
+                <input formControlName="amount">
+            </label>
             <button type="button" *ngIf="variableEntries" (click)="deleteCreditEntry(i)" 
-                [disabled]="creditEntries.length < 2">
+                [disabled]="creditEntries.length < 2" class="delete light">
                 Löschen
             </button>
+            <div *ngIf="showErrors && entry.get('account').invalid" class="error">
+                Konto erforderlich
+            </div>
+            <div *ngIf="showErrors && entry.get('amount').invalid" class="error">
+                Gültiger Betrag erforderlich
+            </div>
         </div>
-        <button type="button" *ngIf="variableEntries" (click)="addCreditEntry()">Hinzufügen</button>
+        <div class="add">
+            <button type="button" *ngIf="variableEntries" (click)="addCreditEntry()" class="light">
+                Hinzufügen
+            </button>
+        </div>
     </div>
 
     <div formArrayName="debitEntries" class="list">
-        <div *ngFor="let entry of debitEntries.controls; let i = index; first as first" [formGroupName]="i">
-            <div class="field">
-                <label>
-                    <span *ngIf="first">Nach Konto</span>
-                    <span *ngIf="!first">Und Konto</span>
-                    <select formControlName="account">
-                        <option *ngFor="let account of debitAccountList" [ngValue]="account.id">
-                            <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
-                                [indented]="true">
-                            </app-account-name>
-                        </option>
-                    </select>
-                </label>
-                <button type="button" (click)="createDebitAccount(i)">Neu</button>
-                <div *ngIf="showErrors && entry.get('account').invalid">
-                    Konto erforderlich
-                </div>
-            </div>
-            <div class="field">
-                <label>
-                    <span>Betrag</span>
-                    <input formControlName="amount">
-                </label>
-                <div *ngIf="showErrors && entry.get('amount').invalid">
-                    Gültiger Betrag erforderlich
-                </div>
-            </div>
+        <div class="entry-label">Nach Konto</div>
+        <div *ngFor="let entry of debitEntries.controls; let i = index; first as first" 
+            [formGroupName]="i" class="entry">
+            <label class="account">
+                <span>Konto</span>
+                <select formControlName="account">
+                    <option *ngFor="let account of debitAccountList" [ngValue]="account.id">
+                        <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
+                            [indented]="true">
+                        </app-account-name>
+                    </option>
+                </select>
+                <button type="button" (click)="createDebitAccount(i)" class="light">Neu</button>
+            </label>
+            <label class="amount">
+                <span>Betrag</span>
+                <input formControlName="amount">
+            </label>
             <button type="button" *ngIf="variableEntries" (click)="deleteDebitEntry(i)" 
-                [disabled]="debitEntries.length < 2">
+                [disabled]="debitEntries.length < 2" class="delete light">
                 Löschen
             </button>
+            <div *ngIf="showErrors && entry.get('account').invalid" class="error">
+                Konto erforderlich
+            </div>
+            <div *ngIf="showErrors && entry.get('amount').invalid" class="error">
+                Gültiger Betrag erforderlich
+            </div>
         </div>
-        <button type="button" *ngIf="variableEntries" (click)="addDebitEntry()">Hinzufügen</button>
+        <div class="add">
+            <button type="button" *ngIf="variableEntries" (click)="addDebitEntry()" class="light">
+                Hinzufügen
+            </button>
+        </div>
     </div>
 
+
     <div>
-        <div *ngIf="showErrors && form.errors?.accountsUnique">
+        <div *ngIf="showErrors && form.errors?.accountsUnique" class="error">
             Konto doppelt erfasst: 
             <app-account-name [account]="accountHierarchy.accountsById.get(form.errors.accountsUnique.duplicate)" 
                 [accountHierarchy]="accountHierarchy">
             </app-account-name>
         </div>
-        <div *ngIf="showErrors && form.errors?.totalIsZero">
+        <div *ngIf="showErrors && form.errors?.totalIsZero" class="error">
             Summe der Beträge muss Null ergeben
         </div>
     </div>
     
-    <div>
+    <div class="buttons">
         <button type="button" (click)="cancel()">Abbrechen</button>
         <button [disabled]="submitted">Speichern</button>
     </div>
