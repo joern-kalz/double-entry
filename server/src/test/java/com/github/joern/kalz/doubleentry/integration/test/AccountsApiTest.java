@@ -100,7 +100,7 @@ public class AccountsApiTest {
     public void shouldUpdateAccount() throws Exception {
         Account childAccount = testSetup.createAccount("lease", loggedInUser);
         Account parentAccount = testSetup.createAccount("parent", loggedInUser);
-        testSetup.createParentChildRelationship(parentAccount, childAccount);
+        testSetup.createParentChildLink(parentAccount, childAccount);
         String requestBody = "{\"name\":\"food\",\"parentId\":" + parentAccount.getId() + "}";
 
         mockMvc.perform(put("/api/accounts/" + childAccount.getId()).content(requestBody))
@@ -115,7 +115,7 @@ public class AccountsApiTest {
     public void shouldFailIfAccountOwnedByDifferentUser() throws Exception {
         Account childAccount = testSetup.createAccount("lease", otherUser);
         Account parentAccount = testSetup.createAccount("parent", loggedInUser);
-        testSetup.createParentChildRelationship(parentAccount, childAccount);
+        testSetup.createParentChildLink(parentAccount, childAccount);
         String requestBody = "{\"name\":\"food\",\"parentId\":" + parentAccount.getId() + "}";
 
         mockMvc.perform(put("/api/accounts/" + childAccount.getId()).content(requestBody))
@@ -126,7 +126,7 @@ public class AccountsApiTest {
     public void shouldFailIfParentChildRelationshipCyclic() throws Exception {
         Account childAccount = testSetup.createAccount("lease", loggedInUser);
         Account parentAccount = testSetup.createAccount("parent", loggedInUser);
-        testSetup.createParentChildRelationship(parentAccount, childAccount);
+        testSetup.createParentChildLink(parentAccount, childAccount);
         String requestBody = "{\"name\":\"food\",\"parentId\":" + childAccount.getId() + "}";
 
         mockMvc.perform(put("/api/accounts/" + parentAccount.getId()).content(requestBody))

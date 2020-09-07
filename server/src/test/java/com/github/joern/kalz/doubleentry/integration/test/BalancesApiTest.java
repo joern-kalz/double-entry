@@ -43,7 +43,7 @@ public class BalancesApiTest {
         cashAccount = testSetup.createAccount("cash", loggedInUser);
         foodAccount = testSetup.createAccount("food", loggedInUser);
         expenseAccount = testSetup.createAccount("expenses", loggedInUser);
-        testSetup.createParentChildRelationship(expenseAccount, foodAccount);
+        testSetup.createParentChildLink(expenseAccount, foodAccount);
         foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser);
         cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser);
     }

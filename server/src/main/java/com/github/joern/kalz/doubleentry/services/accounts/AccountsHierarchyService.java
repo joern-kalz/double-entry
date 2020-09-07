@@ -54,7 +54,7 @@ public class AccountsHierarchyService {
         return childrenById;
     }
 
-    public void walkDepthFirstFromRoots(AccountsVisitor accountsVisitor) {
+    public void walkHierarchyDepthFirst(AccountsVisitor accountsVisitor) {
         walkDepthFirst(getRootAccounts(), accountsVisitor);
     }
 

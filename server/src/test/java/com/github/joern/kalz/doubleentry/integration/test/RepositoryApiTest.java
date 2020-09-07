@@ -52,7 +52,7 @@ public class RepositoryApiTest {
     public void shouldGetRepository() throws Exception {
         Account foodAccount = testSetup.createAccount("food", loggedInUser);
         Account expenseAccount = testSetup.createAccount("expense", loggedInUser);
-        testSetup.createParentChildRelationship(expenseAccount, foodAccount);
+        testSetup.createParentChildLink(expenseAccount, foodAccount);
         Account cashAccount = testSetup.createAccount("cash", loggedInUser);
         Transaction transaction = testSetup.createTransaction("baker", loggedInUser, LocalDate.EPOCH,
                 new TestTransactionEntry(foodAccount, "2.50", false),
@@ -97,7 +97,7 @@ public class RepositoryApiTest {
     public void shouldRestoreAccountsFromRepository() throws Exception {
         Account foodAccount = testSetup.createAccount("food", loggedInUser);
         Account expenseAccount = testSetup.createAccount("expense", loggedInUser);
-        testSetup.createParentChildRelationship(expenseAccount, foodAccount);
+        testSetup.createParentChildLink(expenseAccount, foodAccount);
         testSetup.createAccount("cash", loggedInUser);
         String repository = mockMvc.perform(get("/api/repository"))
                 .andReturn().getResponse().getContentAsString();

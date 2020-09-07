@@ -56,7 +56,7 @@ public class TestSetup {
         return accountsRepository.save(account);
     }
 
-    public Account createParentChildRelationship(Account parent, Account child) {
+    public Account createParentChildLink(Account parent, Account child) {
         child.setParent(parent);
         return accountsRepository.save(child);
     }
