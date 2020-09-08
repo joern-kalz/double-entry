@@ -96,7 +96,7 @@ export class VerificationComponent implements OnInit {
     const creditEntry = transaction.creditEntries.find(entry => entry.account.id == this.account.id);
     if (creditEntry) return -creditEntry.amount;
     const debitEntry = transaction.debitEntries.find(entry => entry.account.id == this.account.id);
-    if (debitEntry) return -debitEntry.amount;
+    if (debitEntry) return debitEntry.amount;
     return 0;
   }
 

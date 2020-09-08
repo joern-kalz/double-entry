@@ -35,6 +35,7 @@ input {
 
     label {
         flex-grow: 1;
+        padding: 0 5px;
         display: flex;
         justify-content: space-between;
         cursor: pointer;
@@ -50,11 +51,11 @@ input {
             width: 90px;
         }
         div:nth-child(3) {
-            width: 40px;
+            width: 30px;
             flex-grow: 1;
         }
         div:nth-child(4) {
-            width: 40px;
+            width: 30px;
             flex-grow: 1;
         }
         div:nth-child(5) {
