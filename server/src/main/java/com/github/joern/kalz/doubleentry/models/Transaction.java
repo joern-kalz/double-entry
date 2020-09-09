@@ -14,7 +14,7 @@ public class Transaction {
     @ManyToOne
     private User user;
 
-    @OneToMany(mappedBy = "id.transaction", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "id.transaction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Entry> entries;
 
     private LocalDate date;

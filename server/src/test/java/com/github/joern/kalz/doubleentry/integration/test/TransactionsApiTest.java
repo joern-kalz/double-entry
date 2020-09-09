@@ -200,17 +200,23 @@ public class TransactionsApiTest {
         long id = createTransactionWithUser("supermarket", loggedInUser).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-99.99}," +
-                "{\"accountId\":" + foodAccount.getId() + ",\"amount\":99.99}]}";
+                "{\"accountId\":" + expenseAccount.getId() + ",\"amount\":99.99}]}";
 
         mockMvc.perform(put("/api/transactions/" + id).content(requestBody))
                 .andExpect(status().isNoContent());
 
-        Optional<Transaction> transaction = transactionsRepository.findById(id);
-        assertTrue(transaction.isPresent());
-        assertEquals("bread and butter", transaction.get().getName());
-        assertEquals(2, transaction.get().getEntries().size());
-        BigDecimal absoluteEntryAmount = transaction.get().getEntries().get(0).getAmount().abs();
-        assertEquals(0, new BigDecimal("99.99").compareTo(absoluteEntryAmount));
+        Optional<Transaction> transactionOptional = transactionsRepository.findById(id);
+        assertTrue(transactionOptional.isPresent());
+
+        Transaction transaction = transactionOptional.get();
+        assertEquals("bread and butter", transaction.getName());
+        assertEquals(2, transaction.getEntries().size());
+
+        Optional<Entry> expenseEntry = transaction.getEntries().stream()
+                .filter(entry -> entry.getId().getAccount().getName().equals(expenseAccount.getName()))
+                .findAny();
+        assertTrue(expenseEntry.isPresent());
+        assertEquals(0, new BigDecimal("99.99").compareTo(expenseEntry.get().getAmount()));
     }
 
     @Test
