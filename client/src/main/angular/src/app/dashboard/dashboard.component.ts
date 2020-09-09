@@ -5,6 +5,10 @@ import { LocalService } from '../local/local.service';
 import { TransactionType } from '../context/context-transaction';
 import { Router } from '@angular/router';
 import { AccountType } from '../account-hierarchy/account-hierarchy';
+import { saveAs } from 'file-saver';
+import { RepositoryService } from '../generated/openapi/api/repository.service';
+import { Repository } from '../generated/openapi/model/models';
+import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,6 +22,8 @@ export class DashboardComponent implements OnInit {
     private contextService: ContextService,
     private localService: LocalService,
     private router: Router,
+    private repositoryService: RepositoryService,
+    private apiErrorHandlerService: ApiErrorHandlerService,
   ) { }
 
   ngOnInit(): void {
@@ -55,5 +61,18 @@ export class DashboardComponent implements OnInit {
     });
 
     this.router.navigate(['/transaction']);
+  }
+
+  export() {
+    this.repositoryService.exportRepository().subscribe(
+      repository => this.handleExportSuccess(repository),
+      error => this.apiErrorHandlerService.handle(error)
+    );
+  }
+
+  private handleExportSuccess(repository: Repository) {
+    const name = `double-entry-backup-${moment().format('YYYY-MM-DD')}.json`;
+    const blob = new Blob([JSON.stringify(repository, null, 2)], {type : 'application/json'});
+    saveAs(blob, name);
   }
 }
