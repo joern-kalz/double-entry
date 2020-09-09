@@ -2,16 +2,12 @@ package com.github.joern.kalz.doubleentry.integration.test;
 
 import com.github.joern.kalz.doubleentry.integration.test.setup.TestSetup;
 import com.github.joern.kalz.doubleentry.integration.test.setup.TestTransactionEntry;
-import com.github.joern.kalz.doubleentry.models.Account;
-import com.github.joern.kalz.doubleentry.models.Transaction;
-import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
-import com.github.joern.kalz.doubleentry.models.User;
+import com.github.joern.kalz.doubleentry.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -59,7 +55,6 @@ public class TransactionsApiTest {
     }
 
     @Test
-    @Transactional
     public void shouldCreateTransaction() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
@@ -68,8 +63,7 @@ public class TransactionsApiTest {
         mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isCreated());
 
-        List<Transaction> transactions = new ArrayList<>();
-        transactionsRepository.findAll().forEach(transactions::add);
+        List<Transaction> transactions = new ArrayList<>(transactionsRepository.findAll());
         assertEquals(1, transactions.size());
 
         Transaction transaction = transactions.get(0);
@@ -202,7 +196,6 @@ public class TransactionsApiTest {
     }
 
     @Test
-    @Transactional
     public void shouldUpdateTransaction() throws Exception {
         long id = createTransactionWithUser("supermarket", loggedInUser).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
@@ -221,7 +214,6 @@ public class TransactionsApiTest {
     }
 
     @Test
-    @Transactional
     public void shouldNotUpdateTransactionOfOtherUser() throws Exception {
         long id = createTransactionWithUser("supermarket", otherUser).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
