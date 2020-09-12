@@ -88,7 +88,7 @@ export class EarningsComponent implements OnInit, OnDestroy {
     
     if (!year) {
       return { 
-        month: moment().month() - 1 + index, 
+        month: moment().month() + index, 
         year: moment().year() 
       };
     } else {

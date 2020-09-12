@@ -20,7 +20,7 @@ const routes: Routes = [
   { path: 'transaction', component: TransactionComponent },
   { path: 'transaction/:entryType/:entryIndex/new/:accountType', component: AccountComponent },
   { path: 'assets', component: AssetsComponent },
-  { path: 'earnings/:earningType', component: EarningsComponent },
+  { path: 'earnings/:accountType', component: EarningsComponent },
   { path: 'accounts/:accountId', component: AccountComponent },
   { path: 'verification', component: VerificationComponent },
 ];
