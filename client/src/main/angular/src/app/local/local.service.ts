@@ -40,10 +40,7 @@ export class LocalService {
     if (this.isEmpty(value)) return null;
     const matcher = value.match(this.AMOUNT_FORMAT);
     if (!matcher) return null;
-    const sign = matcher[1] == '-' ? -1 : 1;
-    const integerPart = +matcher[2];
-    const fractionalPart = matcher[3] ? +matcher[4] / Math.pow(10, matcher[4].length) : 0;
-    return sign * (integerPart + fractionalPart);
+    return +value.replace(',', '.');
   }
 
   parseDate(value: string): moment.Moment {
