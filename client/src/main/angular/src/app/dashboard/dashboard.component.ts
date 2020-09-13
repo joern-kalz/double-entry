@@ -71,7 +71,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private handleExportSuccess(repository: Repository) {
-    const name = `double-entry-backup-${moment().format('YYYY-MM-DD')}.json`;
+    const name = `double-entry-backup-${moment().format('YYYY-MM-DD-hh-mm-ss')}.json`;
     const blob = new Blob([JSON.stringify(repository, null, 2)], {type : 'application/json'});
     saveAs(blob, name);
   }
