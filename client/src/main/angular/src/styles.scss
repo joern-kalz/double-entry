@@ -85,13 +85,15 @@ button.heavy, a.heavy {
 }
 
 .show-errors {
-    .ng-invalid {
-        background: #fff2f4;
-        border-color: #e30000;
-    }
-    .ng-invalid:focus {
-        background: unset;
-        border-color: #bbb;
+    input, select {
+        &.ng-invalid {
+            background: #fff2f4;
+            border-color: #e30000;
+        }
+        &.ng-invalid:focus {
+            background: unset;
+            border-color: #bbb;
+        }
     }
     .error {
         color: #e30000;

@@ -11,6 +11,7 @@
 
 .entry {
     display: flex;
+    flex-wrap: wrap;
     margin-bottom: 5px;
 
     .account {
@@ -40,6 +41,10 @@
 
     button, span, input {
         margin-left: 2px;
+    }
+
+    .error {
+        width: 100%;
     }
 }
 
