@@ -8,7 +8,7 @@
 
 <div class="total">
     <div>Summe</div>
-    <div>{{total}}</div>
+    <div>{{total | amount}}</div>
 </div>
 <div *ngFor="let asset of assets" (click)="select(asset)" class="asset">
     <div>
@@ -18,7 +18,7 @@
             [indentationOffset]="-1">
         </app-account-name>
     </div>
-    <div>{{asset.balance}}</div>
+    <div>{{asset.balance | amount}}</div>
 </div>
 
 <div *ngIf="selectedAsset" class="details">
@@ -41,7 +41,7 @@
         </div>
         <div>
             <div>Kontostand zum {{selectedAsset.date | date}}</div>
-            <div>{{selectedAsset.balance}}</div>
+            <div>{{selectedAsset.balance | amount}}</div>
         </div>
         <div>
             <button *ngIf="selectedAsset.account.active" (click)="setActive(false)">Deaktivieren</button>
