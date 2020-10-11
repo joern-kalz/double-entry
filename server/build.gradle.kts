@@ -2,6 +2,7 @@ plugins {
     id("org.springframework.boot") version "2.3.2.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
     id("org.openapi.generator") version "4.3.1"
+    id("com.google.cloud.tools.jib") version "2.6.0"
     java
 }
 
