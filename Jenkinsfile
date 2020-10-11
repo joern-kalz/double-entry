@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh "./gradlew ${JIB_OPTIONS} jib ${DOCKER_REGISTRY}/double-entry"
+                sh "./gradlew ${JIB_OPTIONS} jib --image=${DOCKER_REGISTRY}/double-entry"
             }
         }
     }
