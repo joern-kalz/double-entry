@@ -3,6 +3,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
     id("org.openapi.generator") version "4.3.1"
     id("com.google.cloud.tools.jib") version "2.6.0"
+    id("org.sonarqube") version "3.0"
     java
 }
 
