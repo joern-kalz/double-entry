@@ -30,7 +30,7 @@ pipeline {
         stage('Deploy') {
             when { branch 'master' }
             steps {
-                sh "./gradlew ${JIB_OPTIONS} jib --image=${DOCKER_REGISTRY_URL}/double-entry"
+                sh "./gradlew ${JIB_OPTIONS} jib --image=${DOCKER_REGISTRY}/double-entry"
             }
         }
     }
