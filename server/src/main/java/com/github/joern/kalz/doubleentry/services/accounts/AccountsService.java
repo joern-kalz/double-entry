@@ -75,7 +75,7 @@ public class AccountsService {
             case MAXIMUM_HIERARCHY_DEPTH_EXCEEDED:
                 return new ParameterException("maximum hierarchy depth exceeded");
             default:
-                throw new RuntimeException("unknown validation error " + validationResult);
+                throw new IllegalArgumentException("unknown validation error " + validationResult);
         }
     }
 }
