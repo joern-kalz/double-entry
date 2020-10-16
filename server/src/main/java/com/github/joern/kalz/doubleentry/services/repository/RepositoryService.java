@@ -32,6 +32,7 @@ public class RepositoryService {
         return getRepositoryResponse;
     }
 
+    @Transactional
     public void importRepository(ImportRepositoryRequest importRepositoryRequest) {
         importRepository(principalProvider.getPrincipal(), importRepositoryRequest);
     }
