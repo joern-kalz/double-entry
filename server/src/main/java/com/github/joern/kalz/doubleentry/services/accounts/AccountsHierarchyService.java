@@ -66,7 +66,7 @@ public class AccountsHierarchyService {
                 .map(State::new)
                 .collect(Collectors.toCollection(ArrayDeque::new));
 
-        while (stateStack.size() > 0) {
+        while (!stateStack.isEmpty()) {
             State state = stateStack.getLast();
             List<Account> children = state.account.getChildren();
 
