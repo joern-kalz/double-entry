@@ -4,6 +4,7 @@ plugins {
     id("org.openapi.generator") version "4.3.1"
     id("com.google.cloud.tools.jib") version "2.6.0"
     id("org.sonarqube") version "3.0"
+    jacoco
     java
 }
 
@@ -56,6 +57,9 @@ tasks {
     named("compileJava").configure {
         dependsOn(named("openApiGenerate"))
     }
+    named("jacocoTestReport").configure {
+        dependsOn(named("test"))
+    }
 }
 
 sourceSets {
@@ -63,5 +67,11 @@ sourceSets {
         java {
             srcDir("$buildDir/generated/openapi/src/main/java")
         }
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.isEnabled = true
     }
 }
