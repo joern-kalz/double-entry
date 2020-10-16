@@ -1,11 +1,12 @@
 package com.github.joern.kalz.doubleentry.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements Serializable {
 
     @Id
     private String username;

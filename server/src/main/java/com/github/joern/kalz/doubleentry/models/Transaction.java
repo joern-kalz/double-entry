@@ -1,11 +1,12 @@
 package com.github.joern.kalz.doubleentry.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-public class Transaction {
+public class Transaction implements Serializable {
 
     @Id
     @GeneratedValue

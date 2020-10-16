@@ -1,10 +1,11 @@
 package com.github.joern.kalz.doubleentry.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
-public class Account {
+public class Account implements Serializable {
 
     @Id
     @GeneratedValue

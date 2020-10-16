@@ -2,10 +2,11 @@ package com.github.joern.kalz.doubleentry.models;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
-public class Entry {
+public class Entry implements Serializable {
 
     @EmbeddedId
     private EntryId id;
