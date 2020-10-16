@@ -60,8 +60,9 @@ public class AccountsService {
             throw createException(validationResult, account);
         }
 
-        accountProvider.find(account.getId())
-                .orElseThrow(() -> new NotFoundException("account " + account.getId() + " not found"));
+        if (accountProvider.find(account.getId()).isEmpty()) {
+            throw  new NotFoundException("account " + account.getId() + " not found");
+        }
 
         accountsRepository.save(account);
     }

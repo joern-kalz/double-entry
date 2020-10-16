@@ -78,8 +78,9 @@ public class TransactionsService {
             throw createValidationException(validationResult);
         }
 
-        findTransaction(transaction.getId())
-                .orElseThrow(() -> new NotFoundException("transaction " + transaction.getId() + " not found"));
+        if (findTransaction(transaction.getId()).isEmpty()) {
+            throw new NotFoundException("transaction " + transaction.getId() + " not found");
+        }
 
         transactionsRepository.save(transaction);
     }
