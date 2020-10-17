@@ -22,38 +22,38 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-public class MeApiTest {
+class MeApiTest {
 
-    private static final String USERNAME = "USERNAME";
-    private static final String PASSWORD = "PASSWORD";
-
-    @Autowired
-    private TestSetup testSetup;
+    static final String USERNAME = "USERNAME";
+    static final String PASSWORD = "PASSWORD";
 
     @Autowired
-    private UsersRepository usersRepository;
+    TestSetup testSetup;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    UsersRepository usersRepository;
 
-    private MockMvc mockMvc;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    MockMvc mockMvc;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         testSetup.clearDatabase();
         User user = testSetup.createUser(USERNAME, PASSWORD);
         mockMvc = testSetup.createAuthenticatedMockMvc(user);
     }
 
     @Test
-    public void shouldProvideUserInformation() throws Exception {
+    void shouldProvideUserInformation() throws Exception {
         mockMvc.perform(get("/api/me").with(user(USERNAME)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is(USERNAME)));
     }
 
     @Test
-    public void shouldUpdatePassword() throws Exception {
+    void shouldUpdatePassword() throws Exception {
         String newPassword = "NEW_PASSWORD";
         String requestBody = "{\"oldPassword\":\"" + PASSWORD + "\",\"newPassword\":\"" + newPassword + "\"}";
 
@@ -66,7 +66,7 @@ public class MeApiTest {
     }
 
     @Test
-    public void shouldNotUpdatePasswordIfOldPasswordIncorrect() throws Exception {
+    void shouldNotUpdatePasswordIfOldPasswordIncorrect() throws Exception {
         String newPassword = "NEW_PASSWORD";
         String requestBody = "{\"oldPassword\":\"" + newPassword + "\",\"newPassword\":\"" + newPassword + "\"}";
 

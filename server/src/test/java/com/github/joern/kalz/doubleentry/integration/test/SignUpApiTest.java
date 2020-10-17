@@ -18,27 +18,27 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-public class SignUpApiTest {
+class SignUpApiTest {
 
     @Autowired
-    private TestSetup testSetup;
+    TestSetup testSetup;
 
     @Autowired
-    private UsersRepository usersRepository;
+    UsersRepository usersRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         testSetup.clearDatabase();
         mockMvc = testSetup.createMockMvc();
     }
 
     @Test
-    public void shouldSignUp() throws Exception {
+    void shouldSignUp() throws Exception {
         String requestBody = "{\"name\":\"joern\",\"password\":\"secret\"," +
                 "\"repository\":{\"accounts\":[{\"id\":1,\"name\":\"root\",\"active\":true}],\"transactions\":[]}}";
 
@@ -52,7 +52,7 @@ public class SignUpApiTest {
     }
 
     @Test
-    public void shouldFailIfNameMissing() throws Exception {
+    void shouldFailIfNameMissing() throws Exception {
         String requestBody = "{\"password\":\"secret\"," +
                 "\"repository\":{\"accounts\":[{\"id\":1,\"name\":\"root\",\"active\":true}],\"transactions\":[]}}";
 
@@ -65,7 +65,7 @@ public class SignUpApiTest {
     }
 
     @Test
-    public void shouldFailIfUserAlreadyExists() throws Exception {
+    void shouldFailIfUserAlreadyExists() throws Exception {
         String requestBody = "{\"name\":\"joern\",\"password\":\"secret\"," +
                 "\"repository\":{\"accounts\":[{\"id\":1,\"name\":\"root\",\"active\":true}],\"transactions\":[]}}";
 

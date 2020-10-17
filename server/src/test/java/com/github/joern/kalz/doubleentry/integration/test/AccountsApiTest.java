@@ -21,21 +21,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-public class AccountsApiTest {
+class AccountsApiTest {
 
     @Autowired
-    private TestSetup testSetup;
+    TestSetup testSetup;
 
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
     @Autowired
-    private AccountsRepository accountsRepository;
+    AccountsRepository accountsRepository;
 
-    private User loggedInUser;
-    private User otherUser;
+    User loggedInUser;
+    User otherUser;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         testSetup.clearDatabase();
         loggedInUser = testSetup.createUser("LOGGED_IN_USERNAME", "");
         otherUser = testSetup.createUser("OTHER_USERNAME", "");
@@ -43,7 +43,7 @@ public class AccountsApiTest {
     }
 
     @Test
-    public void shouldCreateAccount() throws Exception {
+    void shouldCreateAccount() throws Exception {
         String requestBody = "{\"name\":\"cash\"}";
 
         mockMvc.perform(post("/api/accounts").content(requestBody))
@@ -56,7 +56,7 @@ public class AccountsApiTest {
     }
 
     @Test
-    public void shouldCreateChildAccount() throws Exception {
+    void shouldCreateChildAccount() throws Exception {
         Account parentAccount = testSetup.createAccount("parent", loggedInUser);
         String requestBody = "{\"name\":\"cash\",\"parentId\":" + parentAccount.getId() + "}";
 
@@ -70,7 +70,7 @@ public class AccountsApiTest {
     }
 
     @Test
-    public void shouldFailIfNameBlank() throws Exception {
+    void shouldFailIfNameBlank() throws Exception {
         Account parentAccount = testSetup.createAccount("parent", loggedInUser);
         String requestBody = "{\"name\":\"\",\"parentId\":" + parentAccount.getId() + "}";
 
@@ -79,7 +79,7 @@ public class AccountsApiTest {
     }
 
     @Test
-    public void shouldGetAccounts() throws Exception {
+    void shouldGetAccounts() throws Exception {
         testSetup.createAccount("food", loggedInUser);
 
         mockMvc.perform(get("/api/accounts"))
@@ -88,7 +88,7 @@ public class AccountsApiTest {
     }
 
     @Test
-    public void shouldNotGetAccountsOfOtherUser() throws Exception {
+    void shouldNotGetAccountsOfOtherUser() throws Exception {
         testSetup.createAccount("food", otherUser);
 
         mockMvc.perform(get("/api/accounts"))
@@ -97,7 +97,7 @@ public class AccountsApiTest {
     }
 
     @Test
-    public void shouldUpdateAccount() throws Exception {
+    void shouldUpdateAccount() throws Exception {
         Account childAccount = testSetup.createAccount("lease", loggedInUser);
         Account parentAccount = testSetup.createAccount("parent", loggedInUser);
         testSetup.createParentChildLink(parentAccount, childAccount);
@@ -112,7 +112,7 @@ public class AccountsApiTest {
     }
 
     @Test
-    public void shouldFailIfAccountOwnedByDifferentUser() throws Exception {
+    void shouldFailIfAccountOwnedByDifferentUser() throws Exception {
         Account childAccount = testSetup.createAccount("lease", otherUser);
         Account parentAccount = testSetup.createAccount("parent", loggedInUser);
         testSetup.createParentChildLink(parentAccount, childAccount);
@@ -123,7 +123,7 @@ public class AccountsApiTest {
     }
 
     @Test
-    public void shouldFailIfParentChildRelationshipCyclic() throws Exception {
+    void shouldFailIfParentChildRelationshipCyclic() throws Exception {
         Account childAccount = testSetup.createAccount("lease", loggedInUser);
         Account parentAccount = testSetup.createAccount("parent", loggedInUser);
         testSetup.createParentChildLink(parentAccount, childAccount);

@@ -25,23 +25,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-public class RepositoryApiTest {
-    private MockMvc mockMvc;
+class RepositoryApiTest {
+    MockMvc mockMvc;
 
     @Autowired
-    private TestSetup testSetup;
+    TestSetup testSetup;
 
     @Autowired
-    private TransactionsRepository transactionsRepository;
+    TransactionsRepository transactionsRepository;
 
     @Autowired
-    private AccountsRepository accountsRepository;
+    AccountsRepository accountsRepository;
 
-    private User loggedInUser;
-    private User otherUser;
+    User loggedInUser;
+    User otherUser;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         testSetup.clearDatabase();
         loggedInUser = testSetup.createUser("LOGGED_IN_USERNAME", "");
         otherUser = testSetup.createUser("OTHER_USERNAME", "");
@@ -49,7 +49,7 @@ public class RepositoryApiTest {
     }
 
     @Test
-    public void shouldGetRepository() throws Exception {
+    void shouldGetRepository() throws Exception {
         Account foodAccount = testSetup.createAccount("food", loggedInUser);
         Account expenseAccount = testSetup.createAccount("expense", loggedInUser);
         testSetup.createParentChildLink(expenseAccount, foodAccount);
@@ -69,7 +69,7 @@ public class RepositoryApiTest {
     }
 
     @Test
-    public void shouldGetRepositoryWithoutAccountsOfOtherUser() throws Exception {
+    void shouldGetRepositoryWithoutAccountsOfOtherUser() throws Exception {
         Account foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser);
         Account cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser);
 
@@ -80,7 +80,7 @@ public class RepositoryApiTest {
     }
 
     @Test
-    public void shouldGetRepositoryWithoutTransactionsOfOtherUser() throws Exception {
+    void shouldGetRepositoryWithoutTransactionsOfOtherUser() throws Exception {
         Account foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser);
         Account cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser);
         Transaction transaction = testSetup.createTransaction("baker", otherUser, LocalDate.EPOCH,
@@ -94,7 +94,7 @@ public class RepositoryApiTest {
 
     @Test
     @Transactional
-    public void shouldRestoreAccountsFromRepository() throws Exception {
+    void shouldRestoreAccountsFromRepository() throws Exception {
         Account foodAccount = testSetup.createAccount("food", loggedInUser);
         Account expenseAccount = testSetup.createAccount("expense", loggedInUser);
         testSetup.createParentChildLink(expenseAccount, foodAccount);
@@ -113,7 +113,7 @@ public class RepositoryApiTest {
 
     @Test
     @Transactional
-    public void shouldRestoreTransactionFromRepository() throws Exception {
+    void shouldRestoreTransactionFromRepository() throws Exception {
         Account foodAccount = testSetup.createAccount("food", loggedInUser);
         Account cashAccount = testSetup.createAccount("cash", loggedInUser);
         testSetup.createTransaction("baker", loggedInUser, LocalDate.EPOCH,
@@ -136,31 +136,31 @@ public class RepositoryApiTest {
 
     }
 
-    private String buildAccountSearch(Account account) {
+    String buildAccountSearch(Account account) {
         return "$.accounts[?(@.name == '" + account.getName() + "'" +
                 " && @.parentId == " + (account.getParent() != null ? account.getParent().getId() : "null") +
                 " && @.active == " + (account.isActive() ? "true" : "false") + ")]";
     }
 
-    private String buildTransactionSearch(Transaction transaction) {
+    String buildTransactionSearch(Transaction transaction) {
         return "$.transactions[?(@.name == '" + transaction.getName() + "'" +
                 " && @.date == '" + transaction.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "'" +
                 " && @.entries.length() == " + transaction.getEntries().size() + ")]";
     }
 
-    private boolean isAccountRestored(String name, User user, String parentName) {
+    boolean isAccountRestored(String name, User user, String parentName) {
         return StreamSupport.stream(accountsRepository.findAll().spliterator(), false)
                 .anyMatch(account -> account.getName().equals(name) &&
                         account.getUser().getUsername().equals(user.getUsername()) &&
                         isParentName(account, parentName));
     }
 
-    private boolean isParentName(Account account, String parentName) {
+    boolean isParentName(Account account, String parentName) {
         return (parentName == null && account.getParent() == null) ||
                 account.getParent().getName().equals(parentName);
     }
 
-    private boolean isEntryListEquivalent(List<Entry> actualEntries, TestTransactionEntry... expectedEntries) {
+    boolean isEntryListEquivalent(List<Entry> actualEntries, TestTransactionEntry... expectedEntries) {
         if (actualEntries.size() != expectedEntries.length) {
             return false;
         }
@@ -177,7 +177,7 @@ public class RepositoryApiTest {
         return true;
     }
 
-    private boolean isEntryEquivalent(Entry actualEntry, TestTransactionEntry expectedEntry) {
+    boolean isEntryEquivalent(Entry actualEntry, TestTransactionEntry expectedEntry) {
         return actualEntry.getId().getAccount().getName().equals(expectedEntry.getAccount().getName()) &&
                 actualEntry.getAmount().equals(new BigDecimal(expectedEntry.getAmount())) &&
                 actualEntry.isVerified() == expectedEntry.isVerified();

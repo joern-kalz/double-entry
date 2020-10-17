@@ -17,12 +17,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-public class BalancesApiTest {
+class BalancesApiTest {
 
     @Autowired
-    private TestSetup testSetup;
+    TestSetup testSetup;
 
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
     User loggedInUser;
     User otherUser;
@@ -33,7 +33,7 @@ public class BalancesApiTest {
     Account cashAccountOfOtherUser;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         testSetup.clearDatabase();
         loggedInUser = testSetup.createUser("LOGGED_IN_USER", "");
         otherUser = testSetup.createUser("OTHER_USER", "");
@@ -49,7 +49,7 @@ public class BalancesApiTest {
     }
 
     @Test
-    public void shouldGetBalances() throws Exception {
+    void shouldGetBalances() throws Exception {
         createTransaction(foodAccount, "1.99", cashAccount, "-1.99");
         createTransaction(foodAccount, "2.49", cashAccount, "-2.49");
 
@@ -62,7 +62,7 @@ public class BalancesApiTest {
     }
 
     @Test
-    public void shouldGetBalancesForDateInterval() throws Exception {
+    void shouldGetBalancesForDateInterval() throws Exception {
         createTransactionForDate(LocalDate.of(2019, 1, 1),
                 foodAccount, "1.89", cashAccount, "-1.89");
         createTransactionForDate(LocalDate.of(2020, 1, 1),
@@ -79,7 +79,7 @@ public class BalancesApiTest {
     }
 
     @Test
-    public void shouldAddBalanceOfChildAccountToParentAccount() throws Exception {
+    void shouldAddBalanceOfChildAccountToParentAccount() throws Exception {
         createTransaction(foodAccount, "1.99", cashAccount, "-1.99");
 
         mockMvc.perform(get("/api/balances"))
@@ -93,7 +93,7 @@ public class BalancesApiTest {
     }
 
     @Test
-    public void shouldNotGetBalancesOfOtherUser() throws Exception {
+    void shouldNotGetBalancesOfOtherUser() throws Exception {
         createTransactionForUser(loggedInUser,
                 foodAccount, "1.89", cashAccount, "-1.89");
         createTransactionForUser(otherUser,
@@ -107,21 +107,21 @@ public class BalancesApiTest {
                         .exists());
     }
 
-    private void createTransaction(Account debitAccount, String debitAmount,
+    void createTransaction(Account debitAccount, String debitAmount,
                                    Account creditAccount, String creditAmount) {
         testSetup.createTransaction("", loggedInUser, LocalDate.of(2020, 1, 1),
                 new TestTransactionEntry(debitAccount, debitAmount, false),
                 new TestTransactionEntry(creditAccount, creditAmount, false));
     }
 
-    private void createTransactionForUser(User user, Account debitAccount, String debitAmount,
+    void createTransactionForUser(User user, Account debitAccount, String debitAmount,
                                    Account creditAccount, String creditAmount) {
         testSetup.createTransaction("", user, LocalDate.of(2020, 1, 1),
                 new TestTransactionEntry(debitAccount, debitAmount, false),
                 new TestTransactionEntry(creditAccount, creditAmount, false));
     }
 
-    private void createTransactionForDate(LocalDate date, Account debitAccount, String debitAmount,
+    void createTransactionForDate(LocalDate date, Account debitAccount, String debitAmount,
                                    Account creditAccount, String creditAmount) {
         testSetup.createTransaction("", loggedInUser, date,
                 new TestTransactionEntry(debitAccount, debitAmount, false),

@@ -22,25 +22,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-public class TransactionsApiTest {
+class TransactionsApiTest {
 
-    private MockMvc mockMvc;
-
-    @Autowired
-    private TransactionsRepository transactionsRepository;
+    MockMvc mockMvc;
 
     @Autowired
-    private TestSetup testSetup;
+    TransactionsRepository transactionsRepository;
 
-    private User loggedInUser;
-    private User otherUser;
-    private Account foodAccount;
-    private Account expenseAccount;
-    private Account cashAccount;
-    private Account accountOfOtherUser;
+    @Autowired
+    TestSetup testSetup;
+
+    User loggedInUser;
+    User otherUser;
+    Account foodAccount;
+    Account expenseAccount;
+    Account cashAccount;
+    Account accountOfOtherUser;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         testSetup.clearDatabase();
         loggedInUser = testSetup.createUser("LOGGED_IN_USERNAME", "");
         otherUser = testSetup.createUser("OTHER_USERNAME", "");
@@ -55,7 +55,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldCreateTransaction() throws Exception {
+    void shouldCreateTransaction() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":9.99}]}";
@@ -72,7 +72,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldNotCreateTransactionWithoutEntries() throws Exception {
+    void shouldNotCreateTransactionWithoutEntries() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[]}";
 
         mockMvc.perform(post("/api/transactions").content(requestBody))
@@ -80,7 +80,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldNotCreateTransactionWithDuplicatedAccount() throws Exception {
+    void shouldNotCreateTransactionWithDuplicatedAccount() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":9.99}]}";
@@ -90,7 +90,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldNotCreateTransactionWithNonZeroTotal() throws Exception {
+    void shouldNotCreateTransactionWithNonZeroTotal() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.98}," +
                 "{\"accountId\":" + foodAccount.getId() + ",\"amount\":9.99}]}";
@@ -100,7 +100,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldNotCreateTransactionWithAccountOfOtherUser() throws Exception {
+    void shouldNotCreateTransactionWithAccountOfOtherUser() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
                 "{\"accountId\":" + accountOfOtherUser.getId() + ",\"amount\":9.99}]}";
@@ -110,21 +110,21 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldDeleteTransaction() throws Exception {
+    void shouldDeleteTransaction() throws Exception {
         long id = createTransactionWithUser("shopping", loggedInUser).getId();
         mockMvc.perform(delete("/api/transactions/" + id)).andExpect(status().isNoContent());
         assertTrue(transactionsRepository.findById(id).isEmpty());
     }
 
     @Test
-    public void shouldNotDeleteTransactionOfOtherUser() throws Exception {
+    void shouldNotDeleteTransactionOfOtherUser() throws Exception {
         long id = createTransactionWithUser("shopping", otherUser).getId();
         mockMvc.perform(delete("/api/transactions/" + id)).andExpect(status().isNotFound());
         assertFalse(transactionsRepository.findById(id).isEmpty());
     }
 
     @Test
-    public void shouldGetTransaction() throws Exception {
+    void shouldGetTransaction() throws Exception {
         long id = createTransactionWithUser("supermarket", loggedInUser).getId();
         mockMvc.perform(get("/api/transactions/" + id))
                 .andExpect(status().isOk())
@@ -132,14 +132,14 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldNotGetTransactionOfOtherUser() throws Exception {
+    void shouldNotGetTransactionOfOtherUser() throws Exception {
         long id = createTransactionWithUser("supermarket", otherUser).getId();
         mockMvc.perform(get("/api/transactions/" + id))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void shouldGetTransactions() throws Exception {
+    void shouldGetTransactions() throws Exception {
         createTransactionWithUser("supermarket", loggedInUser);
         mockMvc.perform(get("/api/transactions"))
                 .andExpect(status().isOk())
@@ -147,7 +147,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldGetTransactionsByDate() throws Exception {
+    void shouldGetTransactionsByDate() throws Exception {
         createTransactionWithDate("first", LocalDate.of(2020, 1, 1));
         createTransactionWithDate("second", LocalDate.of(2020, 1, 2));
         createTransactionWithDate("third", LocalDate.of(2020, 1, 3));
@@ -159,13 +159,13 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldNotGetTransactionsIfQueryInvalid() throws Exception {
+    void shouldNotGetTransactionsIfQueryInvalid() throws Exception {
         mockMvc.perform(get("/api/transactions?after=2020-99-99"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void shouldGetTransactionsByAccount() throws Exception {
+    void shouldGetTransactionsByAccount() throws Exception {
         createTransactionWithAccounts("food", foodAccount, cashAccount);
         createTransactionWithAccounts("expense", expenseAccount, cashAccount);
 
@@ -176,7 +176,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldGetTransactionsOfChildAccounts() throws Exception {
+    void shouldGetTransactionsOfChildAccounts() throws Exception {
         createTransactionWithAccounts("food", foodAccount, cashAccount);
         createTransactionWithAccounts("expense", expenseAccount, cashAccount);
 
@@ -188,7 +188,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldNotGetTransactionsOfOtherUser() throws Exception {
+    void shouldNotGetTransactionsOfOtherUser() throws Exception {
         createTransactionWithUser("supermarket", otherUser);
         mockMvc.perform(get("/api/transactions"))
                 .andExpect(status().isOk())
@@ -196,7 +196,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldUpdateTransaction() throws Exception {
+    void shouldUpdateTransaction() throws Exception {
         long id = createTransactionWithUser("supermarket", loggedInUser).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-99.99}," +
@@ -220,7 +220,7 @@ public class TransactionsApiTest {
     }
 
     @Test
-    public void shouldNotUpdateTransactionOfOtherUser() throws Exception {
+    void shouldNotUpdateTransactionOfOtherUser() throws Exception {
         long id = createTransactionWithUser("supermarket", otherUser).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
                 "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-99.99}," +
@@ -230,19 +230,19 @@ public class TransactionsApiTest {
                 .andExpect(status().isNotFound());
     }
 
-    private Transaction createTransactionWithUser(String name, User user) {
+    Transaction createTransactionWithUser(String name, User user) {
         return testSetup.createTransaction(name, user, LocalDate.of(2020, 1, 1),
                 new TestTransactionEntry(foodAccount, "9.99", false),
                 new TestTransactionEntry(cashAccount,  "-9.99", false));
     }
 
-    private void createTransactionWithDate(String name, LocalDate date) {
+    void createTransactionWithDate(String name, LocalDate date) {
         testSetup.createTransaction(name, loggedInUser, date,
                 new TestTransactionEntry(foodAccount, "9.99", false),
                 new TestTransactionEntry(cashAccount,  "-9.99", false));
     }
 
-    private void createTransactionWithAccounts(String name, Account debitAccount, Account creditAccount) {
+    void createTransactionWithAccounts(String name, Account debitAccount, Account creditAccount) {
         testSetup.createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1),
                 new TestTransactionEntry(debitAccount, "9.99", false),
                 new TestTransactionEntry(creditAccount,  "-9.99", false));
