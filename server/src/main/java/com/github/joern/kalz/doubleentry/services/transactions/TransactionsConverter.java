@@ -47,7 +47,7 @@ public class TransactionsConverter {
     }
 
     private Entry convertToTransactionEntry(RequestEntry requestEntry, Transaction transaction) {
-        boolean verified = requestEntry.getVerified();
+        boolean verified = requestEntry.isVerified();
         Account account = accountProvider.find(requestEntry.getAccountId())
                 .orElseThrow(() -> new ParameterException("account " + requestEntry.getAccountId() + " not found"));
 
