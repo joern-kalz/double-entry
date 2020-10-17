@@ -52,7 +52,7 @@ public class TransactionsService {
 
     public Transaction findById(long id) {
         return findTransaction(id)
-                .orElseThrow(() -> new NotFoundException("transaction " + id + " not found"));
+                .orElseThrow(() -> createNotFoundException(id));
     }
 
     @Transactional
@@ -79,7 +79,7 @@ public class TransactionsService {
         }
 
         if (findTransaction(transaction.getId()).isEmpty()) {
-            throw new NotFoundException("transaction " + transaction.getId() + " not found");
+            throw createNotFoundException(transaction.getId());
         }
 
         transactionsRepository.save(transaction);
@@ -88,7 +88,7 @@ public class TransactionsService {
     @Transactional
     public void delete(long id) {
         Transaction transaction = findTransaction(id)
-                .orElseThrow(() -> new NotFoundException("transaction " + id + " not found"));
+                .orElseThrow(() -> createNotFoundException(id));
 
         transactionsRepository.delete(transaction);
     }
@@ -116,4 +116,7 @@ public class TransactionsService {
         return transaction;
     }
 
+    private NotFoundException createNotFoundException(long id) {
+        return new NotFoundException("transaction " + id + " not found");
+    }
 }
