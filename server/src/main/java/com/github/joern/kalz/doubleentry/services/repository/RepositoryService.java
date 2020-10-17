@@ -50,7 +50,7 @@ public class RepositoryService {
         Deque<ImportRepositoryRequestAccount> toBeAdded = new ArrayDeque<>(getRootAccounts(importAccounts));
         Map<Long, Account> databaseAccountsByImportId = new HashMap<>();
 
-        while (toBeAdded.size() > 0) {
+        while (!toBeAdded.isEmpty()) {
             ImportRepositoryRequestAccount importAccount = toBeAdded.removeFirst();
 
             if (databaseAccountsByImportId.containsKey(importAccount.getId())) {
@@ -65,7 +65,7 @@ public class RepositoryService {
         List<ImportRepositoryRequestAccount> missingAccounts = getAccountsMissingInDatabase(importAccounts,
                 databaseAccountsByImportId);
 
-        if (missingAccounts.size() > 0) {
+        if (!missingAccounts.isEmpty()) {
             throw new ParameterException("parentId not valid for the accounts " + missingAccounts);
         }
 
