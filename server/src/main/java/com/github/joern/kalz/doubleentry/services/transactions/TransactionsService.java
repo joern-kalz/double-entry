@@ -102,7 +102,7 @@ public class TransactionsService {
             case TOTAL_NOT_ZERO:
                 throw new ParameterException("transaction total must be zero");
             default:
-                throw new RuntimeException("unknown validation error " + result);
+                throw new IllegalArgumentException("unknown validation error " + result);
         }
     }
 
