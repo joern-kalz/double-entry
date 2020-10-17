@@ -53,11 +53,11 @@ public class VerificationsService {
 
         for (Transaction transaction : transactionsRepository.findAllById(ids)) {
             if (!principalProvider.getPrincipal().equals(transaction.getUser())) {
-                throw new ParameterException("transaction " + transaction.getId() + " not found");
+                throw createParameterException(transaction.getId(), "not found");
             }
 
             if (!verify(transaction, updateVerificationStateRequest.getAccountId())) {
-                throw new ParameterException("transaction " + transaction.getId() + " has no entry with account " +
+                throw createParameterException(transaction.getId(), "has no entry with account " +
                         updateVerificationStateRequest.getAccountId());
             }
 
@@ -66,7 +66,7 @@ public class VerificationsService {
         }
 
         if (!ids.isEmpty()) {
-            throw new ParameterException("transaction " + ids.iterator().next() + " not found");
+            throw createParameterException(ids.iterator().next(), "not found");
         }
     }
 
@@ -79,5 +79,9 @@ public class VerificationsService {
         }
 
         return false;
+    }
+
+    private ParameterException createParameterException(long transactionId, String message) {
+        return new ParameterException("transaction " + transactionId + " " + message);
     }
 }
