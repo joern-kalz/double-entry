@@ -133,6 +133,15 @@ public class RepositoryService {
             throw new ParameterException("account " + importEntry.getAccountId() + " not defined");
         }
 
-        return new Entry(transaction, account, importEntry.getAmount(), importEntry.isVerified());
+        EntryId entryId = new EntryId();
+        entryId.setAccount(account);
+        entryId.setTransaction(transaction);
+
+        Entry entry = new Entry();
+        entry.setId(entryId);
+        entry.setAmount(importEntry.getAmount());
+        entry.setVerified(importEntry.isVerified());
+
+        return entry;
     }
 }

@@ -2,6 +2,7 @@ package com.github.joern.kalz.doubleentry.services.transactions;
 
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.Entry;
+import com.github.joern.kalz.doubleentry.models.EntryId;
 import com.github.joern.kalz.doubleentry.models.Transaction;
 import com.github.joern.kalz.doubleentry.services.AccountProvider;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
@@ -45,15 +46,24 @@ public class TransactionsConverter {
         return transaction;
     }
 
-    private Entry convertToTransactionEntry(RequestEntry entry, Transaction transaction) {
-        boolean verified = entry.getVerified();
-        Account account = accountProvider.find(entry.getAccountId())
-                .orElseThrow(() -> new ParameterException("account " + entry.getAccountId() + " not found"));
+    private Entry convertToTransactionEntry(RequestEntry requestEntry, Transaction transaction) {
+        boolean verified = requestEntry.getVerified();
+        Account account = accountProvider.find(requestEntry.getAccountId())
+                .orElseThrow(() -> new ParameterException("account " + requestEntry.getAccountId() + " not found"));
 
         if (!account.getUser().equals(principalProvider.getPrincipal())) {
-            throw new ParameterException("account " + entry.getAccountId() + " not found");
+            throw new ParameterException("account " + requestEntry.getAccountId() + " not found");
         }
 
-        return new Entry(transaction, account, entry.getAmount(), verified);
+        EntryId entryId = new EntryId();
+        entryId.setAccount(account);
+        entryId.setTransaction(transaction);
+
+        Entry entry = new Entry();
+        entry.setId(entryId);
+        entry.setAmount(requestEntry.getAmount());
+        entry.setVerified(verified);
+
+        return entry;
     }
 }

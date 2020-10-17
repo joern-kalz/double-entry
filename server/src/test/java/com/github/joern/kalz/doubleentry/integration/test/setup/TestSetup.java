@@ -46,7 +46,11 @@ public class TestSetup {
     }
 
     public User createUser(String name, String password) {
-        return usersRepository.save(new User(name, passwordEncoder.encode(password), true));
+        User user = new User();
+        user.setUsername(name);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setEnabled(true);
+        return usersRepository.save(user);
     }
 
     public Account createAccount(String name, User user) {
@@ -68,8 +72,18 @@ public class TestSetup {
         transaction.setUser(user);
 
         List<Entry> entryList = Arrays.stream(entries)
-                .map(entry -> new Entry(transaction, entry.getAccount(), new BigDecimal(entry.getAmount()),
-                        entry.isVerified()))
+                .map(testEntry -> {
+                    EntryId entryId = new EntryId();
+                    entryId.setAccount(testEntry.getAccount());
+                    entryId.setTransaction(transaction);
+
+                    Entry entry = new Entry();
+                    entry.setId(entryId);
+                    entry.setAmount(new BigDecimal(testEntry.getAmount()));
+                    entry.setVerified(testEntry.isVerified());
+
+                    return entry;
+                })
                 .collect(Collectors.toList());
 
         transaction.setEntries(entryList);

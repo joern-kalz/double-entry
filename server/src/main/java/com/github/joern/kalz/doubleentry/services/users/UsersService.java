@@ -1,11 +1,8 @@
 package com.github.joern.kalz.doubleentry.services.users;
 
+import com.github.joern.kalz.doubleentry.models.*;
 import com.github.joern.kalz.doubleentry.services.exceptions.AlreadyExistsException;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
-import com.github.joern.kalz.doubleentry.models.AuthoritiesRepository;
-import com.github.joern.kalz.doubleentry.models.Authority;
-import com.github.joern.kalz.doubleentry.models.User;
-import com.github.joern.kalz.doubleentry.models.UsersRepository;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.repository.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +38,18 @@ public class UsersService {
             throw new AlreadyExistsException("username already exists");
         }
 
-        String encodedPassword = passwordEncoder.encode(createUserRequest.getPassword());
-        User createdUser = usersRepository.save(new User(name, encodedPassword, true));
-        authoritiesRepository.save(new Authority(createdUser, DEFAULT_AUTHORITY));
+        User user = new User();
+        user.setUsername(name);
+        user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
+        user.setEnabled(true);
+        User createdUser = usersRepository.save(user);
+
+        AuthorityId authorityId = new AuthorityId();
+        authorityId.setAuthority(DEFAULT_AUTHORITY);
+        authorityId.setUser(createdUser);
+        Authority authority = new Authority();
+        authority.setId(authorityId);
+        authoritiesRepository.save(authority);
 
         repositoryService.importRepository(createdUser, createUserRequest.getImportRepositoryRequest());
     }
