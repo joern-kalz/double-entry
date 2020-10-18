@@ -17,7 +17,7 @@ export class ApiErrorHandlerService {
 
   handle(error: any) {
     if (!error || !error.status) {
-      this.dialogService.show(DialogMessage.ERROR_SERVER);
+      this.dialogService.show(DialogMessage.CONNECTION_ERROR);
       return;
     }
 
@@ -26,7 +26,7 @@ export class ApiErrorHandlerService {
         this.handleUnauthorized();
         break;
       default:
-        this.dialogService.show(DialogMessage.ERROR_SERVER);
+        this.dialogService.show(DialogMessage.INTERNAL_SERVER_ERROR);
         break;
     }
   }
@@ -41,5 +41,5 @@ export class ApiErrorHandlerService {
       this.authenticationService.isLoggedIn = false;
       this.router.navigate(['/login']);
     });
-}
+  }
 }
