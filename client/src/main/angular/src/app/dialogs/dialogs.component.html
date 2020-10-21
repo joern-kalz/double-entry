@@ -1,8 +1,11 @@
 <div *ngIf="message != null" class="overlay">
     <div class="dialog">
         <div [ngSwitch]="message">
-            <ng-container *ngSwitchCase="DialogMessage.ERROR_SERVER">
+            <ng-container *ngSwitchCase="DialogMessage.CONNECTION_ERROR">
                 Fehler bei der Verbindung zum Server.
+            </ng-container>
+            <ng-container *ngSwitchCase="DialogMessage.INTERNAL_SERVER_ERROR">
+                Es ist ein Fehler bei der Ausführung aufgetreten.
             </ng-container>
             <ng-container *ngSwitchCase="DialogMessage.ERROR_SESSION_EXPIRED">
                 Sitzung abgelaufen. Erneute Anmeldung erforderlich.
