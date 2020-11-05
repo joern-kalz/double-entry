@@ -42,14 +42,14 @@ export class AccountComponent implements OnInit, OnDestroy {
     private accountsService: AccountsService,
     private location: Location,
     private apiErrorHandlerService: ApiErrorHandlerService,
-    private acitivatedRoute: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private router: Router,
   ) { }
 
   ngOnInit(): void {
     this.subscription = combineLatest(
       this.accountsService.getAccounts(),
-      this.acitivatedRoute.paramMap,
+      this.activatedRoute.paramMap,
     ).subscribe(
       ([accounts, param]) => {
         this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);

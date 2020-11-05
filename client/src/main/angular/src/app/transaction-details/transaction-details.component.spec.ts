@@ -56,12 +56,12 @@ describe('TransactionDetailsComponent', () => {
     })
     .compileComponents();
     
-    transactionsService = TestBed.inject(TransactionsService)  as jasmine.SpyObj<TransactionsService>;
-    router = TestBed.inject(Router)  as jasmine.SpyObj<Router>;
-    localService = TestBed.inject(LocalService)  as jasmine.SpyObj<LocalService>;
-    dialogService = TestBed.inject(DialogService)  as jasmine.SpyObj<DialogService>;
-    apiErrorHandlerService = TestBed.inject(ApiErrorHandlerService)  as jasmine.SpyObj<ApiErrorHandlerService>;
-    contextService = TestBed.inject(ContextService)  as jasmine.SpyObj<ContextService>;
+    transactionsService = TestBed.inject(TransactionsService) as jasmine.SpyObj<TransactionsService>;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    localService = TestBed.inject(LocalService) as jasmine.SpyObj<LocalService>;
+    dialogService = TestBed.inject(DialogService) as jasmine.SpyObj<DialogService>;
+    apiErrorHandlerService = TestBed.inject(ApiErrorHandlerService) as jasmine.SpyObj<ApiErrorHandlerService>;
+    contextService = TestBed.inject(ContextService) as jasmine.SpyObj<ContextService>;
     localService.formatAmount.and.callFake(value => '' + value);
     localService.formatDate.and.callFake(value => value.format('DD.MM.YYYY'));
   }));
