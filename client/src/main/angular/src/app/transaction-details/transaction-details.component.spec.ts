@@ -9,20 +9,10 @@ import * as moment from 'moment';
 import { AmountPipe } from '../local/amount.pipe';
 import { DatePipe } from '../local/date.pipe';
 import { TransactionDetailsComponent } from './transaction-details.component';
-import { Component, Input } from '@angular/core';
-import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
-import { AccountHierarchy } from '../account-hierarchy/account-hierarchy';
 import { DialogMessage } from '../dialogs/dialog-message.enum';
 import { DialogButton } from '../dialogs/dialog-button.enum';
 import { of } from 'rxjs';
-
-@Component({selector: 'app-account-name', template: '{{account.name}}'})
-class AccountNameComponentStub {
-  @Input() account: AccountHierarchyNode;
-  @Input() accountHierarchy: AccountHierarchy;
-  @Input() indented: boolean;
-  @Input() indentationOffset: number = 0;
-}
+import { AccountNameComponentStub } from '../../testing/account-name-component-stub';
 
 describe('TransactionDetailsComponent', () => {
   const TRANSACTION_ID = 123;

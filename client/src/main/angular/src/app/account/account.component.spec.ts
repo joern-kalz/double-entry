@@ -10,19 +10,10 @@ import { ContextService } from '../context/context.service';
 import { AccountsService } from '../generated/openapi/api/accounts.service';
 import { Account } from '../generated/openapi/model/models';
 import { ContextTransaction } from '../context/context-transaction';
-
 import { AccountComponent } from './account.component';
 import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
-import { Component, Input } from '@angular/core';
+import { AccountNameComponentStub } from '../../testing/account-name-component-stub';
 import { Location } from '@angular/common';
-
-@Component({selector: 'app-account-name', template: '{{account.name}}'})
-class AccountNameComponentStub {
-  @Input() account: AccountHierarchyNode;
-  @Input() accountHierarchy: AccountHierarchy;
-  @Input() indented: boolean;
-  @Input() indentationOffset: number = 0;
-}
 
 describe('AccountComponent', () => {
   const ACCOUNTS_MOCK: Account[] = [{

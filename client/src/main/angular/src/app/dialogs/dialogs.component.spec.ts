@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { DialogMessage } from './dialog-message.enum';
+import { DialogService } from './dialog.service';
 
 import { DialogsComponent } from './dialogs.component';
 
@@ -6,11 +8,19 @@ describe('DialogsComponent', () => {
   let component: DialogsComponent;
   let fixture: ComponentFixture<DialogsComponent>;
 
+  let dialogService: jasmine.SpyObj<DialogService>;
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DialogsComponent ]
+      declarations: [ DialogsComponent ],
+      providers: [
+        { provide: DialogService, useValue: 
+          jasmine.createSpyObj('DialogService', ['hide'], {message: DialogMessage.CONNECTION_ERROR})}
+      ]
     })
     .compileComponents();
+
+    dialogService = TestBed.inject(DialogService) as jasmine.SpyObj<DialogService>;
   }));
 
   beforeEach(() => {
@@ -19,7 +29,14 @@ describe('DialogsComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should show error', () => {
+    const dialogDiv = fixture.nativeElement.querySelector('.dialog');
+    expect(dialogDiv.textContent).toContain('Fehler');
+  });
+
+  it('should close', () => {
+    const button = fixture.nativeElement.querySelector('button');
+    button.click();
+    expect(dialogService.hide).toHaveBeenCalled();
   });
 });

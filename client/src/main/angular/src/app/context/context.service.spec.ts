@@ -10,7 +10,15 @@ describe('ContextService', () => {
     service = TestBed.inject(ContextService);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  it('should set transaction', () => {
+    const TRANSACTION_MOCK = {};
+    service.setTransaction(TRANSACTION_MOCK as any);
+    expect(service.transaction).toBe(TRANSACTION_MOCK as any);
+  });
+
+  it('should set verification', () => {
+    const VERIFICATION_MOCK = {};
+    service.setVerification(VERIFICATION_MOCK as any);
+    expect(service.verification).toBe(VERIFICATION_MOCK as any);
   });
 });

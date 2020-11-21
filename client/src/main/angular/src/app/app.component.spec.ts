@@ -1,35 +1,78 @@
-import { TestBed, async } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClient } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
+import { RouterLinkDirectiveStub } from 'src/testing/router-link-directive-stub';
+import { ApiErrorHandlerService } from './api-access/api-error-handler.service';
+import { AuthenticationService } from './api-access/authentication.service';
 import { AppComponent } from './app.component';
+import { MeService } from './generated/openapi/api/me.service';
+
+@Component({selector: 'router-outlet', template: ''})
+class RouterOutletStub { }
+
+@Component({selector: 'app-dialogs', template: ''})
+class DialogsComponentStub { }
 
 describe('AppComponent', () => {
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+
+  let meService: jasmine.SpyObj<MeService>;
+  let router: jasmine.SpyObj<Router>;
+  let apiErrorHandlerService: jasmine.SpyObj<ApiErrorHandlerService>;
+  let authenticationService: jasmine.SpyObj<AuthenticationService>;
+  let httpClient: jasmine.SpyObj<HttpClient>;
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
-      declarations: [
-        AppComponent
-      ],
+      declarations: [ AppComponent, RouterOutletStub, DialogsComponentStub, RouterLinkDirectiveStub ],
+      providers: [
+        { provide: MeService, useValue: jasmine.createSpyObj('MeService', ['getMe']) },
+        { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
+        { provide: ApiErrorHandlerService, useValue: jasmine.createSpyObj('ApiErrorHandlerService', ['handle']) },
+        { provide: AuthenticationService, useValue: jasmine.createSpyObj('AuthenticationService', [], 
+          {isLoggedIn: true}) },
+        { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) },
+      ]
     }).compileComponents();
+
+    meService = TestBed.inject(MeService) as jasmine.SpyObj<MeService>;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    apiErrorHandlerService = TestBed.inject(ApiErrorHandlerService) as jasmine.SpyObj<ApiErrorHandlerService>;
+    authenticationService = TestBed.inject(AuthenticationService) as jasmine.SpyObj<AuthenticationService>;
+    httpClient = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
   }));
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+  it('should set logged in if get me successful', () => {
+    meService.getMe.and.returnValue(of({}) as any);
 
-  it(`should have as title 'double-entry-client'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('double-entry-client');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
+    fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('double-entry-client app is running!');
+
+    expect(Object.getOwnPropertyDescriptor(authenticationService, 'isLoggedIn').set).toHaveBeenCalledWith(true);
   });
+
+  it('should delegate error handling if get me failed', () => {
+    meService.getMe.and.returnValue(throwError({}));
+
+    fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+
+    expect(apiErrorHandlerService.handle).toHaveBeenCalled();
+  });
+
+  it('should log out', () => {
+    meService.getMe.and.returnValue(of({}) as any);
+    httpClient.post.and.returnValue(of({}) as any);
+    fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const logoutButton = fixture.nativeElement.querySelector('button');
+
+    logoutButton.click();
+
+    expect(httpClient.post).toHaveBeenCalledWith("/logout", {});
+  });
+
 });
