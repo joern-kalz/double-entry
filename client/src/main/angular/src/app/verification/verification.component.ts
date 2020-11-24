@@ -185,6 +185,7 @@ export class VerificationComponent implements OnInit {
   delete() {
     const index = this.transactions.indexOf(this.selectedTransaction);
     if (index >= 0) this.transactions.splice(index, 1);
+    this.contextService.verification.verifiedTransactionIds.delete(this.selectedTransaction.id);
     this.selectedTransaction = null;
   }
 }
