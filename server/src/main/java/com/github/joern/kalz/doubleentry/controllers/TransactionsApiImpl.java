@@ -53,7 +53,8 @@ public class TransactionsApiImpl implements TransactionsApi {
 
     @Override
     public ResponseEntity<List<ApiTransaction>> getTransactions(@Valid LocalDate after, @Valid LocalDate before,
-        @Valid Long accountId, @Valid String name, @Valid Integer page, @Valid Integer size, @Valid String sort) {
+        @Valid Long accountId, @Valid Long debitAccountId, @Valid Long creditAccountId, @Valid String name,
+        @Valid Integer page, @Valid Integer size, @Valid String sort) {
 
         Integer pageOffset = page != null ?
                 page * Optional.ofNullable(size).orElse(1) :
@@ -67,6 +68,8 @@ public class TransactionsApiImpl implements TransactionsApi {
         request.setAfter(after);
         request.setBefore(before);
         request.setAccountId(accountId);
+        request.setCreditAccountId(creditAccountId);
+        request.setDebitAccountId(debitAccountId);
         request.setName(name);
         request.setPageOffset(pageOffset);
         request.setMaxPageSize(size);

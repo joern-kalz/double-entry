@@ -8,6 +8,8 @@ import java.util.*;
 
 public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepository {
 
+    private enum AccountType { CREDIT, DEBIT, ANY }
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -43,17 +45,40 @@ public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepos
         }
 
         if (request.getAccountIds() != null) {
-            Join<Object, Entry> entry = transaction.join("entries");
-            CriteriaBuilder.In<Object> in = cb.in(entry.get("id").get("account").get("id"));
-            request.getAccountIds().forEach(in::value);
-            predicates.add(in);
+            predicates.add(getAccountPredicate(request.getAccountIds(), AccountType.ANY, cb, transaction));
+        }
+
+        if (request.getCreditAccountIds() != null) {
+            predicates.add(getAccountPredicate(request.getCreditAccountIds(), AccountType.CREDIT, cb, transaction));
+        }
+
+        if (request.getDebitAccountIds() != null) {
+            predicates.add(getAccountPredicate(request.getDebitAccountIds(), AccountType.DEBIT, cb, transaction));
         }
 
         if (request.getName() != null && request.getName().length() > 0) {
-            predicates.add(cb.like(transaction.get("name"), "%" + request.getName() + "%"));
+            predicates.add(cb.like(transaction.get("name"), request.getName().replace('*', '%')));
         }
 
         return predicates.toArray(new Predicate[0]);
+    }
+
+    private Predicate getAccountPredicate(List<Long> accountIds, AccountType type,
+        CriteriaBuilder cb, Root<Transaction> transaction) {
+
+        Join<Object, Entry> entry = transaction.join("entries");
+        CriteriaBuilder.In<Object> idPredicate = cb.in(entry.get("id").get("account").get("id"));
+        accountIds.forEach(idPredicate::value);
+
+        if (type == AccountType.ANY) {
+            return idPredicate;
+        }
+
+        Predicate amountPredicate = type == AccountType.CREDIT ?
+                cb.lessThan(entry.get("amount"), 0) :
+                cb.greaterThan(entry.get("amount"), 0);
+
+        return cb.and(idPredicate, amountPredicate);
     }
 
     private List<Transaction> getTransactions(CriteriaQuery<Transaction> query, Integer pageOffset,

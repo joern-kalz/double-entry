@@ -11,6 +11,8 @@ public class TransactionSearchCriteria {
     private LocalDate after;
     private LocalDate before;
     private List<Long> accountIds;
+    private List<Long> creditAccountIds;
+    private List<Long> debitAccountIds;
     private String name;
     private Integer pageOffset;
     private Integer maxPageSize;

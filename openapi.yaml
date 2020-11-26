@@ -45,11 +45,19 @@ paths:
           schema: {type: string, format: date}
         - name: accountId
           in: query
-          description: Only return transactions touching this account
+          description: Only return transactions including this account or its children
+          schema: {type: integer, format: int64}
+        - name: debitAccountId
+          in: query
+          description: Only return transactions including this account or its children as debit account
+          schema: {type: integer, format: int64}
+        - name: creditAccountId
+          in: query
+          description: Only return transactions including this account or its children as credit account
           schema: {type: integer, format: int64}
         - name: name
           in: query
-          description: Only return transactions at least partially matching this name
+          description: Only return transactions matching this name with '*' interpreted as wildcard
           schema: {type: string}
         - name: page
           in: query

@@ -38,10 +38,15 @@ public class TransactionsService {
         criteria.setUser(principalProvider.getPrincipal());
 
         if (request.getAccountId() != null) {
-            Set<Long> accountsSet = accountsHierarchyService.getChildrenById(request.getAccountId()).keySet();
-            ArrayList<Long> accounts = new ArrayList<>(accountsSet);
-            accounts.add(request.getAccountId());
-            criteria.setAccountIds(accounts);
+            criteria.setAccountIds(getIdsOfAccountAndChildren(request.getAccountId()));
+        }
+
+        if (request.getCreditAccountId() != null) {
+            criteria.setCreditAccountIds(getIdsOfAccountAndChildren(request.getCreditAccountId()));
+        }
+
+        if (request.getDebitAccountId() != null) {
+            criteria.setDebitAccountIds(getIdsOfAccountAndChildren(request.getDebitAccountId()));
         }
 
         criteria.setAfter(request.getAfter());
@@ -52,6 +57,13 @@ public class TransactionsService {
         criteria.setOrder(request.getOrder());
 
         return transactionsRepository.find(criteria);
+    }
+
+    private List<Long> getIdsOfAccountAndChildren(Long accountId) {
+        Set<Long> accountsSet = accountsHierarchyService.getChildrenById(accountId).keySet();
+        List<Long> accounts = new ArrayList<>(accountsSet);
+        accounts.add(accountId);
+        return accounts;
     }
 
     public Transaction findById(long id) {

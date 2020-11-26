@@ -188,11 +188,37 @@ class TransactionsApiTest {
     }
 
     @Test
+    void shouldGetTransactionsByDebitAccount() throws Exception {
+        createTransactionWithAccounts("food", foodAccount, cashAccount);
+        createTransactionWithAccounts("expense", expenseAccount, cashAccount);
+        createTransactionWithAccounts("expense-cancellation", cashAccount, expenseAccount);
+
+        mockMvc.perform(get("/api/transactions?debitAccountId=" + expenseAccount.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[?(@.name == 'food')]").exists())
+                .andExpect(jsonPath("$[?(@.name == 'expense')]").exists());
+    }
+
+    @Test
+    void shouldGetTransactionsByCreditAccount() throws Exception {
+        createTransactionWithAccounts("food-cancellation", cashAccount, foodAccount);
+        createTransactionWithAccounts("expense-cancellation", cashAccount, expenseAccount);
+        createTransactionWithAccounts("expense", expenseAccount, cashAccount);
+
+        mockMvc.perform(get("/api/transactions?creditAccountId=" + expenseAccount.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[?(@.name == 'food-cancellation')]").exists())
+                .andExpect(jsonPath("$[?(@.name == 'expense-cancellation')]").exists());
+    }
+
+    @Test
     void shouldGetTransactionsByName() throws Exception {
         createTransaction("weekend shopping");
         createTransaction("grocery");
 
-        mockMvc.perform(get("/api/transactions?name=shop"))
+        mockMvc.perform(get("/api/transactions?name=*shop*"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(1)))
                 .andExpect(jsonPath("$[0].name", is("weekend shopping")));

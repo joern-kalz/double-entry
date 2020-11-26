@@ -10,6 +10,8 @@ public class FindTransactionsRequest {
     private LocalDate after;
     private LocalDate before;
     private Long accountId;
+    private Long creditAccountId;
+    private Long debitAccountId;
     private String name;
     private Integer pageOffset;
     private Integer maxPageSize;
