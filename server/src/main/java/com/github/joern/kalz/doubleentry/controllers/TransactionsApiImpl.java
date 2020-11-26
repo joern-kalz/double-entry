@@ -6,10 +6,8 @@ import com.github.joern.kalz.doubleentry.generated.model.ApiTransaction;
 import com.github.joern.kalz.doubleentry.generated.model.ApiSaveTransactionRequest;
 import com.github.joern.kalz.doubleentry.generated.model.ApiSaveTransactionRequestEntries;
 import com.github.joern.kalz.doubleentry.models.Transaction;
-import com.github.joern.kalz.doubleentry.services.transactions.CreateTransactionRequest;
-import com.github.joern.kalz.doubleentry.services.transactions.RequestEntry;
-import com.github.joern.kalz.doubleentry.services.transactions.TransactionsService;
-import com.github.joern.kalz.doubleentry.services.transactions.UpdateTransactionRequest;
+import com.github.joern.kalz.doubleentry.models.TransactionOrder;
+import com.github.joern.kalz.doubleentry.services.transactions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,10 +52,28 @@ public class TransactionsApiImpl implements TransactionsApi {
     }
 
     @Override
-    public ResponseEntity<List<ApiTransaction>> getTransactions(@Valid LocalDate after,
-                                                                        @Valid LocalDate before,
-                                                                        @Valid Long accountId) {
-        List<ApiTransaction> responseBody = transactionsService.findByDateAndAccount(after, before, accountId)
+    public ResponseEntity<List<ApiTransaction>> getTransactions(@Valid LocalDate after, @Valid LocalDate before,
+        @Valid Long accountId, @Valid String name, @Valid Integer page, @Valid Integer size, @Valid String sort) {
+
+        Integer pageOffset = page != null ?
+                page * Optional.ofNullable(size).orElse(1) :
+                null;
+
+        TransactionOrder order = "dateDescending".equals(sort) ?
+                TransactionOrder.DATE_DESCENDING :
+                TransactionOrder.DATE_ASCENDING;
+
+        FindTransactionsRequest request = new FindTransactionsRequest();
+        request.setAfter(after);
+        request.setBefore(before);
+        request.setAccountId(accountId);
+        request.setName(name);
+        request.setPageOffset(pageOffset);
+        request.setMaxPageSize(size);
+        request.setOrder(order);
+
+        List<ApiTransaction> responseBody = transactionsService
+                .find(request)
                 .stream()
                 .map(responseFactory::convertToResponse)
                 .collect(Collectors.toList());

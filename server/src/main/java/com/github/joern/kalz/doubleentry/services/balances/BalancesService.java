@@ -1,6 +1,7 @@
 package com.github.joern.kalz.doubleentry.services.balances;
 
 import com.github.joern.kalz.doubleentry.models.Account;
+import com.github.joern.kalz.doubleentry.models.TransactionSearchCriteria;
 import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.accounts.AccountsHierarchyService;
@@ -32,8 +33,13 @@ public class BalancesService {
     private Map<Long, BigDecimal> getSeparateBalances(LocalDate after, LocalDate before) {
         Map<Long, BigDecimal> balances = new HashMap<>();
 
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        criteria.setUser(principalProvider.getPrincipal());
+        criteria.setAfter(after);
+        criteria.setBefore(before);
+
         transactionsRepository
-                .findByUserAndDateAndAccount(principalProvider.getPrincipal(), after, before, null)
+                .find(criteria)
                 .stream()
                 .flatMap(transaction -> transaction.getEntries().stream())
                 .forEach(entry -> {

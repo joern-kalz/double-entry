@@ -1,8 +1,8 @@
 package com.github.joern.kalz.doubleentry.services.transactions;
 
 import com.github.joern.kalz.doubleentry.models.Transaction;
+import com.github.joern.kalz.doubleentry.models.TransactionSearchCriteria;
 import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
-import com.github.joern.kalz.doubleentry.models.User;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.accounts.AccountsHierarchyService;
 import com.github.joern.kalz.doubleentry.services.exceptions.NotFoundException;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -33,21 +32,26 @@ public class TransactionsService {
     @Autowired
     private AccountsHierarchyService accountsHierarchyService;
 
-    public List<Transaction> findByDateAndAccount(LocalDate after, LocalDate before, Long accountId) {
-        User principal = principalProvider.getPrincipal();
-        List<Long> accounts = null;
+    public List<Transaction> find(FindTransactionsRequest request) {
 
-        if (accountId != null) {
-            accounts = new ArrayList<>(accountsHierarchyService.getChildrenById(accountId).keySet());
-            accounts.add(accountId);
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        criteria.setUser(principalProvider.getPrincipal());
+
+        if (request.getAccountId() != null) {
+            Set<Long> accountsSet = accountsHierarchyService.getChildrenById(request.getAccountId()).keySet();
+            ArrayList<Long> accounts = new ArrayList<>(accountsSet);
+            accounts.add(request.getAccountId());
+            criteria.setAccountIds(accounts);
         }
 
-        Set<Transaction> transactionsSet = transactionsRepository
-                .findByUserAndDateAndAccount(principal, after, before, accounts);
+        criteria.setAfter(request.getAfter());
+        criteria.setBefore(request.getBefore());
+        criteria.setName(request.getName());
+        criteria.setPageOffset(request.getPageOffset());
+        criteria.setMaxPageSize(request.getMaxPageSize());
+        criteria.setOrder(request.getOrder());
 
-        List<Transaction> transactions = new ArrayList<>(transactionsSet);
-        transactions.sort(Comparator.comparing(Transaction::getDate));
-        return transactions;
+        return transactionsRepository.find(criteria);
     }
 
     public Transaction findById(long id) {

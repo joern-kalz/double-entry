@@ -47,6 +47,22 @@ paths:
           in: query
           description: Only return transactions touching this account
           schema: {type: integer, format: int64}
+        - name: name
+          in: query
+          description: Only return transactions at least partially matching this name
+          schema: {type: string}
+        - name: page
+          in: query
+          description: Zero based page index
+          schema: {type: integer}
+        - name: size
+          in: query
+          description: Size of the page
+          schema: {type: integer}
+        - name: sort
+          in: query
+          description: Sort order
+          schema: {type: string, enum: [dateAscending, dateDescending]}
       responses:
         '200':
           description: Requested transactions

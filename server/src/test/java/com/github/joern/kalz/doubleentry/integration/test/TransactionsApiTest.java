@@ -188,11 +188,58 @@ class TransactionsApiTest {
     }
 
     @Test
+    void shouldGetTransactionsByName() throws Exception {
+        createTransaction("weekend shopping");
+        createTransaction("grocery");
+
+        mockMvc.perform(get("/api/transactions?name=shop"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(jsonPath("$[0].name", is("weekend shopping")));
+    }
+
+    @Test
+    void shouldGetTransactionsByPage() throws Exception {
+        createTransactionWithDate("first", LocalDate.of(2020, 1, 1));
+        createTransactionWithDate("second", LocalDate.of(2020, 1, 2));
+        createTransactionWithDate("third", LocalDate.of(2020, 1, 3));
+
+        mockMvc.perform(get("/api/transactions?page=1&size=1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(jsonPath("$[0].name", is("second")));
+    }
+
+    @Test
     void shouldNotGetTransactionsOfOtherUser() throws Exception {
         createTransactionWithUser("supermarket", otherUser);
         mockMvc.perform(get("/api/transactions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(0)));
+    }
+
+    @Test
+    void shouldGetTransactionsSortedAscending() throws Exception {
+        createTransactionWithDate("first", LocalDate.of(2020, 1, 1));
+        createTransactionWithDate("second", LocalDate.of(2021, 1, 1));
+
+        mockMvc.perform(get("/api/transactions?sort=dateAscending"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[0].date", is("2020-01-01")))
+                .andExpect(jsonPath("$[1].date", is("2021-01-01")));
+    }
+
+    @Test
+    void shouldGetTransactionsSortedDescending() throws Exception {
+        createTransactionWithDate("first", LocalDate.of(2020, 1, 1));
+        createTransactionWithDate("second", LocalDate.of(2021, 1, 1));
+
+        mockMvc.perform(get("/api/transactions?sort=dateDescending"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(2)))
+                .andExpect(jsonPath("$[0].date", is("2021-01-01")))
+                .andExpect(jsonPath("$[1].date", is("2020-01-01")));
     }
 
     @Test
@@ -228,6 +275,12 @@ class TransactionsApiTest {
 
         mockMvc.perform(put("/api/transactions/" + id).content(requestBody))
                 .andExpect(status().isNotFound());
+    }
+
+    void createTransaction(String name) {
+        testSetup.createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1),
+                new TestTransactionEntry(foodAccount, "9.99", false),
+                new TestTransactionEntry(cashAccount,  "-9.99", false));
     }
 
     Transaction createTransactionWithUser(String name, User user) {

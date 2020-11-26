@@ -2,6 +2,7 @@ package com.github.joern.kalz.doubleentry.services.verifications;
 
 import com.github.joern.kalz.doubleentry.models.Entry;
 import com.github.joern.kalz.doubleentry.models.Transaction;
+import com.github.joern.kalz.doubleentry.models.TransactionSearchCriteria;
 import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
@@ -21,12 +22,11 @@ public class VerificationsService {
     private PrincipalProvider principalProvider;
 
     public VerificationState getVerificationState(Long accountId) {
-        Set<Transaction> transactionsSet = transactionsRepository
-                .findByUserAndDateAndAccount(principalProvider.getPrincipal(), null, null,
-                        Collections.singletonList(accountId));
+        TransactionSearchCriteria criteria = new TransactionSearchCriteria();
+        criteria.setUser(principalProvider.getPrincipal());
+        criteria.setAccountIds(Collections.singletonList(accountId));
 
-        List<Transaction> transactions = new ArrayList<>(transactionsSet);
-        transactions.sort(Comparator.comparing(Transaction::getDate));
+        List<Transaction> transactions = transactionsRepository.find(criteria);
 
         VerificationState verificationState = new VerificationState();
         verificationState.setVerifiedBalance(BigDecimal.ZERO);
