@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { ContextTransaction, EntryType, TransactionType } from '../context/context-transaction';
 import { ContextService } from '../context/context.service';
 import { Router } from '@angular/router';
@@ -13,6 +13,9 @@ import { API_DATE } from '../api-access/api-constants';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
 import { Subscription } from 'rxjs';
 import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
+import { Transaction } from '../generated/openapi/model/models';
+import { switchMap } from 'rxjs/operators';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-transaction',
@@ -30,10 +33,16 @@ export class TransactionComponent implements OnInit, OnDestroy {
     validators: [this.createAccountsUniqueValidator(), this.createTotalIsZeroValidator()]
   });
 
+  @ViewChildren('creditEntryAmount') creditEntryAmountElements: QueryList<ElementRef>;
+
   showErrors = false;
   submitted = false;
 
   accountHierarchy: AccountHierarchy;
+
+  showSuggestions = false;
+  suggestions: Transaction[] = [];
+  activeSuggestion = -1;
 
   subscription = new Subscription();
 
@@ -57,6 +66,27 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
     this.loadTransaction(this.contextService.transaction);
     this.loadAccountHierarchy();
+
+    this.subscription.add(this.name.valueChanges
+      .pipe(
+        switchMap(name => {
+          const before14month = moment();
+          before14month.add(-14, 'M');
+
+          const creditAccount = this.creditAccountType == AccountType.ALL ? null :
+            this.accountHierarchy.root.get(this.creditAccountType).id;
+
+          const debitAccount = this.debitAccountType == AccountType.ALL ? null :
+            this.accountHierarchy.root.get(this.debitAccountType).id;
+
+          return this.transactionService.getTransactions(before14month.format(API_DATE), null, null, 
+            debitAccount, creditAccount, name + '*', null, 10, 'dateDescending');
+        })
+      )
+      .subscribe(transactions => {
+        this.suggestions = transactions;
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -66,16 +96,16 @@ export class TransactionComponent implements OnInit, OnDestroy {
   private loadTransaction(transaction: ContextTransaction) {
     this.adjustFormArrayLength(this.creditEntries, transaction.creditEntries.length);
     this.adjustFormArrayLength(this.debitEntries, transaction.debitEntries.length);
-    
-    this.form.setValue({ 
-      name: transaction.name, 
+
+    this.form.setValue({
+      name: transaction.name,
       date: transaction.date,
       creditEntries: transaction.creditEntries.map(entry => ({
-        account: entry.account, 
+        account: entry.account,
         amount: entry.amount
       })),
       debitEntries: transaction.debitEntries.map(entry => ({
-        account: entry.account, 
+        account: entry.account,
         amount: entry.amount
       })),
     });
@@ -125,7 +155,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
         if (accounts.has(account)) duplicate = account;
         accounts.add(account);
       });
-  
+
       return duplicate != null ? { accountsUnique: {duplicate} } : null;
     };
   }
@@ -139,7 +169,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
         if (amount == null) return;
         total += (isCredit ? -1 : 1) * Math.round(amount * 100);
       });
-  
+
       return total != 0 ? { totalIsZero: {total} } : null;
     };
   }
@@ -223,10 +253,10 @@ export class TransactionComponent implements OnInit, OnDestroy {
     };
 
     const id = this.contextService.transaction.id;
-    const apiCall = id == null ? 
+    const apiCall = id == null ?
       this.transactionService.createTransaction(saveTransactionRequest) :
       this.transactionService.updateTransaction(id, saveTransactionRequest);
-    
+
     apiCall.subscribe(
       () => this.location.back(),
       error => {
@@ -244,6 +274,65 @@ export class TransactionComponent implements OnInit, OnDestroy {
       amount: (isCredit ? -1 : 1) * this.localService.parseAmount(control.get('amount').value),
       verified: false
     };
+  }
+
+  onNameFocus() {
+    this.showSuggestions = true;
+    this.activeSuggestion = -1;
+    this.suggestions = [];
+  }
+
+  onNameBlur() {
+    this.showSuggestions = false;
+  }
+
+  onNameDown(event) {
+    event.preventDefault();
+
+    if (this.activeSuggestion < this.suggestions.length - 1) {
+      this.activeSuggestion++;
+    } else if (this.suggestions.length > 0) {
+      this.activeSuggestion = 0;
+    }
+  }
+
+  onNameUp(event) {
+    event.preventDefault();
+
+    if (this.activeSuggestion > 0) {
+      this.activeSuggestion--;
+    } else if (this.suggestions.length > 0) {
+      this.activeSuggestion = this.suggestions.length - 1;
+    }
+  }
+
+  onNameEnter(event) {
+    if (!this.showSuggestions || this.suggestions.length == 0) return;
+    
+    event.preventDefault();
+
+    if (this.activeSuggestion >= 0 && 
+      this.activeSuggestion < this.suggestions.length) {
+      this.onSuggestionSelected(this.suggestions[this.activeSuggestion]);
+    }
+  }
+
+  onSuggestionSelected(suggestion: Transaction) {
+    const creditEntries = suggestion.entries
+      .filter(entry => entry.amount < 0)
+      .map(entry => ({ account: entry.accountId, amount: this.localService.formatAmount(-entry.amount) }));
+
+    const debitEntries = suggestion.entries
+      .filter(entry => entry.amount > 0)
+      .map(entry => ({ account: entry.accountId, amount: this.localService.formatAmount(entry.amount) }));
+
+    this.adjustFormArrayLength(this.creditEntries, creditEntries.length);
+    this.adjustFormArrayLength(this.debitEntries, debitEntries.length);
+  
+    this.form.patchValue({ name: suggestion.name, creditEntries, debitEntries });
+    this.showSuggestions = false;
+    this.creditEntryAmountElements.first.nativeElement.focus();
+    this.creditEntryAmountElements.first.nativeElement.select();
   }
 
   get date() {
@@ -274,7 +363,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
   get variableEntries(): boolean {
     if (!this.contextService.transaction) return true;
-    
+
     switch (this.contextService.transaction.type) {
       case TransactionType.TRANSFER:
       case TransactionType.EXPENSE:

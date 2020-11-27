@@ -1,5 +1,5 @@
 <form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors">
-    
+
     <div class="field">
         <label>
             <span>Datum</span>
@@ -13,7 +13,19 @@
     <div class="field">
         <label>
             <span>Beschreibung</span>
-            <input formControlName="name">
+            <input formControlName="name" 
+                (focus)="onNameFocus()"
+                (blur)="onNameBlur()" 
+                (keydown.arrowdown)="onNameDown($event)"
+                (keydown.arrowup)="onNameUp($event)"
+                (keydown.enter)="onNameEnter($event)">
+            <ul *ngIf="showSuggestions && suggestions.length">
+              <li *ngFor="let suggestion of suggestions; let i = index" 
+                (mousedown)="onSuggestionSelected(suggestion)"
+                [class.active]="i == activeSuggestion">
+                {{suggestion.name}}
+              </li>
+            </ul>
         </label>
         <div *ngIf="showErrors && name.invalid" class="error">
             Beschreibung erforderlich
@@ -22,13 +34,13 @@
 
     <div formArrayName="creditEntries" class="list">
         <div class="entry-label">Von Konto</div>
-        <div *ngFor="let entry of creditEntries.controls; let i = index; first as first" 
+        <div *ngFor="let entry of creditEntries.controls; let i = index; first as first"
             [formGroupName]="i" class="entry">
             <label class="account">
                 <span>Konto</span>
                 <select formControlName="account">
                     <option *ngFor="let account of creditAccountList" [ngValue]="account.id">
-                        <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
+                        <app-account-name [account]="account" [accountHierarchy]="accountHierarchy"
                             [indented]="true">
                         </app-account-name>
                     </option>
@@ -37,9 +49,9 @@
             </label>
             <label class="amount">
                 <span>Betrag</span>
-                <input formControlName="amount">
+                <input formControlName="amount" #creditEntryAmount>
             </label>
-            <button type="button" *ngIf="variableEntries" (click)="deleteCreditEntry(i)" 
+            <button type="button" *ngIf="variableEntries" (click)="deleteCreditEntry(i)"
                 [disabled]="creditEntries.length < 2" class="delete light">
                 Löschen
             </button>
@@ -59,13 +71,13 @@
 
     <div formArrayName="debitEntries" class="list">
         <div class="entry-label">Nach Konto</div>
-        <div *ngFor="let entry of debitEntries.controls; let i = index; first as first" 
+        <div *ngFor="let entry of debitEntries.controls; let i = index; first as first"
             [formGroupName]="i" class="entry">
             <label class="account">
                 <span>Konto</span>
                 <select formControlName="account">
                     <option *ngFor="let account of debitAccountList" [ngValue]="account.id">
-                        <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
+                        <app-account-name [account]="account" [accountHierarchy]="accountHierarchy"
                             [indented]="true">
                         </app-account-name>
                     </option>
@@ -76,7 +88,7 @@
                 <span>Betrag</span>
                 <input formControlName="amount">
             </label>
-            <button type="button" *ngIf="variableEntries" (click)="deleteDebitEntry(i)" 
+            <button type="button" *ngIf="variableEntries" (click)="deleteDebitEntry(i)"
                 [disabled]="debitEntries.length < 2" class="delete light">
                 Löschen
             </button>
@@ -97,8 +109,8 @@
 
     <div>
         <div *ngIf="showErrors && form.errors?.accountsUnique" class="error">
-            Konto doppelt erfasst: 
-            <app-account-name [account]="accountHierarchy.accountsById.get(form.errors.accountsUnique.duplicate)" 
+            Konto doppelt erfasst:
+            <app-account-name [account]="accountHierarchy.accountsById.get(form.errors.accountsUnique.duplicate)"
                 [accountHierarchy]="accountHierarchy">
             </app-account-name>
         </div>
@@ -106,10 +118,10 @@
             Summe der Beträge muss Null ergeben
         </div>
     </div>
-    
+
     <div class="buttons">
         <button type="button" (click)="cancel()">Abbrechen</button>
         <button [disabled]="submitted">Speichern</button>
     </div>
-    
+
 </form>

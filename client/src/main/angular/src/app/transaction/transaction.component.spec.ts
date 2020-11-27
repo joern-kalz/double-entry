@@ -55,7 +55,7 @@ describe('TransactionComponent', () => {
         { provide: Location, useValue: jasmine
           .createSpyObj('Location', ['back']) },
         { provide: TransactionsService, useValue: jasmine
-          .createSpyObj('TransactionsService', ['createTransaction', 'updateTransaction']) },
+          .createSpyObj('TransactionsService', ['createTransaction', 'updateTransaction', 'getTransactions']) },
         { provide: ApiErrorHandlerService, useValue: jasmine
           .createSpyObj('ApiErrorHandlerService', ['handle']) },
       ]
@@ -107,4 +107,39 @@ describe('TransactionComponent', () => {
     cancelButton.click();
     expect(location.back).toHaveBeenCalled();
   });
+
+  it('should show suggestions', () => {
+    const nameInput = fixture.nativeElement.querySelectorAll('input')[1];
+    transactionService.getTransactions.and.returnValue(of([createMockTransaction('suggestion', 10)]) as any);
+
+    nameInput.dispatchEvent(new Event('focus'));
+    nameInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const suggestionsUl = fixture.nativeElement.querySelector('ul');
+    expect(suggestionsUl.textContent).toContain('suggestion');
+  });
+
+  it('should fill in name and amount of selected suggestion', () => {
+    const nameInput = fixture.nativeElement.querySelectorAll('input')[1];
+    transactionService.getTransactions.and.returnValue(of([createMockTransaction('suggestion', 10)]) as any);
+
+    nameInput.dispatchEvent(new Event('focus'));
+    nameInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    const suggestionLi = fixture.nativeElement.querySelectorAll('li')[0];
+    suggestionLi.dispatchEvent(new Event('mousedown'));
+    fixture.detectChanges();
+
+    expect(nameInput.value).toContain('suggestion');
+    const debitAmountInput = fixture.nativeElement.querySelectorAll('input')[2];
+    expect(debitAmountInput.value).toContain('10');
+  });
+
+  function createMockTransaction(name, amount) {
+    return { id: 1, date: '2010-01-01', name, entries: [
+      { accountId: 1, amount: -amount, verified: false },
+      { accountId: 3, amount: +amount, verified: false },
+    ]};
+  }
 });
