@@ -61,6 +61,9 @@ tasks {
     named("jacocoTestReport").configure {
         dependsOn(named("test"))
     }
+    named("sonar").configure {
+        dependsOn(named("jacocoTestReport"))
+    }
 }
 
 sourceSets {
