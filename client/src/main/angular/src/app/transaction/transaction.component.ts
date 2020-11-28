@@ -66,27 +66,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
     this.loadTransaction(this.contextService.transaction);
     this.loadAccountHierarchy();
-
-    this.subscription.add(this.name.valueChanges
-      .pipe(
-        switchMap(name => {
-          const before14month = moment();
-          before14month.add(-14, 'M');
-
-          const creditAccount = this.creditAccountType == AccountType.ALL ? null :
-            this.accountHierarchy.root.get(this.creditAccountType).id;
-
-          const debitAccount = this.debitAccountType == AccountType.ALL ? null :
-            this.accountHierarchy.root.get(this.debitAccountType).id;
-
-          return this.transactionService.getTransactions(before14month.format(API_DATE), null, null, 
-            debitAccount, creditAccount, name + '*', null, 10, 'dateDescending');
-        })
-      )
-      .subscribe(transactions => {
-        this.suggestions = transactions;
-      })
-    );
+    this.initializeSuggestionLoading();
   }
 
   ngOnDestroy(): void {
@@ -142,6 +122,35 @@ export class TransactionComponent implements OnInit, OnDestroy {
     if (this.creditEntries.length == 1 && this.debitEntries.length == 1) {
       this.debitEntries.at(0).get('amount').setValue(this.creditEntries.at(0).get('amount').value);
     }
+  }
+
+  private initializeSuggestionLoading() {
+    this.subscription.add(this.name.valueChanges
+      .pipe(
+        switchMap(name => {
+          const before14month = moment();
+          before14month.add(-14, 'M');
+
+          const creditAccount = this.creditAccountType == AccountType.ALL ? null :
+            this.accountHierarchy.root.get(this.creditAccountType).id;
+
+          const debitAccount = this.debitAccountType == AccountType.ALL ? null :
+            this.accountHierarchy.root.get(this.debitAccountType).id;
+
+          return this.transactionService.getTransactions(before14month.format(API_DATE), null, null, 
+            debitAccount, creditAccount, name + '*', null, 10, 'dateDescending');
+        })
+      )
+      .subscribe(transactions => {
+        this.suggestions = [];
+
+        for (let transaction of transactions) {
+          if (!this.suggestions.some(suggestion => suggestion.name == transaction.name)) {
+            this.suggestions.push(transaction);
+          }
+        }
+      })
+    );
   }
 
   private createAccountsUniqueValidator(): ValidatorFn {
@@ -331,8 +340,10 @@ export class TransactionComponent implements OnInit, OnDestroy {
   
     this.form.patchValue({ name: suggestion.name, creditEntries, debitEntries });
     this.showSuggestions = false;
-    this.creditEntryAmountElements.first.nativeElement.focus();
-    this.creditEntryAmountElements.first.nativeElement.select();
+    setTimeout(() => {
+      this.creditEntryAmountElements.first.nativeElement.focus();
+      this.creditEntryAmountElements.first.nativeElement.select();
+    }, 0);
   }
 
   get date() {
