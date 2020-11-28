@@ -25,6 +25,9 @@ button {
     padding: 0;
     margin: 0;
     cursor: pointer;
+    &:disabled {
+        cursor: default;
+    }
 }
 
 input, select {
@@ -68,6 +71,14 @@ button.heavy, a.heavy {
 
     &:hover {
         background: #555;
+    }
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 4px #bbb;
+        border-radius: 2px;
+    }
+    &:disabled {
+        background: #aaa;
     }
 }
 
@@ -135,9 +146,18 @@ button.heavy, a.heavy {
         width: 120px;
         margin-left: 20px;
         padding: 4px 0;
-    }
-    button:hover {
-        background: #555;
+
+        &:hover {
+            background: #555;
+        }
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px #bbb;
+            border-radius: 2px;
+        }
+        &:disabled {
+            background: #aaa;
+        }
     }
 }
 
