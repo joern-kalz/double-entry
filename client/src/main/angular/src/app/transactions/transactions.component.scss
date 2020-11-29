@@ -3,8 +3,14 @@
     flex-wrap: wrap;
     & > * {
         width: 100%;
-        margin-bottom: 10px;
     }
+}
+
+.type, .dates, .month, .year, .account {
+    margin-bottom: 10px;
+}
+
+.submit {
     margin-bottom: 20px;
 }
 
@@ -16,23 +22,34 @@ button[type=button] {
     padding: 0 8px;
 }
 
-.year, .month {
-    span {
-        margin: 0 5px;
+.dates, .year, .month {
+    display: flex;
+    label {
+        flex-grow: 1;
+        display: flex;
+        align-items: baseline;
+        span {
+            margin-right: 5px;
+        }
+        input {
+            flex-grow: 1;
+            width: 100px;
+        }
     }
 }
 
 .dates {
-    label:first-child, span {
+    label:first-child input {
         margin-right: 5px;
-    }
-
-    input {
-        width: 100px;
     }
 }
 
-.submit {
+
+.change-button {
+    width: 25px;
+}
+
+.submit, .create {
     text-align: right;
 }
 
@@ -101,34 +118,47 @@ button[type=button] {
     }
 }
 
-@media(min-width: 600px) {
+@media(min-width: 450px) {
     .search {
         .type {
-            width: 90px;
+            width: 150px;
             margin-right: 10px;
         }
 
         .year, .month, .dates {
             width: unset;
-            margin-right: 10px;
-        }
-
-        .account {
-            width: 130px;
             flex-grow: 1;
         }
     }
 }
 
-@media(min-width: 650px) {
+@media(min-width: 750px) {
     .search {
+        .year, .month, .dates {
+            margin-right: 10px;
+        }
+
         .account {
+            width: 150px;
             margin-right: 10px;
             flex-grow: unset;
         }
 
         .submit {
             width: unset;
+        }
+    }
+}
+
+@media(min-width: 900px) {
+    .search {
+        .year, .month, .dates {
+            flex-grow: unset;
+        }
+
+        .create {
+            width: unset;
+            flex-grow: 1;
         }
     }
 }

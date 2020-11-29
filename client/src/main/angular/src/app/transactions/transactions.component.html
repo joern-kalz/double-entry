@@ -1,8 +1,8 @@
 <form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors" class="search">
     <select formControlName="dateSelectionType" class="type">
-        <option [value]="MONTH">Monat</option>
-        <option [value]="YEAR">Jahr</option>
-        <option [value]="INTERVAL">Zeitraum</option>
+        <option [value]="MONTH">Monatsübersicht</option>
+        <option [value]="YEAR">Jahrsübersicht</option>
+        <option [value]="INTERVAL">Freier Zeitraum</option>
     </select>
     <ng-container [ngSwitch]="dateSelectionType.value">
         <div *ngSwitchCase="INTERVAL" class="dates">
@@ -16,14 +16,20 @@
             </label>
         </div>
         <div *ngSwitchCase="MONTH" class="month">
-            <button type="button" (click)="decrementMonth()">&lt;</button>
-            <span>{{month < 10 ? '0' + month : month}} / {{year}}</span>
-            <button type="button" (click)="incrementMonth()">&gt;</button>
+            <label>
+                <span>Monat</span>
+                <input formControlName="month" #month>
+            </label>
+            <button type="button" (click)="decrementMonth()" class="change-button">-</button>
+            <button type="button" (click)="incrementMonth()" class="change-button">+</button>
         </div>
         <div *ngSwitchCase="YEAR" class="year">
-            <button type="button" (click)="decrementYear()">&lt;</button>
-            <span>{{year}}</span>
-            <button type="button" (click)="incrementYear()">&gt;</button>
+            <label>
+                <span>Jahr</span>
+                <input formControlName="year" #year>
+            </label>
+            <button type="button" (click)="decrementYear()" class="change-button">-</button>
+            <button type="button" (click)="incrementYear()" class="change-button">+</button>
         </div>
     </ng-container>
     <select formControlName="account" class="account">
@@ -34,7 +40,10 @@
         </option>
     </select>
     <div class="submit">
-        <button type="submit">Suchen</button>
+        <button type="submit">Aktualisieren</button>
+    </div>
+    <div class="create">
+        <button type="button" (click)="create()">Neu</button>
     </div>
 </form>
 

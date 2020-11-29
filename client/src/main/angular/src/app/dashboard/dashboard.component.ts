@@ -30,36 +30,22 @@ export class DashboardComponent implements OnInit {
   }
 
   createGenericTransaction() {
-    this.createTransaction(TransactionType.GENERIC);
+    this.contextService.createTransaction(TransactionType.GENERIC);
+    this.router.navigate(['/transaction']);
   }
 
   createTransferTransaction() {
-    this.createTransaction(TransactionType.TRANSFER);
+    this.contextService.createTransaction(TransactionType.TRANSFER);
+    this.router.navigate(['/transaction']);
   }
 
   createExpenseTransaction() {
-    this.createTransaction(TransactionType.EXPENSE);
+    this.contextService.createTransaction(TransactionType.EXPENSE);
+    this.router.navigate(['/transaction']);
   }
 
   createRevenueTransaction() {
-    this.createTransaction(TransactionType.REVENUE);
-  }
-
-  createTransaction(type: TransactionType) {
-    this.contextService.setTransaction({
-      type,
-      date: this.localService.formatDate(moment()),
-      name: '',
-      creditEntries: [{
-        account: null,
-        amount: ''
-      }],
-      debitEntries: [{
-        account: null,
-        amount: ''
-      }],
-    });
-
+    this.contextService.createTransaction(TransactionType.REVENUE);
     this.router.navigate(['/transaction']);
   }
 

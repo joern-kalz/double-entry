@@ -11,7 +11,9 @@ export class DatePipe implements PipeTransform {
   ) { }
 
   transform(value: moment.Moment, format?: string): string {
-    return this.localService.formatDate(value, format);
+    return format == 'year' ? this.localService.formatYear(value) :
+      format == 'month' ? this.localService.formatMonth(value) :
+      this.localService.formatDate(value);
   }
 
 }

@@ -14,6 +14,8 @@ import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hier
 import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
 import { ViewTransactionFactoryService } from '../transaction-details/view-transaction-factory.service';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
+import { ContextService } from '../context/context.service';
+import { TransactionType } from '../context/context-transaction';
 
 @Component({
   selector: 'app-transactions',
@@ -30,14 +32,15 @@ export class TransactionsComponent implements OnInit {
     dateSelectionType: [''],
     after: ['', this.localService.createDateValidator()],
     before: ['', this.localService.createDateValidator()],
+    year: ['', this.localService.createYearValidator()],
+    month: ['', this.localService.createMonthValidator()],
     account: [''],
   });
 
-  month: number = new Date().getMonth() + 1;
-  year: number = new Date().getFullYear();
-
   @ViewChild('after') afterElement: ElementRef;
   @ViewChild('before') beforeElement: ElementRef;
+  @ViewChild('year') yearElement: ElementRef;
+  @ViewChild('month') monthElement: ElementRef;
 
   showErrors = false;
 
@@ -54,7 +57,8 @@ export class TransactionsComponent implements OnInit {
     private localService: LocalService,
     private accountHierarchyService: AccountHierarchyService,
     private viewTransactionFactoryService: ViewTransactionFactoryService,
-    private apiErrorHandlerService: ApiErrorHandlerService
+    private apiErrorHandlerService: ApiErrorHandlerService,
+    private contextService: ContextService,
   ) { }
 
   ngOnInit() {
@@ -68,27 +72,26 @@ export class TransactionsComponent implements OnInit {
   }
 
   private loadQuery(query: ParamMap) {
-    const after = query.get('after') ? moment(query.get('after'), API_DATE) : null;
-    const before = query.get('before') ? moment(query.get('before'), API_DATE) : null;
+    let after = query.get('after') ? moment(query.get('after'), API_DATE) : null;
+    let before = query.get('before') ? moment(query.get('before'), API_DATE) : null;
+    const afterOrToday = after != null ? after : moment();
+
+    if (this.dateSelectionType.value == this.MONTH) {
+      after = afterOrToday.clone().startOf('month');
+      before = after.clone().endOf('month');
+    } else if (this.dateSelectionType.value == this.YEAR) {
+      after = afterOrToday.clone().startOf('year');
+      before = after.clone().endOf('year');
+    }
 
     this.dateSelectionType.setValue(query.get('type'));
     this.after.setValue(after == null ? '' : this.localService.formatDate(after));
+    this.month.setValue(this.localService.formatMonth(afterOrToday));
+    this.year.setValue(this.localService.formatYear(afterOrToday));
     this.before.setValue(before == null ? '' : this.localService.formatDate(before));
-    this.month = +query.get('month');
-    this.year = +query.get('year');
     this.account.setValue(query.get('account') ? +query.get('account') : null);
 
-    if (this.dateSelectionType.value == this.INTERVAL) {
-      this.load(after, before, this.account.value);
-    } else if (this.dateSelectionType.value == this.MONTH) {
-      const startOfMonth = moment().year(this.year).month(this.month - 1).startOf('month');
-      const endOfMonth = startOfMonth.clone().endOf('month');
-      this.load(startOfMonth, endOfMonth, this.account.value);
-    } else {
-      const startOfYear = moment([this.year, 0, 1]);
-      const endOfYear = moment([this.year, 11, 31]);
-      this.load(startOfYear, endOfYear, this.account.value);
-    }
+    this.load(after, before, this.account.value);
   }
 
   private loadDefault() {
@@ -97,9 +100,9 @@ export class TransactionsComponent implements OnInit {
 
     this.dateSelectionType.setValue(this.MONTH);
     this.after.setValue(this.localService.formatDate(after));
+    this.month.setValue(this.localService.formatMonth(after));
+    this.year.setValue(this.localService.formatYear(after));
     this.before.setValue(this.localService.formatDate(before));
-    this.month = moment().month() + 1;
-    this.year = moment().year();
     this.account.setValue(null);
 
     this.load(after, before, null);
@@ -108,8 +111,8 @@ export class TransactionsComponent implements OnInit {
   private load(after: moment.Moment, before: moment.Moment, accountId: number) {
     forkJoin(
       this.transactionsService.getTransactions(
-        after.format(API_DATE), 
-        before.format(API_DATE), 
+        after != null ? after.format(API_DATE) : null, 
+        before != null ? before.format(API_DATE) : null, 
         accountId
       ),
       this.accountsService.getAccounts()
@@ -127,20 +130,27 @@ export class TransactionsComponent implements OnInit {
   }
 
   submit() {
-    const isInterval = this.dateSelectionType.value == this.INTERVAL;
+    let after: moment.Moment;
+    let before: moment.Moment;
 
-    if (isInterval && this.after.invalid) {
-      this.showErrors = true;
-      return this.afterElement.nativeElement.focus();
+    switch(this.dateSelectionType.value) {
+      case this.INTERVAL:
+        if (this.after.invalid) return this.focusErrorElement(this.afterElement);
+        if (this.before.invalid) return this.focusErrorElement(this.beforeElement);
+        after = this.localService.parseDate(this.after.value);
+        before = this.localService.parseDate(this.before.value);
+        break;
+      case this.YEAR:
+        if (this.year.invalid) return this.focusErrorElement(this.yearElement);
+        after = this.localService.parseYear(this.year.value);
+        before = after.clone().endOf('year');
+        break;
+      case this.MONTH:
+        if (this.month.invalid) return this.focusErrorElement(this.monthElement);
+        after = this.localService.parseMonth(this.month.value);
+        before = after.clone().endOf('month');
+        break;
     }
-
-    if (isInterval && this.before.invalid) {
-      this.showErrors = true;
-      return this.beforeElement.nativeElement.focus();
-    }
-
-    const after = this.localService.parseDate(this.after.value);
-    const before = this.localService.parseDate(this.before.value);
 
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
@@ -149,35 +159,57 @@ export class TransactionsComponent implements OnInit {
         type: this.dateSelectionType.value,
         after: after ? after.format(API_DATE) : null,
         before: before ? before.format(API_DATE) : null,
-        month: this.month,
-        year: this.year,
         account: this.account.value,
       }
     });
   }
 
-  incrementMonth() {
-    this.month++;
-    if (this.month > 12) {
-      this.month = 1;
-      this.year++;
+  private focusErrorElement(element: ElementRef) {
+    this.showErrors = true;
+    element.nativeElement.focus();
+  }
+
+  create() {
+    this.contextService.createTransaction(TransactionType.GENERIC);
+    this.router.navigate(['/transaction'])
+  }
+
+  private addMonth(delta: number) {
+    if (this.month.invalid) {
+      this.month.setValue(this.localService.formatMonth(moment()));
+      return;
     }
+
+    const date = this.localService.parseMonth(this.month.value);
+    date.add(delta, 'months');
+    this.month.setValue(this.localService.formatMonth(date));
+  }
+
+  incrementMonth() {
+    this.addMonth(1);
   }
 
   decrementMonth() {
-    this.month--;
-    if (this.month < 1) {
-      this.month = 12;
-      this.year--;
+    this.addMonth(-1);
+  }
+
+  private addYear(delta: number) {
+    if (this.year.invalid) {
+      this.year.setValue(this.localService.formatYear(moment()));
+      return;
     }
+
+    const date = this.localService.parseYear(this.year.value);
+    date.add(delta, 'years');
+    this.year.setValue(this.localService.formatYear(date));
   }
 
   incrementYear() {
-    this.year++;
+    this.addYear(1);
   }
 
   decrementYear() {
-    this.year--;
+    this.addYear(-1);
   }
 
   get dateSelectionType() {
@@ -190,6 +222,14 @@ export class TransactionsComponent implements OnInit {
 
   get before() {
     return this.form.get('before') as FormControl;
+  }
+
+  get month() {
+    return this.form.get('month') as FormControl;
+  }
+
+  get year() {
+    return this.form.get('year') as FormControl;
   }
 
   get account() {

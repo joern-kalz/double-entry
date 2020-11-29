@@ -19,7 +19,7 @@ import { TransactionDetailsComponentStub } from '../../testing/transaction-detai
 describe('TransactionsComponent', () => {
   const PARAM_MAP_MOCK: ParamMap = convertToParamMap({
     type: 'year',
-    year: '2020'
+    after: '2020-01-01'
   });
 
   const ACCOUNTS_MOCK: Account[] = [
@@ -96,7 +96,7 @@ describe('TransactionsComponent', () => {
     submitButton.click();
 
     expect(router.navigate).toHaveBeenCalledWith([], jasmine.objectContaining({queryParams: {
-      type: 'year', after: null, before: null, month: 0, year: 2021, account: null
+      type: 'year', after: '2021-01-01', before: '2021-12-31', account: null
     }}));
   });
 });

@@ -24,7 +24,8 @@ describe('DashboardComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ DashboardComponent, RouterLinkDirectiveStub ],
       providers: [
-        { provide: ContextService, useValue: jasmine.createSpyObj('ContextService', ['setTransaction']) },
+        { provide: ContextService, useValue: jasmine.createSpyObj('ContextService', 
+          ['setTransaction', 'createTransaction']) },
         { provide: LocalService, useValue: jasmine.createSpyObj('LocalService', ['formatDate']) },
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
         { provide: RepositoryService, useValue: jasmine.createSpyObj('RepositoryService', ['exportRepository']) },
@@ -51,7 +52,7 @@ describe('DashboardComponent', () => {
   it('should create expense', () => {
     const createExpenseButton = fixture.nativeElement.querySelectorAll('button')[0];
     createExpenseButton.click();
-    expect(contextService.setTransaction.calls.mostRecent().args[0].type).toEqual(TransactionType.EXPENSE);
+    expect(contextService.createTransaction.calls.mostRecent().args[0]).toEqual(TransactionType.EXPENSE);
   });
 
   it('should export', () => {
