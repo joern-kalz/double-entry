@@ -2,7 +2,6 @@ package com.github.joern.kalz.doubleentry.models;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,7 +11,6 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@ToString
 public class Transaction implements Serializable {
 
     @Id

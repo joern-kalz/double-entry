@@ -11,7 +11,6 @@ import java.io.Serializable;
 @Table(name = "authorities")
 @Getter
 @Setter
-@ToString
 public class Authority implements Serializable {
 
     @EmbeddedId

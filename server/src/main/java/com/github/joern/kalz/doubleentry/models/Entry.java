@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@ToString
 public class Entry implements Serializable {
 
     @EmbeddedId

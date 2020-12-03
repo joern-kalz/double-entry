@@ -10,7 +10,6 @@ import java.util.List;
 @Table(name = "users")
 @Getter
 @Setter
-@ToString
 public class User implements Serializable {
 
     @Id
