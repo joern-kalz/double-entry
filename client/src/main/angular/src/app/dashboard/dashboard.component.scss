@@ -1,4 +1,55 @@
-a, button {
-    display: block;
-    margin: 10px 0;
+button, a {
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.tiles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.tile {
+    width: 100%;
+
+    margin: 0 0 50px 0;
+    
+    h2 {
+        font-size: 0.97em;
+        font-weight: inherit;
+        margin: 0 0 5px 0;
+        color: #666;
+    }
+
+    div:nth-child(3) {
+        margin: 15px 0 0 0;
+        text-align: right;
+        
+        button, a {
+            &:nth-child(2) {
+                margin-left: 15px;
+            }
+        }
+    }
+}
+
+.footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 5px 15px;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    div {
+        max-width: 1200px;
+        text-align: right;
+    }
+}
+
+@media(min-width: 700px) {
+    .tile {
+        width: 45%;
+    }
 }

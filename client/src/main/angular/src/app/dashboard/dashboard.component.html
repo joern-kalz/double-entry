@@ -1,9 +1,52 @@
-<button (click)="createExpenseTransaction()">Ausgabe buchen</button>
-<a [routerLink]="['/earnings', AccountType.EXPENSE]">Ausgaben ansehen</a>
-<button (click)="createRevenueTransaction()">Einnahme buchen</button>
-<a [routerLink]="['/earnings', AccountType.REVENUE]">Einnahmen ansehen</a>
-<button (click)="createGenericTransaction()">Freie Transaktion buchen</button>
-<a [routerLink]="['/transactions']">Buchungen ansehen</a>
-<button (click)="createTransferTransaction()">Transfer buchen</button>
-<a [routerLink]="['/assets']">Bestand ansehen</a>
-<button (click)="export()">Backup erstellen</button>
+<div class="tiles">
+    <div class="tile">
+        <h2>Ausgaben</h2>
+        <div>
+
+        </div>
+        <div>
+            <a [routerLink]="['/earnings', AccountType.EXPENSE]">Ausgaben ansehen</a>
+            <button (click)="createExpenseTransaction()">Ausgabe buchen</button>
+        </div>
+    </div>
+    
+    <div class="tile">
+        <h2>Einnahmen</h2>
+        <div>
+
+        </div>
+        <div>
+            <a [routerLink]="['/earnings', AccountType.REVENUE]">Einnahmen ansehen</a>
+            <button (click)="createRevenueTransaction()">Einnahme buchen</button>
+        </div>
+    </div>
+    
+    <div class="tile">
+        <h2>Bestand</h2>
+        <div>
+
+        </div>
+        <div>
+            <a [routerLink]="['/assets']">Bestand ansehen</a>
+            <button (click)="createTransferTransaction()">Transfer buchen</button>
+        </div>
+    </div>
+    
+    <div class="tile">
+        <h2>Transaktionen</h2>
+        <div>
+
+        </div>
+        <div>
+            <a [routerLink]="['/transactions']">Buchungen ansehen</a>
+            <button (click)="createGenericTransaction()">Transaktion buchen</button>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div>
+        <button (click)="export()">Backup erstellen</button>
+    </div>
+</div>
+
