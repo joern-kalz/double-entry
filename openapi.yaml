@@ -211,22 +211,26 @@ paths:
           description: Not found
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
-  '/balances':
+  '/balances/absolute':
     get:
-      operationId: getBalances
+      operationId: getAbsoluteBalances
       tags: [balances]
       summary: |
-        Calculates for each account the sum of all amounts in transactions of 
-        the specified time interval
+        Calculates the account balances on specific timepoints
       parameters:
-        - name: after
+        - name: date
           in: query
-          description: Start of balance calculation
+          description: First timepoint
+          required: true
           schema: {type: string, format: date}
-        - name: before
+        - name: stepMonths
           in: query
-          description: End of balance calculation
-          schema: {type: string, format: date}
+          description: Time interval between the timepoints in months
+          schema: {type: integer, minimum: 1}
+        - name: stepCount
+          in: query
+          description: Number of timepoints
+          schema: {type: integer, minimum: 0}
       responses:
         '200':
           description: Requested balances
@@ -235,7 +239,44 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GetBalanceResponse'
+                  $ref: '#/components/schemas/GetAbsoluteBalanceResponse'
+        '400':
+          $ref: '#/components/responses/InvalidParameterResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  '/balances/relative':
+    get:
+      operationId: getRelativeBalances
+      tags: [balances]
+      summary: |
+        Calculates the differences of the account balances between specific timepoints
+      parameters:
+        - name: start
+          in: query
+          description: First timepoint
+          required: true
+          schema: {type: string, format: date}
+        - name: stepMonths
+          in: query
+          description: Time interval between the timepoints in months
+          required: true
+          schema: {type: integer, minimum: 1}
+        - name: stepCount
+          in: query
+          description: Number of timepoints
+          required: true
+          schema: {type: integer, minimum: 1}
+      responses:
+        '200':
+          description: Requested differences
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetRelativeBalanceResponse'
         '400':
           $ref: '#/components/responses/InvalidParameterResponse'
         '401':
@@ -487,14 +528,44 @@ components:
         name: grocery
         parentId: 982753
         active: true
-    GetBalanceResponse:
+    GetAbsoluteBalanceResponse:
       type: object
       properties:
-        accountId: {type: integer, format: int64}
-        balance: {type: number}
+        date: {type: string, format: date}
+        balances:
+          type: array
+          items:
+            type: object
+            properties:
+              accountId: {type: integer, format: int64}
+              amount: {type: number}
       example:
-        accountId: 260425
-        balance: 100.45
+        date: 2020-01-01
+        balances:
+          - accountId: 260425
+            amount: 100.45
+          - accountId: 260423
+            amount: 52.42
+    GetRelativeBalanceResponse:
+      type: object
+      properties:
+        start: {type: string, format: date}
+        end: {type: string, format: date}
+        differences:
+          type: array
+          items:
+            type: object
+            properties:
+              accountId: {type: integer, format: int64}
+              amount: {type: number}
+      example:
+        start: 2020-01-01
+        end: 2020-01-31
+        differences:
+          - accountId: 260425
+            amount: 1050.45
+          - accountId: 260423
+            amount: 352.42
     GetVerificationResponse:
       type: object
       properties:

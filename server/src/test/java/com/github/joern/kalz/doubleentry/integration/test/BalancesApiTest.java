@@ -29,7 +29,7 @@ class BalancesApiTest {
     Account cashAccount;
     Account expenseAccount;
     Account foodAccount;
-    Account foodAccountOfOtherUser;
+    Account expenseAccountOfOtherUser;
     Account cashAccountOfOtherUser;
 
     @BeforeEach
@@ -44,86 +44,138 @@ class BalancesApiTest {
         foodAccount = testSetup.createAccount("food", loggedInUser);
         expenseAccount = testSetup.createAccount("expenses", loggedInUser);
         testSetup.createParentChildLink(expenseAccount, foodAccount);
-        foodAccountOfOtherUser = testSetup.createAccount("food of other user", otherUser);
+        expenseAccountOfOtherUser = testSetup.createAccount("expense of other user", otherUser);
         cashAccountOfOtherUser = testSetup.createAccount("cash of other user", otherUser);
     }
 
     @Test
-    void shouldGetBalances() throws Exception {
-        createTransaction(foodAccount, "1.99", cashAccount, "-1.99");
-        createTransaction(foodAccount, "2.49", cashAccount, "-2.49");
+    void shouldGetAbsoluteBalances() throws Exception {
+        createTransaction("2020-01-01", foodAccount, "1.99", cashAccount, "-1.99");
+        createTransaction("2020-01-02", foodAccount, "2.49", cashAccount, "-2.49");
+        createTransaction("2020-01-03", foodAccount, "5.29", cashAccount, "-5.29");
 
-        mockMvc.perform(get("/api/balances"))
+        mockMvc.perform(get("/api/balances/absolute?date=2020-01-02"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 4.48)]")
-                        .exists())
-                .andExpect(jsonPath("$[?(@.accountId == " + cashAccount.getId() + " && @.balance == -4.48)]")
-                        .exists());
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].balances[?(@.accountId == " + foodAccount.getId() +
+                        " && @.amount == 4.48)]").exists())
+                .andExpect(jsonPath("$[0].balances[?(@.accountId == " + cashAccount.getId() +
+                        " && @.amount == -4.48)]").exists());
     }
 
     @Test
-    void shouldGetBalancesForDateInterval() throws Exception {
-        createTransactionForDate(LocalDate.of(2019, 1, 1),
-                foodAccount, "1.89", cashAccount, "-1.89");
-        createTransactionForDate(LocalDate.of(2020, 1, 1),
-                foodAccount, "1.99", cashAccount, "-1.99");
-        createTransactionForDate(LocalDate.of(2021, 1, 1),
-                foodAccount, "2.49", cashAccount, "-2.49");
+    void shouldGetAbsoluteBalancesWithSteps() throws Exception {
+        createTransactionForDate("2019-01-02", foodAccount, "1.89", cashAccount, "-1.89");
+        createTransactionForDate("2019-12-31", foodAccount, "1.99", cashAccount, "-1.99");
+        createTransactionForDate("2021-01-01", foodAccount, "2.49", cashAccount, "-2.49");
 
-        mockMvc.perform(get("/api/balances?after=2020-01-01&before=2020-01-01"))
+        mockMvc.perform(get("/api/balances/absolute?date=2019-01-01&stepMonths=12&stepCount=2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 1.99)]")
-                        .exists())
-                .andExpect(jsonPath("$[?(@.accountId == " + cashAccount.getId() + " && @.balance == -1.99)]")
-                        .exists());
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[?(@.date == '2019-01-01')].balances[?(@.accountId == " +
+                        cashAccount.getId() + " && @.amount == 0.00)]").exists())
+                .andExpect(jsonPath("$[?(@.date == '2020-01-01')].balances[?(@.accountId == " +
+                        cashAccount.getId() + " && @.amount == -3.88)]").exists())
+                .andExpect(jsonPath("$[?(@.date == '2021-01-01')].balances[?(@.accountId == " +
+                        cashAccount.getId() + " && @.amount == -6.37)]").exists());
     }
 
     @Test
-    void shouldAddBalanceOfChildAccountToParentAccount() throws Exception {
-        createTransaction(foodAccount, "1.99", cashAccount, "-1.99");
+    void shouldAddAbsoluteBalanceOfChildAccountToParentAccount() throws Exception {
+        createTransaction("2020-01-01", foodAccount, "1.99", cashAccount, "-1.99");
 
-        mockMvc.perform(get("/api/balances"))
+        mockMvc.perform(get("/api/balances/absolute?date=2020-01-01"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.accountId == " + expenseAccount.getId() + " && @.balance == 1.99)]")
-                        .exists())
-                .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 1.99)]")
-                        .exists())
-                .andExpect(jsonPath("$[?(@.accountId == " + cashAccount.getId() + " && @.balance == -1.99)]")
-                        .exists());
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].balances[?(@.accountId == " + expenseAccount.getId() +
+                        " && @.amount == 1.99)]").exists())
+                .andExpect(jsonPath("$[0].balances[?(@.accountId == " + foodAccount.getId() +
+                        " && @.amount == 1.99)]").exists())
+                .andExpect(jsonPath("$[0].balances[?(@.accountId == " + cashAccount.getId() +
+                        " && @.amount == -1.99)]").exists());
     }
 
     @Test
-    void shouldNotGetBalancesOfOtherUser() throws Exception {
-        createTransactionForUser(loggedInUser,
-                foodAccount, "1.89", cashAccount, "-1.89");
-        createTransactionForUser(otherUser,
-                foodAccountOfOtherUser, "2.49", cashAccountOfOtherUser, "-2.49");
+    void shouldNotGetAbsoluteBalancesOfOtherUser() throws Exception {
+        createTransactionForUser("2019-01-01", loggedInUser, expenseAccount, "1.99",
+                cashAccount, "-1.99");
+        createTransactionForUser("2019-01-01", otherUser, expenseAccountOfOtherUser, "3.89",
+                cashAccountOfOtherUser, "-3.89");
 
-        mockMvc.perform(get("/api/balances"))
+        mockMvc.perform(get("/api/balances/absolute?date=2020-01-01"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.accountId == " + foodAccount.getId() + " && @.balance == 1.89)]")
-                        .exists())
-                .andExpect(jsonPath("$[?(@.accountId == " + cashAccount.getId() + " && @.balance == -1.89)]")
-                        .exists());
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].balances.length()").value(2))
+                .andExpect(jsonPath("$[0].balances[?(@.accountId == " + expenseAccount.getId() +
+                        " && @.amount == 1.99)]").exists())
+                .andExpect(jsonPath("$[0].balances[?(@.accountId == " + cashAccount.getId() +
+                        " && @.amount == -1.99)]").exists());
     }
 
-    void createTransaction(Account debitAccount, String debitAmount,
-                                   Account creditAccount, String creditAmount) {
-        testSetup.createTransaction("", loggedInUser, LocalDate.of(2020, 1, 1),
+    @Test
+    void shouldGetRelativeBalances() throws Exception {
+        createTransactionForDate("2019-01-02", foodAccount, "1.89", cashAccount, "-1.89");
+        createTransactionForDate("2019-12-31", foodAccount, "1.99", cashAccount, "-1.99");
+        createTransactionForDate("2021-01-01", foodAccount, "2.49", cashAccount, "-2.49");
+
+        mockMvc.perform(get("/api/balances/relative?start=2019-01-01&stepMonths=12&stepCount=2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[?(@.start == '2019-01-01' && @.end == '2019-12-31')]" +
+                        ".differences[?(@.accountId == " + cashAccount.getId() + " && @.amount == -3.88)]").exists())
+                .andExpect(jsonPath("$[?(@.start == '2020-01-01' && @.end == '2020-12-31')]" +
+                        ".differences[?(@.accountId == " + cashAccount.getId() + " && @.amount == 0.00)]").exists());
+    }
+
+    @Test
+    void shouldAddRelativeBalanceOfChildAccountToParentAccount() throws Exception {
+        createTransaction("2020-01-01", foodAccount, "1", cashAccount, "-1");
+
+        mockMvc.perform(get("/api/balances/relative?start=2020-01-01&stepMonths=1&stepCount=1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[?(@.start == '2020-01-01' && @.end == '2020-01-31')]" +
+                        ".differences[?(@.accountId == " + cashAccount.getId() + " && @.amount == -1)]").exists())
+                .andExpect(jsonPath("$[?(@.start == '2020-01-01' && @.end == '2020-01-31')]" +
+                        ".differences[?(@.accountId == " + foodAccount.getId() + " && @.amount == 1)]").exists())
+                .andExpect(jsonPath("$[?(@.start == '2020-01-01' && @.end == '2020-01-31')]" +
+                        ".differences[?(@.accountId == " + expenseAccount.getId() + " && @.amount == 1)]").exists());
+    }
+
+    @Test
+    void shouldNotGetRelativeBalancesOfOtherUser() throws Exception {
+        createTransactionForUser("2020-01-01", loggedInUser, expenseAccount, "1.99",
+                cashAccount, "-1.99");
+        createTransactionForUser("2020-01-01", otherUser, expenseAccountOfOtherUser, "3.89",
+                cashAccountOfOtherUser, "-3.89");
+
+        mockMvc.perform(get("/api/balances/absolute?date=2020-01-01"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].balances.length()").value(2))
+                .andExpect(jsonPath("$[0].balances[?(@.accountId == " + expenseAccount.getId() +
+                        " && @.amount == 1.99)]").exists())
+                .andExpect(jsonPath("$[0].balances[?(@.accountId == " + cashAccount.getId() +
+                        " && @.amount == -1.99)]").exists());
+    }
+
+    void createTransaction(String date, Account debitAccount, String debitAmount,
+                           Account creditAccount, String creditAmount) {
+        testSetup.createTransaction("", loggedInUser, LocalDate.parse(date),
                 new TestTransactionEntry(debitAccount, debitAmount, false),
                 new TestTransactionEntry(creditAccount, creditAmount, false));
     }
 
-    void createTransactionForUser(User user, Account debitAccount, String debitAmount,
-                                   Account creditAccount, String creditAmount) {
-        testSetup.createTransaction("", user, LocalDate.of(2020, 1, 1),
+    void createTransactionForUser(String date, User user, Account debitAccount, String debitAmount,
+                                  Account creditAccount, String creditAmount) {
+        testSetup.createTransaction("", user, LocalDate.parse(date),
                 new TestTransactionEntry(debitAccount, debitAmount, false),
                 new TestTransactionEntry(creditAccount, creditAmount, false));
     }
 
-    void createTransactionForDate(LocalDate date, Account debitAccount, String debitAmount,
-                                   Account creditAccount, String creditAmount) {
-        testSetup.createTransaction("", loggedInUser, date,
+    void createTransactionForDate(String date, Account debitAccount, String debitAmount,
+                                  Account creditAccount, String creditAmount) {
+        testSetup.createTransaction("", loggedInUser, LocalDate.parse(date),
                 new TestTransactionEntry(debitAccount, debitAmount, false),
                 new TestTransactionEntry(creditAccount, creditAmount, false));
     }

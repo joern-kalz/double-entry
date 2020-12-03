@@ -1,8 +1,6 @@
 package com.github.joern.kalz.doubleentry.services.balances;
 
-import com.github.joern.kalz.doubleentry.models.Account;
-import com.github.joern.kalz.doubleentry.models.TransactionSearchCriteria;
-import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
+import com.github.joern.kalz.doubleentry.models.*;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.accounts.AccountsHierarchyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BalancesService {
@@ -23,53 +21,136 @@ public class BalancesService {
     private AccountsHierarchyService accountsHierarchyService;
 
     @Autowired
+    private AccountsRepository accountsRepository;
+
+    @Autowired
     private PrincipalProvider principalProvider;
 
-    public Map<Long, BigDecimal> getBalances(LocalDate after, LocalDate before) {
-        Map<Long, BigDecimal> balances = getSeparateBalances(after, before);
-        return getAddedUpBalances(balances);
+    public List<Balances> getBalances(LocalDate date, int stepInMonth, int stepCount) {
+        LocalDate before = date.plusMonths(stepInMonth * stepCount);
+        Map<Long, TurnoverIterator> turnoverIterators = getTurnoverIteratorsByAccountId(null, before);
+
+        return getBalances(turnoverIterators, date, stepInMonth, stepCount, true);
     }
 
-    private Map<Long, BigDecimal> getSeparateBalances(LocalDate after, LocalDate before) {
-        Map<Long, BigDecimal> balances = new HashMap<>();
+    public List<BalanceDifferences> getBalanceDifferences(LocalDate start, int stepInMonth, int stepCount) {
+        LocalDate before = start.plusMonths(stepInMonth * stepCount);
+        Map<Long, TurnoverIterator> turnoverIterators = getTurnoverIteratorsByAccountId(start, before);
 
+        return getBalances(turnoverIterators, start.plusMonths(stepInMonth), stepInMonth, stepCount - 1, false)
+                .stream()
+                .map(balances -> new BalanceDifferences(
+                        balances.getDate().minusMonths(stepInMonth),
+                        balances.getDate().minusDays(1),
+                        balances.getAmountsByAccountId()))
+                .collect(Collectors.toList());
+    }
+
+    private List<Balances> getBalances(Map<Long, TurnoverIterator> turnoversByAccountId, LocalDate start,
+                                       int stepInMonth, int stepCount, boolean accumulate) {
+        List<Balances> balancesList = new ArrayList<>();
+
+        for (int step = 0; step <= stepCount; step++) {
+            LocalDate stepEnd = start.plusMonths(stepInMonth * step);
+            Map<Long, BigDecimal> amountsByAccountId = accumulate && !balancesList.isEmpty() ?
+                    new HashMap<>(balancesList.get(balancesList.size() - 1).getAmountsByAccountId()) :
+                    turnoversByAccountId.keySet().stream().collect(Collectors.toMap(id -> id, id -> BigDecimal.ZERO));
+
+            for (Map.Entry<Long, TurnoverIterator> turnovers : turnoversByAccountId.entrySet()) {
+                Long accountId = turnovers.getKey();
+
+                for (TurnoverIterator iterator = turnovers.getValue(); !iterator.isAfterLast(); iterator.moveNext()) {
+                    Turnover turnover = iterator.get();
+
+                    if (turnover.date.isAfter(stepEnd) || (!accumulate && turnover.date.isEqual(stepEnd))) {
+                        break;
+                    }
+
+                    amountsByAccountId.put(accountId, amountsByAccountId.get(accountId).add(turnover.amount));
+                }
+            }
+
+            balancesList.add(new Balances(stepEnd, amountsByAccountId));
+        }
+
+        return balancesList;
+    }
+
+    private Map<Long, TurnoverIterator> getTurnoverIteratorsByAccountId(LocalDate after, LocalDate before) {
+        Map<Long, Long> parentsByAccountId = getParentsByAccountId();
+        Map<Long, SortedMap<LocalDate, Turnover>> turnoversByAccount = new HashMap<>();
+
+        for (Transaction transaction : getTransactions(after, before)) {
+            LocalDate date = transaction.getDate();
+
+            for (Entry entry : transaction.getEntries()) {
+                Long accountId = entry.getId().getAccount().getId();
+
+                do {
+                    SortedMap<LocalDate, Turnover> turnovers = turnoversByAccount
+                            .computeIfAbsent(accountId, k -> new TreeMap<>());
+
+                    Turnover turnover = turnovers.computeIfAbsent(date, k -> new Turnover(date));
+                    turnover.amount = turnover.amount.add(entry.getAmount());
+
+                    accountId = parentsByAccountId.get(accountId);
+                } while (accountId != null);
+            }
+        }
+
+        return turnoversByAccount.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> new TurnoverIterator(entry.getValue())));
+    }
+
+    private List<Transaction> getTransactions(LocalDate after, LocalDate before) {
         TransactionSearchCriteria criteria = new TransactionSearchCriteria();
         criteria.setUser(principalProvider.getPrincipal());
         criteria.setAfter(after);
         criteria.setBefore(before);
 
-        transactionsRepository
-                .find(criteria)
-                .stream()
-                .flatMap(transaction -> transaction.getEntries().stream())
-                .forEach(entry -> {
-                    Account account = entry.getId().getAccount();
-                    BigDecimal oldBalance = balances.getOrDefault(account.getId(), BigDecimal.ZERO);
-                    balances.put(account.getId(), oldBalance.add(entry.getAmount()));
-                });
-
-        return balances;
+        return transactionsRepository.find(criteria);
     }
 
-    private Map<Long, BigDecimal> getAddedUpBalances(Map<Long, BigDecimal> balances) {
-        Map<Long, BigDecimal> addedUpBalances = new HashMap<>();
+    private Map<Long, Long> getParentsByAccountId() {
+        Map<Long, Long> parentsByAccountId = new HashMap<>();
 
-        accountsHierarchyService.walkHierarchyDepthFirst(account -> {
-            BigDecimal amount = balances.getOrDefault(account.getId(), BigDecimal.ZERO);
-            boolean childBalanceFound = false;
+        for (Account account : accountsRepository.findByUser(principalProvider.getPrincipal())) {
+            parentsByAccountId.put(account.getId(), account.getParent() != null ? account.getParent().getId() : null);
+        }
 
-            for (Account child : account.getChildren()) {
-                if (addedUpBalances.containsKey(child.getId())) {
-                    childBalanceFound = true;
-                    amount = amount.add(addedUpBalances.get(child.getId()));
-                }
-            }
+        return parentsByAccountId;
+    }
 
-            if (balances.containsKey(account.getId()) || childBalanceFound) {
-                addedUpBalances.put(account.getId(), amount);
-            }
-        });
+    private static class Turnover {
+        LocalDate date;
+        BigDecimal amount;
 
-        return addedUpBalances;
+        Turnover(LocalDate date) {
+            this.date = date;
+            this.amount = BigDecimal.ZERO;
+        }
+    }
+
+    private static class TurnoverIterator {
+        int index;
+        List<Turnover> turnovers;
+
+        TurnoverIterator(SortedMap<LocalDate, Turnover> turnovers) {
+            index = 0;
+            this.turnovers = new ArrayList<>(turnovers.values());
+        }
+
+        boolean isAfterLast() {
+            return index >= turnovers.size();
+        }
+
+        void moveNext() {
+            index++;
+        }
+
+        Turnover get() {
+            return turnovers.get(index);
+        }
     }
 }
