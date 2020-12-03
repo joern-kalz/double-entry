@@ -7,7 +7,7 @@ import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hier
 import { forkJoin, Subscription, combineLatest, of } from 'rxjs';
 import { switchMap, distinctUntilChanged, map } from 'rxjs/operators';
 import { API_DATE } from '../api-access/api-constants';
-import { GetBalanceResponse, Account } from '../generated/openapi/model/models';
+import { GetRelativeBalanceResponse, Account } from '../generated/openapi/model/models';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
 import { DialogService } from '../dialogs/dialog.service';
 import { DialogMessage } from '../dialogs/dialog-message.enum';
@@ -59,8 +59,10 @@ export class EarningsComponent implements OnInit, OnDestroy {
         return forkJoin([
           of(searchRequest),
           this.accountsService.getAccounts(),
-          this.balancesService.getBalances(...this.getDatesForInterval(searchRequest.intervals[0])),
-          this.balancesService.getBalances(...this.getDatesForInterval(searchRequest.intervals[1])),
+          this.balancesService.getRelativeBalances(this.getDatesForInterval(searchRequest.intervals[0])[0], 
+            searchRequest.intervals[0].month ? 1 : 12, 1),
+          this.balancesService.getRelativeBalances(this.getDatesForInterval(searchRequest.intervals[1])[0], 
+            searchRequest.intervals[0].month ? 1 : 12, 1),
         ]);
       })
     ).subscribe(
@@ -118,7 +120,7 @@ export class EarningsComponent implements OnInit, OnDestroy {
     }
   }
 
-  load(searchRequest: SearchRequest, accounts: Account[], balances: GetBalanceResponse[][]) {
+  load(searchRequest: SearchRequest, accounts: Account[], balances: GetRelativeBalanceResponse[][]) {
     this.ignoreEvents = true;
     this.accountType = searchRequest.accountType;
     this.intervalType.setValue(searchRequest.intervals[0].month ? IntervalType.MONTH : IntervalType.YEAR);
@@ -151,11 +153,11 @@ export class EarningsComponent implements OnInit, OnDestroy {
     return value != null ? value : 0;
   }
 
-  private getBalancesById(balances: GetBalanceResponse[]): Map<number, number> {
+  private getBalancesById(balances: GetRelativeBalanceResponse[]): Map<number, number> {
     const balancesById = new Map<number, number>();
 
-    for (let balance of balances) {
-      balancesById.set(balance.accountId, balance.balance);
+    for (let balance of balances[0].differences) {
+      balancesById.set(balance.accountId, balance.amount);
     }
     
     return balancesById;

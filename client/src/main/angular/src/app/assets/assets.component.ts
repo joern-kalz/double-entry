@@ -9,7 +9,7 @@ import { ViewAsset } from './view-asset';
 import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
 import { forkJoin } from 'rxjs';
 import { API_DATE } from '../api-access/api-constants';
-import { GetBalanceResponse } from '../generated/openapi/model/models';
+import { GetAbsoluteBalanceResponse } from '../generated/openapi/model/models';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
 import { DialogService } from '../dialogs/dialog.service';
 import { DialogMessage } from '../dialogs/dialog-message.enum';
@@ -56,7 +56,7 @@ export class AssetsComponent implements OnInit {
 
     forkJoin([
       this.accountsService.getAccounts(),
-      this.balancesService.getBalances(null, balancesDate.format(API_DATE))
+      this.balancesService.getAbsoluteBalances(balancesDate.format(API_DATE))
     ]).subscribe(([accounts, balances]) => {
       this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
       const balancesById = this.getBalancesById(balances);
@@ -78,11 +78,11 @@ export class AssetsComponent implements OnInit {
     error => this.apiErrorHandlerService.handle(error));
   }
 
-  private getBalancesById(balances: GetBalanceResponse[]): Map<number, number> {
+  private getBalancesById(balances: GetAbsoluteBalanceResponse[]): Map<number, number> {
     const balancesById = new Map<number, number>();
 
-    for (let balance of balances) {
-      balancesById.set(balance.accountId, balance.balance);
+    for (let balance of balances[0].balances) {
+      balancesById.set(balance.accountId, balance.amount);
     }
     
     return balancesById;
