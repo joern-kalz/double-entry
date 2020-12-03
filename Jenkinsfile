@@ -24,7 +24,7 @@ pipeline {
         stage('Analyse') {
             when { branch 'master' }
             steps {
-                sh "./gradlew sonar -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONARQUBE_TOKEN}"
+                sh "./gradlew sonarqube -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONARQUBE_TOKEN}"
             }
         }
         stage('Deploy') {

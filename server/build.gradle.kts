@@ -61,7 +61,7 @@ tasks {
     named("jacocoTestReport").configure {
         dependsOn(named("test"))
     }
-    named("sonar").configure {
+    named("sonarqube").configure {
         dependsOn(named("jacocoTestReport"))
     }
 }
