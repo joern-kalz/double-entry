@@ -1,6 +1,15 @@
-button, a {
-    &:hover {
-        text-decoration: underline;
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+
+    button {
+        padding: 2px 0;
+        width: 31%;
+    }
+
+    i {
+        color: #555;
     }
 }
 
@@ -10,16 +19,20 @@ button, a {
     justify-content: space-between;
 }
 
-.tile {
+a {
     width: 100%;
-
+    padding: 5px;
     margin: 0 0 50px 0;
+
+    &:hover {
+        background: #eee;
+    }
     
     h2 {
-        font-size: 0.97em;
+        font-size: inherit;
         font-weight: inherit;
         margin: 0 0 5px 0;
-        color: #666;
+        color: #555;
     }
 
     div:nth-child(3) {
@@ -48,8 +61,26 @@ button, a {
     }
 }
 
-@media(min-width: 700px) {
-    .tile {
-        width: 45%;
+@media (min-width: 450px) {
+    .actions {
+        justify-content: flex-end;
+
+        button {
+            width: 100px;
+            margin-left: 5px;
+        }
+    }
+}
+
+@media (min-width: 700px) {
+    a {
+        width: 47%;
+    }
+}
+
+
+@media (min-width: 900px) {
+    a {
+        margin-bottom: 60px;
     }
 }

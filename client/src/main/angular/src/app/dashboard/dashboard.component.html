@@ -1,47 +1,49 @@
+<div class="actions">
+    <button (click)="createExpenseTransaction()" class="light"><i class="fa fa-plus"></i> Ausgabe</button>
+    <button (click)="createRevenueTransaction()" class="light"><i class="fa fa-plus"></i> Einnahme</button>
+    <button (click)="createTransferTransaction()" class="light"><i class="fa fa-plus"></i> Transfer</button>
+</div>
+
 <div class="tiles">
-    <div class="tile">
-        <h2>Ausgaben</h2>
-        <div>
+    <a [routerLink]="['/earnings', AccountType.EXPENSE]">
+        <h2>Ausgabenübersicht</h2>
+        <canvas baseChart 
+            [datasets]="expenseChartData" 
+            [labels]="expenseChartLabels" 
+            [options]="earningsChartOptions"
+            [chartType]="'bar'">
+        </canvas>
+    </a>
 
-        </div>
-        <div>
-            <a [routerLink]="['/earnings', AccountType.EXPENSE]">Ausgaben ansehen</a>
-            <button (click)="createExpenseTransaction()">Ausgabe buchen</button>
-        </div>
-    </div>
-    
-    <div class="tile">
-        <h2>Einnahmen</h2>
-        <div>
+    <a [routerLink]="['/earnings', AccountType.REVENUE]">
+        <h2>Einnahmenübersicht</h2>
+        <canvas baseChart 
+            [datasets]="revenueChartData" 
+            [labels]="revenueChartLabels" 
+            [options]="earningsChartOptions"
+            [chartType]="'bar'">
+        </canvas>
+    </a>
 
-        </div>
-        <div>
-            <a [routerLink]="['/earnings', AccountType.REVENUE]">Einnahmen ansehen</a>
-            <button (click)="createRevenueTransaction()">Einnahme buchen</button>
-        </div>
-    </div>
-    
-    <div class="tile">
-        <h2>Bestand</h2>
-        <div>
+    <a [routerLink]="['/assets']">
+        <h2>Bestandsübersicht</h2>
+        <canvas *ngIf="assetChartInitialized" baseChart 
+            [data]="assetChartData" 
+            [labels]="assetChartLabels" 
+            [chartType]="'doughnut'"
+            [options]="assetChartOptions">
+        </canvas>
+    </a>
 
-        </div>
-        <div>
-            <a [routerLink]="['/assets']">Bestand ansehen</a>
-            <button (click)="createTransferTransaction()">Transfer buchen</button>
-        </div>
-    </div>
-    
-    <div class="tile">
-        <h2>Transaktionen</h2>
-        <div>
-
-        </div>
-        <div>
-            <a [routerLink]="['/transactions']">Buchungen ansehen</a>
-            <button (click)="createGenericTransaction()">Transaktion buchen</button>
-        </div>
-    </div>
+    <a [routerLink]="['/transactions']">
+        <h2>Buchungsübersicht</h2>
+        <canvas baseChart 
+            [datasets]="transactionsChartData" 
+            [labels]="transactionsChartLabels" 
+            [options]="transactionsChartOptions"
+            [chartType]="'line'">
+        </canvas>
+    </a>
 </div>
 
 <div class="footer">
@@ -49,4 +51,3 @@
         <button (click)="export()">Backup erstellen</button>
     </div>
 </div>
-
