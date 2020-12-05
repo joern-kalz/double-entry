@@ -17,6 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": ["chart.js", "file-saver"],
             "outputPath": "dist/double-entry-client",
             "index": "src/index.html",
             "main": "src/main.ts",

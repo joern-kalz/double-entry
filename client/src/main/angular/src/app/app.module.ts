@@ -21,6 +21,7 @@ import { AssetsComponent } from './assets/assets.component';
 import { EarningsComponent } from './earnings/earnings.component';
 import { VerificationComponent } from './verification/verification.component';
 import { TransactionDetailsComponent } from './transaction-details/transaction-details.component';
+import { ChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { TransactionDetailsComponent } from './transaction-details/transaction-d
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ChartsModule
   ],
   providers: [
     { provide: BASE_PATH, useValue: '/api' },
