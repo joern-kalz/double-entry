@@ -4,7 +4,7 @@ import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.
 import { BalancesService } from '../generated/openapi/api/balances.service';
 import * as moment from 'moment';
 import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
-import { forkJoin, Subscription, combineLatest, of } from 'rxjs';
+import { forkJoin, Subscription, combineLatest, of, Observable } from 'rxjs';
 import { switchMap, distinctUntilChanged, map } from 'rxjs/operators';
 import { API_DATE } from '../api-access/api-constants';
 import { GetRelativeBalanceResponse, Account } from '../generated/openapi/model/models';
@@ -12,11 +12,13 @@ import { ApiErrorHandlerService } from '../api-access/api-error-handler.service'
 import { DialogService } from '../dialogs/dialog.service';
 import { DialogMessage } from '../dialogs/dialog-message.enum';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { IntervalType } from './interval-type.enum';
+import { Presentation } from './presentation.enum';
 import { ViewEarning } from './view-earning';
 import { FormControl } from '@angular/forms';
 import { SearchRequest } from './search-request';
-import { Interval } from './interval';
+import { Label } from 'ng2-charts';
+import { ChartDataSets, ChartOptions } from 'chart.js';
+import { LocalService } from '../local/local.service';
 
 @Component({
   selector: 'app-earnings',
@@ -24,12 +26,12 @@ import { Interval } from './interval';
   styleUrls: ['./earnings.component.scss']
 })
 export class EarningsComponent implements OnInit, OnDestroy {
-  IntervalType = IntervalType;
   AccountType = AccountType;
+  Presentation = Presentation;
 
   accountType: AccountType;
-  intervalType = new FormControl();
-  intervals: Interval[];
+  presentation = new FormControl();
+  dates: moment.Moment[];
 
   totals: number[];
   earnings: ViewEarning[];
@@ -39,6 +41,19 @@ export class EarningsComponent implements OnInit, OnDestroy {
   ignoreEvents = true;
   subscription = new Subscription();
   
+  chartLabels: Label[];
+  chartData: ChartDataSets[];
+  chartOptions : ChartOptions = {
+    legend: { labels: {fontColor: '#777', boxWidth: 12}, align: 'end'},
+    scales: {
+      xAxes: [{ ticks: {fontColor: '#888'}, gridLines: {display: false} }],
+      yAxes: [{ ticks: {fontColor: '#888', maxTicksLimit: 8}, gridLines: {borderDash: [2]}, stacked: true }],
+    },
+    tooltips: { enabled: false },
+    hover: { mode: null },
+    aspectRatio: 1.6
+  };
+
   constructor(
     private accountsService: AccountsService,
     private accountHierarchyService: AccountHierarchyService,
@@ -47,30 +62,28 @@ export class EarningsComponent implements OnInit, OnDestroy {
     private dialogService: DialogService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private localService: LocalService,
   ) { }
 
   ngOnInit(): void {
-    this.subscription.add(combineLatest(
+    this.subscription.add(combineLatest([
       this.activatedRoute.paramMap,
       this.activatedRoute.queryParamMap
-    ).pipe(
+    ]).pipe(
       map(([param, query]) => this.parseSearchRequest(param, query)),
       switchMap(searchRequest => {
         return forkJoin([
           of(searchRequest),
           this.accountsService.getAccounts(),
-          this.balancesService.getRelativeBalances(this.getDatesForInterval(searchRequest.intervals[0])[0], 
-            searchRequest.intervals[0].month ? 1 : 12, 1),
-          this.balancesService.getRelativeBalances(this.getDatesForInterval(searchRequest.intervals[1])[0], 
-            searchRequest.intervals[0].month ? 1 : 12, 1),
+          this.getBalances(searchRequest)
         ]);
       })
     ).subscribe(
-      ([searchRequest, accounts, ...balances]) => this.load(searchRequest, accounts, balances),
+      ([searchRequest, accounts, balances]) => this.load(searchRequest, accounts, balances),
       error => this.apiErrorHandlerService.handle(error)
     ));
 
-    this.subscription.add(this.intervalType.valueChanges.subscribe(() => this.onIntervalTypeChanged()));
+    this.subscription.add(this.presentation.valueChanges.subscribe(() => this.onPresentationChanged()));
   }
 
   ngOnDestroy(): void {
@@ -78,55 +91,88 @@ export class EarningsComponent implements OnInit, OnDestroy {
   }
 
   private parseSearchRequest(param: ParamMap, query: ParamMap): SearchRequest {
+    const presentation = Presentation[query.get('presentation')] || Presentation.CHART_MONTH;
+    const dates = query.get('dates');
+    const parsedDates = dates ? dates.split('+').map(date => moment(date)) : null;
+
     return {
-      intervals: [this.parseInterval(query, 0), this.parseInterval(query, 1)],
-      accountType: this.parseAccountType(param),
+      accountType: AccountType[param.get('accountType')] || AccountType.EXPENSE,
+      presentation: presentation,
+      dates: this.getDates(presentation, parsedDates),
     }
   }
 
-  private parseInterval(query: ParamMap, index: number): Interval {
-    const month = query.get('month' + index);
-    const year = query.get('year' + index);
-    
-    if (!year) {
-      return { 
-        month: moment().month() + index, 
-        year: moment().year() 
-      };
-    } else {
-      return { 
-        month: month ? +month : null, 
-        year: +year 
-      };
+  private getDates(presentation: Presentation, dates: moment.Moment[]): moment.Moment[] {
+    switch (presentation) {
+      case Presentation.LIST_YEAR:
+        return dates ? dates : [moment().startOf('year'), moment().startOf('year').subtract(1, 'years')];
+      case Presentation.LIST_MONTH:
+        return dates ? dates : [moment().startOf('month'), moment().startOf('month').subtract(1, 'months')];
+      case Presentation.CHART_YEAR:
+        return [moment().startOf('year').subtract(9, 'years')];
+      default:
+        return [moment().startOf('year').subtract(9, 'years')];
     }
   }
 
-  private parseAccountType(param: ParamMap): AccountType {
-    const accountType = AccountType[param.get('accountType')];
-    return accountType ? accountType : AccountType.EXPENSE;
-  }
+  private getBalances(searchRequest: SearchRequest) {
+    const dates = searchRequest.dates;
+    const [stepMonth, stepCount] = 
+      searchRequest.presentation == Presentation.CHART_MONTH ? [1, 120] :
+      searchRequest.presentation == Presentation.CHART_YEAR ? [12, 10] :
+      searchRequest.presentation == Presentation.LIST_MONTH ? [1, 1] :
+      [12, 1];
 
-  private getDatesForInterval(interval: Interval): string[] {
-    if (interval.month) {
-      return [
-        moment([interval.year, interval.month - 1]).startOf('month').format(API_DATE),
-        moment([interval.year, interval.month - 1]).endOf('month').format(API_DATE),
-      ];
-    } else {
-      return [
-        moment([interval.year]).startOf('year').format(API_DATE),
-        moment([interval.year]).endOf('year').format(API_DATE),
-      ];
-    }
+    return forkJoin(dates.map(date => this.balancesService.getRelativeBalances(
+      date.format(API_DATE), stepMonth, stepCount)));
   }
 
   load(searchRequest: SearchRequest, accounts: Account[], balances: GetRelativeBalanceResponse[][]) {
-    this.ignoreEvents = true;
     this.accountType = searchRequest.accountType;
-    this.intervalType.setValue(searchRequest.intervals[0].month ? IntervalType.MONTH : IntervalType.YEAR);
-    this.intervals = searchRequest.intervals;
+
+    this.ignoreEvents = true;
+    this.presentation.setValue(searchRequest.presentation);
+    this.ignoreEvents = false;
+
     this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
 
+    if ([Presentation.CHART_MONTH, Presentation.CHART_YEAR].includes(searchRequest.presentation)) {
+      this.loadChart(accounts, balances[0]);
+    } else {
+      this.loadList(searchRequest.dates, accounts, balances);
+    }
+  }
+
+  private loadChart(accounts: Account[], balances: GetRelativeBalanceResponse[]) {
+    this.dates = null;
+    this.earnings = null;
+
+    this.chartLabels = balances.map(balances => this.presentation.value == Presentation.CHART_MONTH ? 
+      this.localService.formatMonth(moment(balances.start)) :
+      this.localService.formatYear(moment(balances.start)));
+
+    const rootAccount = this.accountHierarchy.root.get(this.accountType);
+    
+    this.chartData = this.accountHierarchy.list.get(this.accountType)
+      .filter(account => account.parentId == rootAccount.id && account.active &&
+        balances[0].differences.find(difference => difference.accountId == account.id)
+      )
+      .map(account => ({
+        stack: '1',
+        label: account.name,
+        data: balances
+          .map(balances => {
+            const difference = balances.differences.find(difference => difference.accountId == account.id);
+            const amount = difference ? difference.amount : 0;
+            return this.accountType == AccountType.EXPENSE ? amount : -amount;
+          })
+      }));
+  }
+
+  loadList(dates: moment.Moment[], accounts: Account[], balances: GetRelativeBalanceResponse[][]) {
+    this.chartData = null;
+
+    this.dates = dates;
     const balancesById = [this.getBalancesById(balances[0]), this.getBalancesById(balances[1])];
     this.earnings = [];
     this.totals = [0, 0];
@@ -140,13 +186,12 @@ export class EarningsComponent implements OnInit, OnDestroy {
 
         if (amounts[0] != null || amounts[1] != null) {
           this.earnings.push({account, balances: [
-            { interval: this.intervals[0], amount: this.getOrZero(amounts[0]) },
-            { interval: this.intervals[1], amount: this.getOrZero(amounts[1]) },
+            { date: this.dates[0], amount: this.getOrZero(amounts[0]) },
+            { date: this.dates[1], amount: this.getOrZero(amounts[1]) },
           ]});
         }
       }
     }
-    this.ignoreEvents = false;
   }
 
   private getOrZero(value?: number) {
@@ -155,49 +200,29 @@ export class EarningsComponent implements OnInit, OnDestroy {
 
   private getBalancesById(balances: GetRelativeBalanceResponse[]): Map<number, number> {
     const balancesById = new Map<number, number>();
+    const factor = this.accountType == AccountType.REVENUE ? -1 : 1;
 
     for (let balance of balances[0].differences) {
-      balancesById.set(balance.accountId, balance.amount);
+      balancesById.set(balance.accountId, factor * balance.amount);
     }
     
     return balancesById;
   }
 
-  onIntervalTypeChanged() {
+  onPresentationChanged() {
     if (this.ignoreEvents) return;
-    
-    for (let i = 0; i < this.intervals.length; i++) {
-      this.intervals[i].month = this.intervalType.value == IntervalType.MONTH ? i + 1 : null;
-    }
-
     this.updateQuery();
   }
 
-  incrementInterval(interval: Interval) {
-    if (interval.month) {
-      interval.month++;
-      if (interval.month > 12) {
-        interval.month = 1;
-        interval.year++;
-      }
-    } else {
-      interval.year++;
-    }
-
+  incrementInterval(index: number) {
+    const unit = this.presentation.value == Presentation.LIST_MONTH ? 'months' : 'years';
+    this.dates[index] = this.dates[index].add(1, unit);
     this.updateQuery();
   }
 
-  decrementInterval(interval: Interval) {
-    if (interval.month) {
-      interval.month--;
-      if (interval.month < 1) {
-        interval.month = 12;
-        interval.year--;
-      }
-    } else {
-      interval.year--;
-    }
-
+  decrementInterval(index: number) {
+    const unit = this.presentation.value == Presentation.LIST_MONTH ? 'months' : 'years';
+    this.dates[index] = this.dates[index].subtract(1, unit);
     this.updateQuery();
   }
 
@@ -205,10 +230,9 @@ export class EarningsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/earnings', this.accountType], {
       replaceUrl: true,
       queryParams: {
-        year0: this.intervals[0].year,
-        month0: this.intervals[0].month,
-        year1: this.intervals[1].year,
-        month1: this.intervals[1].month,
+        accountType: this.accountType,
+        presentation: this.presentation.value,
+        dates: this.dates ? this.dates.map(date => date.format(API_DATE)).join('+') : null
       }
     });
   }
@@ -233,13 +257,11 @@ export class EarningsComponent implements OnInit, OnDestroy {
     )
   }
 
-  showTransactions(interval: Interval) {
-    const dates = this.getDatesForInterval(interval);
-
+  showTransactions(date: moment.Moment) {
     this.router.navigate(['/transactions'], {queryParams: {
       account: this.selection.account.id,
-      type: interval.month ? 'month' : 'year',
-      ...interval
+      type: this.presentation.value == Presentation.LIST_MONTH ? 'month' : 'year',
+      after: date
     }});
   }
 }

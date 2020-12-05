@@ -1,29 +1,41 @@
 <div class="search">
     <div>
-        <select [formControl]="intervalType">
+        <select [formControl]="presentation">
             <ng-container *ngIf="accountType == AccountType.EXPENSE">
-                <option [ngValue]="IntervalType.MONTH">Ausgaben für Monat</option>
-                <option [ngValue]="IntervalType.YEAR">Ausgaben für Jahr</option>
+                <option [ngValue]="Presentation.CHART_MONTH">Grafik Monatsausgaben</option>
+                <option [ngValue]="Presentation.CHART_YEAR">Grafik Jahresausgaben</option>
+                <option [ngValue]="Presentation.LIST_MONTH">Liste Monatsausgaben</option>
+                <option [ngValue]="Presentation.LIST_YEAR">Liste Jahresausgaben</option>
             </ng-container>
             <ng-container *ngIf="accountType == AccountType.REVENUE">
-                <option [ngValue]="IntervalType.MONTH">Einnahmen für Monat</option>
-                <option [ngValue]="IntervalType.YEAR">Einnahmen für Jahr</option>
+                <option [ngValue]="Presentation.CHART_MONTH">Grafik Monatseinnahmen</option>
+                <option [ngValue]="Presentation.CHART_YEAR">Grafik Jahreseinnahmen</option>
+                <option [ngValue]="Presentation.LIST_MONTH">Liste Monatseinnahmen</option>
+                <option [ngValue]="Presentation.LIST_YEAR">Liste Jahreseinnahmen</option>
             </ng-container>
         </select>
     </div>
-    <div *ngFor="let interval of intervals">
-        <button (click)="decrementInterval(interval)" class="light">&lt;</button>
-        <span>
-            <ng-container *ngIf="interval.month">
-                {{interval.month}} /
-            </ng-container>
-            {{interval.year}}
-        </span>
-        <button (click)="incrementInterval(interval)" class="light">&gt;</button>
-    </div>
+    <ng-container *ngIf="earnings">
+        <ng-container *ngFor="let date of dates; let i = index" [ngSwitch]="presentation.value">
+            <div *ngSwitchCase="Presentation.LIST_MONTH">
+                <button (click)="decrementInterval(i)" class="light">&lt;</button>
+                <span>{{date | date:'month'}}</span>
+                <button (click)="incrementInterval(i)" class="light">&gt;</button>
+            </div>        
+            <div *ngSwitchCase="Presentation.LIST_YEAR">
+                <button (click)="decrementInterval(i)" class="light">&lt;</button>
+                <span>{{date | date:'year'}}</span>
+                <button (click)="incrementInterval(i)" class="light">&gt;</button>
+            </div>        
+        </ng-container>
+    </ng-container>
+    <ng-container *ngIf="!earnings">
+        <div></div>
+        <div></div>
+    </ng-container>
 </div>
 
-<div *ngIf="totals" class="row">
+<div *ngIf="earnings" class="row">
     <div>Summe</div>
     <div *ngFor="let total of totals">{{total | amount}}</div>
 </div>
@@ -37,6 +49,15 @@
         </app-account-name>
     </div>
     <div *ngFor="let balance of earning.balances">{{balance.amount | amount}}</div>
+</div>
+
+<div *ngIf="chartData">
+    <canvas baseChart 
+        [datasets]="chartData" 
+        [labels]="chartLabels" 
+        [options]="chartOptions"
+        [chartType]="'bar'">
+    </canvas>
 </div>
 
 <div *ngIf="selection" class="details">
@@ -59,15 +80,16 @@
             <div *ngIf="!selection.account.active">Nein</div>
         </div>
         <div *ngFor="let balance of selection.balances" class="balance">
-            <div>
-                Stand
-                <ng-container *ngIf="balance.interval.month">
-                    {{balance.interval.month}} /
+            <div [ngSwitch]="presentation.value">
+                <ng-container *ngSwitchCase="Presentation.LIST_MONTH">
+                    Stand {{balance.date | date:'month'}}
                 </ng-container>
-                {{balance.interval.year}}
+                <ng-container *ngSwitchCase="Presentation.LIST_YEAR">
+                    Stand {{balance.date | date:'year'}}
+                </ng-container>
             </div>
             <div>{{balance.amount | amount}}</div>
-            <button (click)="showTransactions(balance.interval)">Transaktionen</button>
+            <button (click)="showTransactions(balance.date)">Transaktionen</button>
         </div>
         <div>
             <button *ngIf="selection.account.active" (click)="setActive(false)">Deaktivieren</button>
