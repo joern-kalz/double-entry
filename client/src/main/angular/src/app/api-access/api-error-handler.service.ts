@@ -17,6 +17,7 @@ export class ApiErrorHandlerService {
 
   handle(error: any) {
     if (!error || !error.status) {
+      console.log(error);
       this.dialogService.show(DialogMessage.CONNECTION_ERROR);
       return;
     }
