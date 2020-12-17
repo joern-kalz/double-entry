@@ -1,24 +1,21 @@
 package com.github.joern.kalz.doubleentry.services.accounts;
 
-import com.github.joern.kalz.doubleentry.services.AccountProvider;
-import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.models.Account;
-import com.github.joern.kalz.doubleentry.models.AccountsRepository;
+import com.github.joern.kalz.doubleentry.services.AccountProvider;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AccountsConverter {
 
-    @Autowired
-    private AccountsRepository accountsRepository;
+    private final PrincipalProvider principalProvider;
+    private final AccountProvider accountProvider;
 
-    @Autowired
-    private PrincipalProvider principalProvider;
-
-    @Autowired
-    private AccountProvider accountProvider;
+    public AccountsConverter(PrincipalProvider principalProvider, AccountProvider accountProvider) {
+        this.principalProvider = principalProvider;
+        this.accountProvider = accountProvider;
+    }
 
     public Account convertToAccount(CreateAccountRequest createAccountRequest) {
         Account account = new Account();

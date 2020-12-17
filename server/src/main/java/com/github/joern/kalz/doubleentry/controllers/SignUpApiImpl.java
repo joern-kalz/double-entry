@@ -4,7 +4,6 @@ import com.github.joern.kalz.doubleentry.generated.api.SignUpApi;
 import com.github.joern.kalz.doubleentry.generated.model.ApiSignUpRequest;
 import com.github.joern.kalz.doubleentry.services.users.CreateUserRequest;
 import com.github.joern.kalz.doubleentry.services.users.UsersService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,11 +15,13 @@ import javax.validation.Valid;
 @RequestMapping("/api")
 public class SignUpApiImpl implements SignUpApi {
 
-    @Autowired
-    private UsersService usersService;
+    private final UsersService usersService;
+    private final RequestFactory requestFactory;
 
-    @Autowired
-    private RequestFactory requestFactory;
+    public SignUpApiImpl(UsersService usersService, RequestFactory requestFactory) {
+        this.usersService = usersService;
+        this.requestFactory = requestFactory;
+    }
 
     @Override
     public ResponseEntity<Void> signUp(@Valid ApiSignUpRequest signUpRequest) {

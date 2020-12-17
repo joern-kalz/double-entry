@@ -2,18 +2,20 @@ package com.github.joern.kalz.doubleentry.services;
 
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.models.AccountsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 public class AccountProvider {
-    @Autowired
-    private AccountsRepository accountsRepository;
 
-    @Autowired
-    private PrincipalProvider principalProvider;
+    private final AccountsRepository accountsRepository;
+    private final PrincipalProvider principalProvider;
+
+    public AccountProvider(AccountsRepository accountsRepository, PrincipalProvider principalProvider) {
+        this.accountsRepository = accountsRepository;
+        this.principalProvider = principalProvider;
+    }
 
     public Optional<Account> find(long id) {
         Optional<Account> account = accountsRepository.findById(id);

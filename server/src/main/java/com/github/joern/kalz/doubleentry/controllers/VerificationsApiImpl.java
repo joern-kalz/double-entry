@@ -1,12 +1,11 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.VerificationsApi;
-import com.github.joern.kalz.doubleentry.generated.model.ApiTransaction;
 import com.github.joern.kalz.doubleentry.generated.model.ApiGetVerificationResponse;
+import com.github.joern.kalz.doubleentry.generated.model.ApiTransaction;
 import com.github.joern.kalz.doubleentry.services.verifications.UpdateVerificationStateRequest;
 import com.github.joern.kalz.doubleentry.services.verifications.VerificationState;
 import com.github.joern.kalz.doubleentry.services.verifications.VerificationsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +18,14 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api")
 public class VerificationsApiImpl implements VerificationsApi {
-    @Autowired
-    private VerificationsService verificationsService;
 
-    @Autowired
-    private ResponseFactory responseFactory;
+    private final VerificationsService verificationsService;
+    private final ResponseFactory responseFactory;
+
+    public VerificationsApiImpl(VerificationsService verificationsService, ResponseFactory responseFactory) {
+        this.verificationsService = verificationsService;
+        this.responseFactory = responseFactory;
+    }
 
     @Override
     public ResponseEntity<ApiGetVerificationResponse> getVerification(Long accountId) {

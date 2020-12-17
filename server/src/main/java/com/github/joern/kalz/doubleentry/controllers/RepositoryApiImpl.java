@@ -5,7 +5,6 @@ import com.github.joern.kalz.doubleentry.generated.model.ApiRepository;
 import com.github.joern.kalz.doubleentry.services.repository.GetRepositoryResponse;
 import com.github.joern.kalz.doubleentry.services.repository.ImportRepositoryRequest;
 import com.github.joern.kalz.doubleentry.services.repository.RepositoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,14 +16,17 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api")
 public class RepositoryApiImpl implements RepositoryApi {
-    @Autowired
-    private RepositoryService repositoryService;
 
-    @Autowired
-    private ResponseFactory responseFactory;
+    private final RepositoryService repositoryService;
+    private final ResponseFactory responseFactory;
+    private final RequestFactory requestFactory;
 
-    @Autowired
-    private RequestFactory requestFactory;
+    public RepositoryApiImpl(RepositoryService repositoryService, ResponseFactory responseFactory,
+                             RequestFactory requestFactory) {
+        this.repositoryService = repositoryService;
+        this.responseFactory = responseFactory;
+        this.requestFactory = requestFactory;
+    }
 
     @Override
     public ResponseEntity<ApiRepository> exportRepository() {

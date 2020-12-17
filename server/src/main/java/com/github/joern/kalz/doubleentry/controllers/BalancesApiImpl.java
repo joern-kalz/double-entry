@@ -1,11 +1,12 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.BalancesApi;
-import com.github.joern.kalz.doubleentry.generated.model.*;
+import com.github.joern.kalz.doubleentry.generated.model.ApiGetAbsoluteBalanceResponse;
+import com.github.joern.kalz.doubleentry.generated.model.ApiGetAbsoluteBalanceResponseBalances;
+import com.github.joern.kalz.doubleentry.generated.model.ApiGetRelativeBalanceResponse;
 import com.github.joern.kalz.doubleentry.services.balances.BalanceDifferences;
 import com.github.joern.kalz.doubleentry.services.balances.Balances;
 import com.github.joern.kalz.doubleentry.services.balances.BalancesService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +26,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class BalancesApiImpl implements BalancesApi {
 
-    @Autowired
-    private BalancesService balancesService;
+    private final BalancesService balancesService;
+
+    public BalancesApiImpl(BalancesService balancesService) {
+        this.balancesService = balancesService;
+    }
 
     @Override
     public ResponseEntity<List<ApiGetAbsoluteBalanceResponse>> getAbsoluteBalances(@NotNull @Valid LocalDate date,

@@ -3,7 +3,6 @@ package com.github.joern.kalz.doubleentry.services.repository;
 import com.github.joern.kalz.doubleentry.models.*;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -12,14 +11,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class RepositoryService {
-    @Autowired
-    private AccountsRepository accountsRepository;
 
-    @Autowired
-    private TransactionsRepository transactionsRepository;
+    private final AccountsRepository accountsRepository;
+    private final TransactionsRepository transactionsRepository;
+    private final PrincipalProvider principalProvider;
 
-    @Autowired
-    private PrincipalProvider principalProvider;
+    public RepositoryService(AccountsRepository accountsRepository, TransactionsRepository transactionsRepository,
+                             PrincipalProvider principalProvider) {
+        this.accountsRepository = accountsRepository;
+        this.transactionsRepository = transactionsRepository;
+        this.principalProvider = principalProvider;
+    }
 
     @Transactional
     public GetRepositoryResponse getRepository() {

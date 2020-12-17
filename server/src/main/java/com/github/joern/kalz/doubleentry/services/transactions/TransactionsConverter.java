@@ -7,7 +7,6 @@ import com.github.joern.kalz.doubleentry.models.Transaction;
 import com.github.joern.kalz.doubleentry.services.AccountProvider;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -15,11 +14,13 @@ import java.util.stream.Collectors;
 @Service
 public class TransactionsConverter {
 
-    @Autowired
-    private PrincipalProvider principalProvider;
+    private final PrincipalProvider principalProvider;
+    private final AccountProvider accountProvider;
 
-    @Autowired
-    private AccountProvider accountProvider;
+    public TransactionsConverter(PrincipalProvider principalProvider, AccountProvider accountProvider) {
+        this.principalProvider = principalProvider;
+        this.accountProvider = accountProvider;
+    }
 
     public Transaction convertToTransaction(CreateTransactionRequest createRequest) {
         Transaction transaction = new Transaction();

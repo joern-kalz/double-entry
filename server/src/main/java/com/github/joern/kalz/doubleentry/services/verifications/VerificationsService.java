@@ -6,7 +6,6 @@ import com.github.joern.kalz.doubleentry.models.TransactionSearchCriteria;
 import com.github.joern.kalz.doubleentry.models.TransactionsRepository;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -15,11 +14,14 @@ import java.util.*;
 
 @Service
 public class VerificationsService {
-    @Autowired
-    private TransactionsRepository transactionsRepository;
 
-    @Autowired
-    private PrincipalProvider principalProvider;
+    private final TransactionsRepository transactionsRepository;
+    private final PrincipalProvider principalProvider;
+
+    public VerificationsService(TransactionsRepository transactionsRepository, PrincipalProvider principalProvider) {
+        this.transactionsRepository = transactionsRepository;
+        this.principalProvider = principalProvider;
+    }
 
     public VerificationState getVerificationState(Long accountId) {
         TransactionSearchCriteria criteria = new TransactionSearchCriteria();

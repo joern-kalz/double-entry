@@ -2,8 +2,6 @@ package com.github.joern.kalz.doubleentry.services.balances;
 
 import com.github.joern.kalz.doubleentry.models.*;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
-import com.github.joern.kalz.doubleentry.services.accounts.AccountsHierarchyService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -14,17 +12,16 @@ import java.util.stream.Collectors;
 @Service
 public class BalancesService {
 
-    @Autowired
-    private TransactionsRepository transactionsRepository;
+    private final TransactionsRepository transactionsRepository;
+    private final AccountsRepository accountsRepository;
+    private final PrincipalProvider principalProvider;
 
-    @Autowired
-    private AccountsHierarchyService accountsHierarchyService;
-
-    @Autowired
-    private AccountsRepository accountsRepository;
-
-    @Autowired
-    private PrincipalProvider principalProvider;
+    public BalancesService(TransactionsRepository transactionsRepository, AccountsRepository accountsRepository,
+                           PrincipalProvider principalProvider) {
+        this.transactionsRepository = transactionsRepository;
+        this.accountsRepository = accountsRepository;
+        this.principalProvider = principalProvider;
+    }
 
     public List<Balances> getBalances(LocalDate date, int stepInMonth, int stepCount) {
         LocalDate before = date.plusMonths(stepInMonth * stepCount);

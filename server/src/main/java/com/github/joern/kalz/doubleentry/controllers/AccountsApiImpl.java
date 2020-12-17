@@ -1,14 +1,13 @@
 package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.AccountsApi;
-import com.github.joern.kalz.doubleentry.generated.model.ApiCreatedResponse;
 import com.github.joern.kalz.doubleentry.generated.model.ApiAccount;
+import com.github.joern.kalz.doubleentry.generated.model.ApiCreatedResponse;
 import com.github.joern.kalz.doubleentry.generated.model.ApiSaveAccountRequest;
 import com.github.joern.kalz.doubleentry.models.Account;
 import com.github.joern.kalz.doubleentry.services.accounts.AccountsService;
 import com.github.joern.kalz.doubleentry.services.accounts.CreateAccountRequest;
 import com.github.joern.kalz.doubleentry.services.accounts.UpdateAccountRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +21,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class AccountsApiImpl implements AccountsApi {
 
-    @Autowired
-    private AccountsService accountsService;
+    private final AccountsService accountsService;
+    private final ResponseFactory responseFactory;
 
-    @Autowired
-    private ResponseFactory responseFactory;
+    public AccountsApiImpl(AccountsService accountsService, ResponseFactory responseFactory) {
+        this.accountsService = accountsService;
+        this.responseFactory = responseFactory;
+    }
 
     @Override
     public ResponseEntity<ApiCreatedResponse> createAccount(@Valid ApiSaveAccountRequest saveAccountRequest) {

@@ -5,7 +5,6 @@ import com.github.joern.kalz.doubleentry.generated.model.ApiGetMeResponse;
 import com.github.joern.kalz.doubleentry.generated.model.ApiUpdateMeRequest;
 import com.github.joern.kalz.doubleentry.models.User;
 import com.github.joern.kalz.doubleentry.services.users.UsersService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +16,11 @@ import javax.validation.Valid;
 @RequestMapping("/api")
 public class MeApiImpl implements MeApi {
 
-    @Autowired
-    private UsersService usersService;
+    private final UsersService usersService;
+
+    public MeApiImpl(UsersService usersService) {
+        this.usersService = usersService;
+    }
 
     @Override
     public ResponseEntity<ApiGetMeResponse> getMe() {

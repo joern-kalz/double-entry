@@ -1,7 +1,6 @@
 package com.github.joern.kalz.doubleentry.models;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.*;
@@ -9,9 +8,11 @@ import java.util.*;
 public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepository {
 
     private enum AccountType { CREDIT, DEBIT, ANY }
+    private final EntityManager entityManager;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    public TransactionsCustomRepositoryImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     public List<Transaction> find(TransactionSearchCriteria request) {

@@ -2,13 +2,12 @@ package com.github.joern.kalz.doubleentry.controllers;
 
 import com.github.joern.kalz.doubleentry.generated.api.TransactionsApi;
 import com.github.joern.kalz.doubleentry.generated.model.ApiCreatedResponse;
-import com.github.joern.kalz.doubleentry.generated.model.ApiTransaction;
 import com.github.joern.kalz.doubleentry.generated.model.ApiSaveTransactionRequest;
 import com.github.joern.kalz.doubleentry.generated.model.ApiSaveTransactionRequestEntries;
+import com.github.joern.kalz.doubleentry.generated.model.ApiTransaction;
 import com.github.joern.kalz.doubleentry.models.Transaction;
 import com.github.joern.kalz.doubleentry.models.TransactionOrder;
 import com.github.joern.kalz.doubleentry.services.transactions.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,11 +23,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class TransactionsApiImpl implements TransactionsApi {
 
-    @Autowired
-    private TransactionsService transactionsService;
+    private final TransactionsService transactionsService;
+    private final ResponseFactory responseFactory;
 
-    @Autowired
-    private ResponseFactory responseFactory;
+    public TransactionsApiImpl(TransactionsService transactionsService, ResponseFactory responseFactory) {
+        this.transactionsService = transactionsService;
+        this.responseFactory = responseFactory;
+    }
 
     @Override
     public ResponseEntity<ApiCreatedResponse> createTransaction(@Valid ApiSaveTransactionRequest saveTransactionRequest) {

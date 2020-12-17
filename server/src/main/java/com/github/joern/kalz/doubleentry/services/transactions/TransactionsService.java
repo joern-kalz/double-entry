@@ -8,29 +8,34 @@ import com.github.joern.kalz.doubleentry.services.accounts.AccountsHierarchyServ
 import com.github.joern.kalz.doubleentry.services.exceptions.NotFoundException;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.services.transactions.TransactionsValidator.Result;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class TransactionsService {
 
-    @Autowired
-    private TransactionsRepository transactionsRepository;
+    private final TransactionsRepository transactionsRepository;
+    private final PrincipalProvider principalProvider;
+    private final TransactionsConverter transactionsConverter;
+    private final TransactionsValidator transactionsValidator;
+    private final AccountsHierarchyService accountsHierarchyService;
 
-    @Autowired
-    private PrincipalProvider principalProvider;
-
-    @Autowired
-    private TransactionsConverter transactionsConverter;
-
-    @Autowired
-    private TransactionsValidator transactionsValidator;
-
-    @Autowired
-    private AccountsHierarchyService accountsHierarchyService;
+    public TransactionsService(TransactionsRepository transactionsRepository,
+                               PrincipalProvider principalProvider,
+                               TransactionsConverter transactionsConverter,
+                               TransactionsValidator transactionsValidator,
+                               AccountsHierarchyService accountsHierarchyService) {
+        this.transactionsRepository = transactionsRepository;
+        this.principalProvider = principalProvider;
+        this.transactionsConverter = transactionsConverter;
+        this.transactionsValidator = transactionsValidator;
+        this.accountsHierarchyService = accountsHierarchyService;
+    }
 
     public List<Transaction> find(FindTransactionsRequest request) {
 

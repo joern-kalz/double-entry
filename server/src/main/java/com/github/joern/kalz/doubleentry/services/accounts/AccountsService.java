@@ -6,7 +6,6 @@ import com.github.joern.kalz.doubleentry.services.AccountProvider;
 import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.exceptions.NotFoundException;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,20 +14,21 @@ import java.util.List;
 @Service
 public class AccountsService {
 
-    @Autowired
-    private AccountsRepository accountsRepository;
+    private final AccountsRepository accountsRepository;
+    private final PrincipalProvider principalProvider;
+    private final AccountsConverter accountsConverter;
+    private final AccountsValidator accountsValidator;
+    private final AccountProvider accountProvider;
 
-    @Autowired
-    private PrincipalProvider principalProvider;
-
-    @Autowired
-    private AccountsConverter accountsConverter;
-
-    @Autowired
-    private AccountsValidator accountsValidator;
-
-    @Autowired
-    private AccountProvider accountProvider;
+    public AccountsService(AccountsRepository accountsRepository, PrincipalProvider principalProvider,
+                           AccountsConverter accountsConverter, AccountsValidator accountsValidator,
+                           AccountProvider accountProvider) {
+        this.accountsRepository = accountsRepository;
+        this.principalProvider = principalProvider;
+        this.accountsConverter = accountsConverter;
+        this.accountsValidator = accountsValidator;
+        this.accountProvider = accountProvider;
+    }
 
     public List<Account> findAll() {
         return accountsRepository.findByUser(principalProvider.getPrincipal());

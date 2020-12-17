@@ -1,11 +1,10 @@
 package com.github.joern.kalz.doubleentry.services.users;
 
 import com.github.joern.kalz.doubleentry.models.*;
+import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.exceptions.AlreadyExistsException;
 import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
-import com.github.joern.kalz.doubleentry.services.PrincipalProvider;
 import com.github.joern.kalz.doubleentry.services.repository.RepositoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,20 +14,21 @@ public class UsersService {
 
     private static final String DEFAULT_AUTHORITY = "USER";
 
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
+    private final AuthoritiesRepository authoritiesRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final PrincipalProvider principalProvider;
+    private final RepositoryService repositoryService;
 
-    @Autowired
-    private AuthoritiesRepository authoritiesRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private PrincipalProvider principalProvider;
-
-    @Autowired
-    private RepositoryService repositoryService;
+    public UsersService(UsersRepository usersRepository, AuthoritiesRepository authoritiesRepository,
+                        PasswordEncoder passwordEncoder, PrincipalProvider principalProvider,
+                        RepositoryService repositoryService) {
+        this.usersRepository = usersRepository;
+        this.authoritiesRepository = authoritiesRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.principalProvider = principalProvider;
+        this.repositoryService = repositoryService;
+    }
 
     @Transactional
     public void create(CreateUserRequest createUserRequest) {
