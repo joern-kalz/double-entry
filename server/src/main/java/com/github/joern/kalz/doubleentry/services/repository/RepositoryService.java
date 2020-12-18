@@ -29,7 +29,7 @@ public class RepositoryService {
 
         GetRepositoryResponse getRepositoryResponse = new GetRepositoryResponse();
         getRepositoryResponse.setAccounts(accountsRepository.findByUser(principal));
-        getRepositoryResponse.setTransactions(transactionsRepository.findByUser(principal));
+        getRepositoryResponse.setTransactions(new ArrayList<>(transactionsRepository.findByUser(principal)));
 
         return getRepositoryResponse;
     }

@@ -4,13 +4,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public interface TransactionsRepository extends CrudRepository<Transaction, Long>, TransactionsCustomRepository {
 
-    List<Transaction> findByUser(User user);
+    @Query("SELECT t FROM Transaction t JOIN FETCH t.entries WHERE t.user = :user")
+    Set<Transaction> findByUser(@Param("user") User user);
 
     @Override
     @Query("SELECT t FROM Transaction t JOIN FETCH t.entries WHERE t.id = :id")

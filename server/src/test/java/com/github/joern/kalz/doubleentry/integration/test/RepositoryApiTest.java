@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 
 import static org.hamcrest.Matchers.is;
@@ -126,11 +127,12 @@ class RepositoryApiTest {
 
         mockMvc.perform(post("/api/repository").content(repository));
 
-        List<Transaction> transactions = transactionsRepository.findByUser(loggedInUser);
+        Set<Transaction> transactions = transactionsRepository.findByUser(loggedInUser);
         assertEquals(1, transactions.size());
-        assertEquals("baker", transactions.get(0).getName());
-        assertEquals(LocalDate.EPOCH, transactions.get(0).getDate());
-        assertTrue(isEntryListEquivalent(transactions.get(0).getEntries(),
+        Transaction transaction = transactions.iterator().next();
+        assertEquals("baker", transaction.getName());
+        assertEquals(LocalDate.EPOCH, transaction.getDate());
+        assertTrue(isEntryListEquivalent(transaction.getEntries(),
                 new TestTransactionEntry(foodAccount, "2.39", true),
                 new TestTransactionEntry(cashAccount, "-2.39", false)));
 
