@@ -10,6 +10,7 @@ tags:
   - name: accounts
   - name: balances
   - name: verifications
+  - name: portfolio-returns
   - name: repository
   - name: sign-up
   - name: me
@@ -342,6 +343,54 @@ paths:
           description: Not found
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+  '/portfolio-returns':
+    get:
+      operationId: getPortfolioReturns
+      tags: [portfolio-returns]
+      summary: Calculates the returns for an investment portfolio
+      parameters:
+        - name: portfolioAccountId
+          in: query
+          description: Id of the portfolio account
+          required: true
+          schema: {type: integer, format: int64}
+        - name: revenueAccountId
+          in: query
+          description: Id of the revenue account
+          required: true
+          schema: {type: integer, format: int64}
+        - name: expenseAccountId
+          in: query
+          description: Id of the expense account
+          required: true
+          schema: {type: integer, format: int64}
+        - name: until
+          in: query
+          description: Date until which returns are to be calculated
+          required: true
+          schema: {type: string, format: date}
+        - name: stepYears
+          in: query
+          description: Length of intervals for which returns are to be calculated
+          required: true
+          schema: {type: integer, minimum: 1}
+      responses:
+        '200':
+          description: Investment returns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetPortfolioReturnsResponse'
+        '400':
+          description: Invalid portfolio account
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
   '/repository':
     get:
       operationId: exportRepository
@@ -587,6 +636,12 @@ components:
               - accountId: 982753
                 amount: -10.12
                 verified: false
+    GetPortfolioReturnsResponse:
+      type: object
+      properties:
+        start: {type: string, format: date}
+        end: {type: string, format: date}
+        portfolioReturn: {type: number}
     Repository:
       type: object
       required: [accounts, transactions]
