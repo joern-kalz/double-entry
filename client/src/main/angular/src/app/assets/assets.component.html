@@ -12,8 +12,8 @@
 </div>
 <div *ngFor="let asset of assets" (click)="select(asset)" class="asset">
     <div>
-        <app-account-name [account]="asset.account" 
-            [accountHierarchy]="accountHierarchy" 
+        <app-account-name [account]="asset.account"
+            [accountHierarchy]="accountHierarchy"
             [indented]="true"
             [indentationOffset]="-1">
         </app-account-name>
@@ -44,6 +44,7 @@
             <div>{{selectedAsset.balance | amount}}</div>
         </div>
         <div>
+            <button (click)="performance()">Performance</button>
             <button *ngIf="selectedAsset.account.active" (click)="setActive(false)">Deaktivieren</button>
             <button *ngIf="!selectedAsset.account.active" (click)="setActive(true)">Aktivieren</button>
             <a [routerLink]="['/accounts', selectedAsset.account.id]">Bearbeiten</a>

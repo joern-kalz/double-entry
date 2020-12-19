@@ -22,6 +22,7 @@ import { EarningsComponent } from './earnings/earnings.component';
 import { VerificationComponent } from './verification/verification.component';
 import { TransactionDetailsComponent } from './transaction-details/transaction-details.component';
 import { ChartsModule } from 'ng2-charts';
+import { PortfolioReturnsComponent } from './portfolio-returns/portfolio-returns.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { ChartsModule } from 'ng2-charts';
     EarningsComponent,
     VerificationComponent,
     TransactionDetailsComponent,
+    PortfolioReturnsComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,34 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="search">
+  <label>
+    <span>Konto</span>
+    <select formControlName="account">
+      <option *ngFor="let account of accountList" [ngValue]="account.id">
+        <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" [indented]="true">
+        </app-account-name>
+      </option>
+    </select>
+  </label>
+  <label>
+    <span>Vergleich</span>
+    <select formControlName="comparison">
+      <option *ngFor="let account of accountList" [ngValue]="account.id">
+        <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" [indented]="true">
+        </app-account-name>
+      </option>
+    </select>
+  </label>
+  <label>
+    <span>Intervall in Jahren</span>
+    <input formControlName="stepYears" size="5">
+  </label>
+  <button type="submit">Aktualisieren</button>
+</form>
+
+<div *ngIf="chartData">
+  <canvas baseChart
+          [datasets]="chartData"
+          [labels]="chartLabels"
+          [options]="chartOptions"
+          [chartType]="'bar'">
+  </canvas>
+</div>

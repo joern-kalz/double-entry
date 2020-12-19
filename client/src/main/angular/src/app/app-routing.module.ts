@@ -10,6 +10,7 @@ import { AccountComponent } from './account/account.component';
 import { AssetsComponent } from './assets/assets.component';
 import { EarningsComponent } from './earnings/earnings.component';
 import { VerificationComponent } from './verification/verification.component';
+import { PortfolioReturnsComponent } from './portfolio-returns/portfolio-returns.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -23,6 +24,7 @@ const routes: Routes = [
   { path: 'earnings/:accountType', component: EarningsComponent },
   { path: 'accounts/:accountId', component: AccountComponent },
   { path: 'verification', component: VerificationComponent },
+  { path: 'portfolio-returns', component: PortfolioReturnsComponent },
 ];
 
 @NgModule({

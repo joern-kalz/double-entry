@@ -24,7 +24,7 @@ import { ContextService } from '../context/context.service';
 export class AssetsComponent implements OnInit {
   form = this.formBuilder.group({
     date: [this.localService.formatDate(moment()), [
-      this.localService.createDateValidator(), 
+      this.localService.createDateValidator(),
       Validators.required]
     ],
   });
@@ -34,7 +34,7 @@ export class AssetsComponent implements OnInit {
   accountHierarchy: AccountHierarchy;
   showErrors = false;
   selectedAsset: ViewAsset;
-  
+
   constructor(
     private formBuilder: FormBuilder,
     private accountsService: AccountsService,
@@ -84,7 +84,7 @@ export class AssetsComponent implements OnInit {
     for (let balance of balances[0].balances) {
       balancesById.set(balance.accountId, balance.amount);
     }
-    
+
     return balancesById;
   }
 
@@ -133,5 +133,11 @@ export class AssetsComponent implements OnInit {
     });
 
     this.router.navigate(['/verification']);
+  }
+
+  performance() {
+    this.router.navigate(['/portfolio-returns'], { queryParams: {
+      account: this.selectedAsset.account.id
+    }});
   }
 }
