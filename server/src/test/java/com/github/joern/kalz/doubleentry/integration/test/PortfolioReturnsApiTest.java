@@ -134,6 +134,17 @@ public class PortfolioReturnsApiTest {
     }
 
     @Test
+    void shouldNotAcceptLeadingAdjustment() throws Exception {
+        createTransaction("2007-08-01", "5.71", revenueAccount, portfolioAccount);
+        createTransaction("2020-02-10", "40.00", assetAccount, portfolioAccount);
+
+        mockMvc.perform(get("/api/portfolio-returns?portfolioAccountId=" + portfolioAccount.getId() +
+                "&revenueAccountId=" + revenueAccount.getId() + "&expenseAccountId=" + expenseAccount.getId() +
+                "&until=2020-08-05&stepYears=1"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void shouldCalculateForAccountOfOtherUser() throws Exception {
         createTransaction("2020-02-10", "40.00", revenueAccountOfOtherUser, portfolioAccountOfOtherUser);
 

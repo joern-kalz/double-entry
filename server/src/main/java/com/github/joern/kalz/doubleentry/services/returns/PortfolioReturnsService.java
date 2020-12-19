@@ -36,7 +36,7 @@ public class PortfolioReturnsService {
         var portfolioAccounts = getAccountIdsRecursively(accounts, portfolioAccountId);
         var earningsAccounts = getEarningsAccounts(revenueAccountId, expenseAccountId, accounts);
         var depositAccounts = getDepositAccounts(accounts, portfolioAccounts, earningsAccounts);
-        var transactions = getTransactions(until, principal, portfolioAccounts);
+        var transactions = getTransactions(until, principal, portfolioAccounts, depositAccounts);
 
         var balance = BigDecimal.ZERO;
         var i = 0;
@@ -103,7 +103,9 @@ public class PortfolioReturnsService {
         return depositAccounts;
     }
 
-    private List<Transaction> getTransactions(LocalDate until, User principal, Set<Long> portfolioAccounts) {
+    private List<Transaction> getTransactions(LocalDate until, User principal, Set<Long> portfolioAccounts,
+                                              Set<Long> depositAccounts) {
+
         var transactionSearchCriteria = new TransactionSearchCriteria();
         transactionSearchCriteria.setUser(principal);
         transactionSearchCriteria.setBefore(until);
@@ -113,6 +115,8 @@ public class PortfolioReturnsService {
 
         if (transactions.isEmpty()) {
             throw new ParameterException("no transactions until " + until + " in portfolio account");
+        } else if (getTotalForAccountGroup(transactions.get(0), depositAccounts).equals(BigDecimal.ZERO)) {
+            throw new ParameterException("first transaction of portfolio account is not a deposit");
         }
 
         return transactions;
