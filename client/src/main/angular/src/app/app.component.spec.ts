@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { TestBed, async, ComponentFixture } from '@angular/core/testing';
+import { TestBed, ComponentFixture, waitForAsync } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { RouterLinkDirectiveStub } from 'src/testing/router-link-directive-stub';
@@ -25,7 +25,7 @@ describe('AppComponent', () => {
   let authenticationService: jasmine.SpyObj<AuthenticationService>;
   let httpClient: jasmine.SpyObj<HttpClient>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ AppComponent, RouterOutletStub, DialogsComponentStub, RouterLinkDirectiveStub ],
       providers: [

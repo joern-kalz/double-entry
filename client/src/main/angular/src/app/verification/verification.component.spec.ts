@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { EMPTY, of } from 'rxjs';
 import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
@@ -56,7 +56,7 @@ describe('VerificationComponent', () => {
   let dialogService: jasmine.SpyObj<DialogService>;
 
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ VerificationComponent, AccountNameComponentStub, DatePipe, AmountPipe ],
       providers: [

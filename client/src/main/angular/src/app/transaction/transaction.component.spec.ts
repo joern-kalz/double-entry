@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -39,7 +39,7 @@ describe('TransactionComponent', () => {
   let transactionService: jasmine.SpyObj<TransactionsService>;
   let apiErrorHandlerService: jasmine.SpyObj<ApiErrorHandlerService>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ TransactionComponent, AccountNameComponentStub ],
       imports: [ ReactiveFormsModule ],

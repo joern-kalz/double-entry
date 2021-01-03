@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -49,7 +49,7 @@ describe('AssetsComponent', () => {
   let router: jasmine.SpyObj<Router>;
   let contextService: jasmine.SpyObj<ContextService>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ AssetsComponent, AmountPipe, DatePipe, AccountNameComponentStub, RouterLinkDirectiveStub ],
       imports: [ ReactiveFormsModule ],

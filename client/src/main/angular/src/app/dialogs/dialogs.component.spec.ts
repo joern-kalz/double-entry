@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { DialogMessage } from './dialog-message.enum';
 import { DialogService } from './dialog.service';
 
@@ -10,7 +10,7 @@ describe('DialogsComponent', () => {
 
   let dialogService: jasmine.SpyObj<DialogService>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ DialogsComponent ],
       providers: [

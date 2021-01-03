@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, convertToParamMap, ParamMap, Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -49,7 +49,7 @@ describe('TransactionsComponent', () => {
   let router: jasmine.SpyObj<Router>;
   let apiErrorHandlerService: jasmine.SpyObj<ApiErrorHandlerService>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ TransactionsComponent, TransactionDetailsComponentStub, AccountNameComponentStub, DatePipe, AmountPipe ],
       imports: [ ReactiveFormsModule ],

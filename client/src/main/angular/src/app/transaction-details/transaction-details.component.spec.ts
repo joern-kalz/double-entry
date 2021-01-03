@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
 import { ContextService } from '../context/context.service';
@@ -30,7 +30,7 @@ describe('TransactionDetailsComponent', () => {
   let apiErrorHandlerService: jasmine.SpyObj<ApiErrorHandlerService>;
   let contextService: jasmine.SpyObj<ContextService>;
   
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ TransactionDetailsComponent, DatePipe, AmountPipe, AccountNameComponentStub ],
       providers: [

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
 import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
 
@@ -32,7 +32,7 @@ describe('AccountNameComponent', () => {
   let component: AccountNameComponent;
   let fixture: ComponentFixture<AccountNameComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ AccountNameComponent ]
     })
