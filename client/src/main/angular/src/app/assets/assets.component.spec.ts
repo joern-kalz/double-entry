@@ -8,7 +8,7 @@ import { ContextService } from '../context/context.service';
 import { DialogService } from '../dialogs/dialog.service';
 import { AccountsService } from '../generated/openapi/api/accounts.service';
 import { BalancesService } from '../generated/openapi/api/balances.service';
-import { Account, GetBalanceResponse } from '../generated/openapi/model/models';
+import { Account, GetAbsoluteBalanceResponse } from '../generated/openapi/model/models';
 import { AmountPipe } from '../local/amount.pipe';
 import { LocalService } from '../local/local.service';
 import * as moment from 'moment';
@@ -28,14 +28,15 @@ describe('AssetsComponent', () => {
     { id: 6, name: 'bank-account', active: true, parentId: 1 },
   ];
 
-  const BALANCES_MOCK: GetBalanceResponse[] = [
-    { accountId: 1, balance: 12 },
-    { accountId: 2, balance: 14 },
-    { accountId: 3, balance: 41 },
-    { accountId: 4, balance: 51 },
-    { accountId: 5, balance: 27 },
-    { accountId: 6, balance: 24 },
-  ]
+  const BALANCES_MOCK: GetAbsoluteBalanceResponse[] = [{ 
+    date: '2021-01-01', balances: [
+      { accountId: 1, amount: 12 },
+      { accountId: 2, amount: 14 },
+      { accountId: 3, amount: 41 },
+      { accountId: 4, amount: 51 },
+      { accountId: 5, amount: 27 },
+      { accountId: 6, amount: 24 },
+  ]}];
 
   let component: AssetsComponent;
   let fixture: ComponentFixture<AssetsComponent>;
@@ -58,7 +59,7 @@ describe('AssetsComponent', () => {
           ['getAccounts']) },
         AccountHierarchyService,
         { provide: BalancesService, useValue: jasmine.createSpyObj('BalancesService', 
-          ['getBalances']) },
+          ['getAbsoluteBalances']) },
         { provide: LocalService, useValue: jasmine.createSpyObj('LocalService', 
           ['formatDate', 'formatAmount', 'parseDate', 'createDateValidator']) },
         { provide: ApiErrorHandlerService, useValue: jasmine.createSpyObj('ApiErrorHandlerService', ['handle']) },
@@ -81,7 +82,7 @@ describe('AssetsComponent', () => {
     localService.createDateValidator.and.returnValue(() => null);
     localService.formatAmount.and.callFake(v => `${v}`);
     accountsService.getAccounts.and.returnValue(of(ACCOUNTS_MOCK) as any);
-    balancesService.getBalances.and.returnValue(of(BALANCES_MOCK) as any);
+    balancesService.getAbsoluteBalances.and.returnValue(of(BALANCES_MOCK) as any);
     localService.parseDate.and.returnValue(moment([2020, 0, 1]));
   }));
 
@@ -105,11 +106,11 @@ describe('AssetsComponent', () => {
     expect(detailsDiv.textContent).toContain('cash');
   });
 
-  it('should show details', () => {
+  it('should navigate to verification', () => {
     const cashDiv = fixture.nativeElement.querySelectorAll('.asset')[1];
     cashDiv.click();
     fixture.detectChanges();
-    const verifyButton = fixture.nativeElement.querySelectorAll('.details button')[1];
+    const verifyButton = fixture.nativeElement.querySelectorAll('.details button')[2];
     verifyButton.click();
     expect(router.navigate).toHaveBeenCalledWith(['/verification']);
   });

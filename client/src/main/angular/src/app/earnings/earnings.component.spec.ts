@@ -9,21 +9,19 @@ import { ApiErrorHandlerService } from '../api-access/api-error-handler.service'
 import { DialogService } from '../dialogs/dialog.service';
 import { AccountsService } from '../generated/openapi/api/accounts.service';
 import { BalancesService } from '../generated/openapi/api/balances.service';
-import { Account, GetBalanceResponse } from '../generated/openapi/model/models';
+import { Account, GetRelativeBalanceResponse } from '../generated/openapi/model/models';
 import { AmountPipe } from '../local/amount.pipe';
 import { RouterLinkDirectiveStub } from '../../testing/router-link-directive-stub';
 
 import { EarningsComponent } from './earnings.component';
+import { BaseChartDirectiveStub } from 'src/testing/base-chart-directive-stub';
 
 describe('EarningsComponent', () => {
   const PARAM_MOCK: ParamMap = convertToParamMap({
     accountType: AccountType.REVENUE,
   });
 
-  const QUERY_MOCK: ParamMap = convertToParamMap({
-    year0: 2019,
-    year1: 2020,
-  });
+  const QUERY_MOCK: ParamMap = convertToParamMap({});
 
   const ACCOUNTS_MOCK: Account[] = [
     { id: 1, name: 'ASSET', active: true, parentId: null },
@@ -34,14 +32,17 @@ describe('EarningsComponent', () => {
     { id: 6, name: 'interest', active: true, parentId: 4 },
   ];
 
-  const BALANCES_MOCK: GetBalanceResponse[] = [
-    { accountId: 1, balance: 12 },
-    { accountId: 2, balance: 14 },
-    { accountId: 3, balance: 41 },
-    { accountId: 4, balance: 51 },
-    { accountId: 5, balance: 27 },
-    { accountId: 6, balance: 24 },
-  ]
+  const BALANCES_MOCK: GetRelativeBalanceResponse[] = [{
+    start: '2020-01-01',
+    end: '2021-01-01',
+    differences: [
+      { accountId: 1, amount: 12 },
+      { accountId: 2, amount: 14 },
+      { accountId: 3, amount: 41 },
+      { accountId: 4, amount: 51 },
+      { accountId: 5, amount: 27 },
+      { accountId: 6, amount: 24 },
+  ]}];
 
   let component: EarningsComponent;
   let fixture: ComponentFixture<EarningsComponent>;
@@ -55,12 +56,18 @@ describe('EarningsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ EarningsComponent, AmountPipe, AccountNameComponentStub, RouterLinkDirectiveStub ],
+      declarations: [ 
+        EarningsComponent, 
+        AmountPipe, 
+        AccountNameComponentStub, 
+        RouterLinkDirectiveStub,
+        BaseChartDirectiveStub,
+      ],
       imports: [ ReactiveFormsModule ],
       providers: [
         { provide: AccountsService, useValue: jasmine.createSpyObj('AccountsService', ['getAccounts']) },
         AccountHierarchyService,
-        { provide: BalancesService, useValue: jasmine.createSpyObj('BalancesService', ['getBalances']) },
+        { provide: BalancesService, useValue: jasmine.createSpyObj('BalancesService', ['getRelativeBalances']) },
         { provide: ApiErrorHandlerService, useValue: jasmine.createSpyObj('ApiErrorHandlerService', ['handle']) },
         { provide: DialogService, useValue: jasmine.createSpyObj('DialogService', ['show']) },
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
@@ -78,16 +85,17 @@ describe('EarningsComponent', () => {
     activatedRoute = TestBed.inject(ActivatedRoute) as jasmine.SpyObj<ActivatedRoute>;
 
     accountsService.getAccounts.and.returnValue(of(ACCOUNTS_MOCK) as any);
-    balancesService.getBalances.and.returnValue(of(BALANCES_MOCK) as any);
+    balancesService.getRelativeBalances.and.returnValue(of(BALANCES_MOCK) as any);
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(EarningsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should show balances', () => {
+    setQueryMap('LIST_YEAR', '2020-01-01+2021-01-01');
+    fixture.detectChanges();
     const rowDivs = fixture.nativeElement.querySelectorAll('.row');
     expect(rowDivs[0].textContent).toContain('Summe');
     expect(rowDivs[0].textContent).toContain('51');
@@ -95,19 +103,27 @@ describe('EarningsComponent', () => {
     expect(rowDivs[1].textContent).toContain('24');
   });
 
-  it('should increment year', () => {
-    const incrementYearButton = fixture.nativeElement.querySelectorAll('.search button')[1];
-    incrementYearButton.click();
-    expect(router.navigate.calls.mostRecent().args[1].queryParams.year0).toEqual(2020);
+  it('should switch to year list view', () => {
+    setQueryMap('CHART_YEAR', null);
+    fixture.detectChanges();
+    const presentationList = fixture.nativeElement.querySelectorAll('.search select')[0];
+    presentationList.value = presentationList.options[3].value;
+    presentationList.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    expect(router.navigate.calls.mostRecent().args[1].queryParams.presentation).toEqual('LIST_YEAR');
   });
 
   it('should decrement year', () => {
+    setQueryMap('LIST_YEAR', '2020-01-01+2021-01-01');
+    fixture.detectChanges();
     const decrementYearButton = fixture.nativeElement.querySelectorAll('.search button')[0];
     decrementYearButton.click();
-    expect(router.navigate.calls.mostRecent().args[1].queryParams.year0).toEqual(2018);
+    expect(router.navigate.calls.mostRecent().args[1].queryParams.dates).toEqual('2019-01-01+2021-01-01');
   });
 
   it('should show transactions', () => {
+    setQueryMap('LIST_YEAR', '2020-01-01+2021-01-01');
+    fixture.detectChanges();
     const interestRowDiv = fixture.nativeElement.querySelectorAll('.row')[1];
     interestRowDiv.click();
     fixture.detectChanges();
@@ -116,4 +132,9 @@ describe('EarningsComponent', () => {
     expect(router.navigate.calls.mostRecent().args[0][0]).toEqual('/transactions');
     expect(router.navigate.calls.mostRecent().args[1].queryParams.account).toEqual(6);
   });
+
+  function setQueryMap(presentation, dates) {
+    const queryParamMap = (Object.getOwnPropertyDescriptor(activatedRoute, 'queryParamMap').get as any);
+    queryParamMap.and.returnValue(of(convertToParamMap({ presentation, dates })));
+  }
 });
