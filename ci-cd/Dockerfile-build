@@ -1,0 +1,6 @@
+FROM node:14
+
+RUN apt-get update && apt-get -y install chromium
+RUN export CHROME_BIN='/usr/bin/chromium'
+
+RUN apt install openjdk-11-jre-headless

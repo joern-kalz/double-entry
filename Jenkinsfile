@@ -1,7 +1,8 @@
 pipeline {
     agent {
-        docker {
-            image 'openjdk:11'
+        dockerfile {
+            filename 'Dockerfile-build'
+            dir 'ci-cd'
             args '-v /root/.gradle:/root/.gradle'
         }
     }
@@ -9,11 +10,6 @@ pipeline {
         stage('Build') {
             steps {
                 sh "./gradlew clean build"
-            }
-        }
-        stage('Test') {
-            steps {
-                sh "./gradlew test"
             }
             post {
                 always {
