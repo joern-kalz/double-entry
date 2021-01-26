@@ -31,10 +31,10 @@ val angularNpmBuild by tasks.registering(NpmTask::class) {
 
 val angularNpmTest by tasks.registering(NpmTask::class) {
     setWorkingDir(file("src/main/angular"))
-    setArgs(listOf("test", "sonar", "--no-watch", "--code-coverage"))
+    setArgs(listOf("test", "--", "--watch=false", "--code-coverage"))
 }
 
-val angularNpmSonar by tasks.registering(NpmTask::class) {
+val sonarqube by tasks.registering(NpmTask::class) {
     dependsOn(angularNpmTest)
     setWorkingDir(file("src/main/angular"))
     setArgs(listOf(
@@ -46,9 +46,6 @@ val angularNpmSonar by tasks.registering(NpmTask::class) {
 }
 
 tasks {
-    named("sonarqube").configure {
-        dependsOn(angularNpmSonar)
-    }
     named("jar", Jar::class).configure {
         dependsOn(angularNpmBuild)
         from("$buildDir/generated-resources/main")
