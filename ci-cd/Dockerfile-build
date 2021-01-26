@@ -1,6 +1,5 @@
-FROM node:14
+FROM ubuntu:20.04
 
-RUN apt-get update && apt-get -y install chromium
+RUN apt-get update
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install openjdk-11-jre-headless nodejs npm chromium-browser
 RUN export CHROME_BIN='/usr/bin/chromium'
-
-RUN apt install openjdk-11-jre-headless
