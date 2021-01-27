@@ -109,7 +109,8 @@ export class AccountHierarchyService {
       visitedIds.add(account.id);
 
       accountsList.push(account);
-      unvisited.push(...account.children.sort((a, b) => b.name.localeCompare(a.name)));
+      const children = [...account.children].sort((a, b) => b.name.localeCompare(a.name));
+      unvisited.push(...children);
     }
 
     return accountsList;
