@@ -1,5 +1,11 @@
-FROM ubuntu:20.04
+FROM debian:10
 
 RUN apt-get update
-RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install openjdk-11-jre-headless nodejs npm chromium-browser
+
+RUN apt-get -y install \
+    openjdk-11-jdk-headless \
+    nodejs \
+    npm \
+    chromium
+
 RUN export CHROME_BIN='/usr/bin/chromium'
