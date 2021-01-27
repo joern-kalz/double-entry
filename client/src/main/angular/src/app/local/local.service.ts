@@ -10,7 +10,6 @@ export class LocalService {
   private readonly DATE_FORMAT = 'DD.MM.YYYY';
   private readonly MONTH_FORMAT = 'MM / YYYY';
   private readonly YEAR_FORMAT = 'YYYY';
-  private readonly AMOUNT_FORMAT = /^([-+]?)(\d+)(\,(\d+))?$/;
 
   constructor() { }
 
@@ -26,17 +25,25 @@ export class LocalService {
 
   parseAmount(value: string): number {
     if (this.isEmpty(value)) return null;
-    const matcher = value.match(this.AMOUNT_FORMAT);
-    if (!matcher) return null;
+    if (!this._isAmount(value)) return null;
     return +value.replace(',', '.');
   }
 
   createAmountValidator() {
     return (control: FormControl) => {
       if (this.isEmpty(control.value)) return null;
-      const valid = control.value.match(this.AMOUNT_FORMAT) != null;
-      return valid ? null : { amount: true };
+      return this._isAmount(control.value) ? null : { amount: true };
     };
+  }
+
+  _isAmount(value) {
+    let digit = false;
+    let i = 0;
+    if (i < value.length && ['-', '+'].includes(value[i])) i++;
+    while (i < value.length && value[i] >= '0' && value[i] <= '9') { i++; digit = true; }
+    if (i < value.length && [','].includes(value[i])) i++;
+    while (i < value.length && value[i] >= '0' && value[i] <= '9') { i++; }
+    return i == value.length - 1 && digit;
   }
 
   formatDate(value: moment.Moment, format?: string): string {
@@ -65,12 +72,19 @@ export class LocalService {
 
   parseMonth(value: string): moment.Moment {
     if (this.isEmpty(value)) return null;
-    const matcher = value.match(/^\s*(\d+)\s*\/\s*(\d+)\s*$/);
-    if (!matcher) return null;
-    const month = +matcher[1];
-    const year = +matcher[2];
+    const splitted = value.split('/').map(v => v.trim());
+    if (splitted.length != 2 || !this._isInteger(splitted[0]) || !this._isInteger(splitted[1])) return null;
+    const month = +splitted[0];
+    const year = +splitted[1];
     if (month < 1 || month > 12) return null;
     return moment([year, month - 1, 1]);
+  }
+
+  _isInteger(value: string) {
+    for (let i = 0; i < value.length; i++) {
+      if (value[i] < '0' || value[i] > '9') return false;
+    }
+    return value.length > 0;
   }
 
   createMonthValidator() {
@@ -88,9 +102,9 @@ export class LocalService {
 
   parseYear(value: string): moment.Moment {
     if (this.isEmpty(value)) return null;
-    const matcher = value.match(/^\s*(\d+)\s*$/);
-    if (!matcher) return null;
-    const year = +matcher[1];
+    const trimmed = value.trim();
+    if (!this._isInteger(trimmed)) return null;
+    const year = +trimmed;
     return moment([year, 0, 1]);
   }
 
