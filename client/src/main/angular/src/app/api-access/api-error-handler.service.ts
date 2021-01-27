@@ -19,16 +19,10 @@ export class ApiErrorHandlerService {
     if (!error || !error.status) {
       console.log(error);
       this.dialogService.show(DialogMessage.CONNECTION_ERROR);
-      return;
-    }
-
-    switch(error.status) {
-      case 401:
-        this.handleUnauthorized();
-        break;
-      default:
-        this.dialogService.show(DialogMessage.INTERNAL_SERVER_ERROR);
-        break;
+    } else if (error.status == 401) {
+      this.handleUnauthorized();
+    } else {
+      this.dialogService.show(DialogMessage.INTERNAL_SERVER_ERROR);
     }
   }
 
