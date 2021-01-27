@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-node';
 import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
 
