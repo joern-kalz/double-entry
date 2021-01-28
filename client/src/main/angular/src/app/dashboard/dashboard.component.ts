@@ -9,8 +9,8 @@ import { saveAs } from 'file-saver';
 import { RepositoryService } from '../generated/openapi/api/repository.service';
 import { GetAbsoluteBalanceResponse, GetRelativeBalanceResponse, Repository } from '../generated/openapi/model/models';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
-import { ChartData, ChartDataSets, ChartOptions, ChartType } from 'chart.js';
-import { Label, MultiDataSet, SingleDataSet } from 'ng2-charts';
+import { ChartDataSets, ChartOptions } from 'chart.js';
+import { Label, SingleDataSet } from 'ng2-charts';
 import { BalancesService } from '../generated/openapi/api/balances.service';
 import { API_DATE } from '../api-access/api-constants';
 import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.service';
@@ -139,14 +139,14 @@ export class DashboardComponent implements OnInit {
     
     return this.accountHierarchy.list.get(accountType)
       .filter(account => account.parentId == rootAccount.id && account.active &&
-        this.relativeBalancesList[0].differences.find(difference => difference.accountId == account.id)
+        this.relativeBalancesList[0].differences.find(d => d.accountId == account.id)
       )
       .map(account => ({
         stack: '1',
         label: account.name,
         data: this.relativeBalancesList
           .map(balances => {
-            const difference = balances.differences.find(difference => difference.accountId == account.id);
+            const difference = balances.differences.find(d => d.accountId == account.id);
             const amount = difference ? difference.amount : 0;
             return accountType == AccountType.EXPENSE ? amount : -amount;
           })
