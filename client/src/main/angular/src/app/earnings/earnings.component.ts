@@ -4,8 +4,8 @@ import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.
 import { BalancesService } from '../generated/openapi/api/balances.service';
 import * as moment from 'moment';
 import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
-import { forkJoin, Subscription, combineLatest, of, Observable } from 'rxjs';
-import { switchMap, distinctUntilChanged, map } from 'rxjs/operators';
+import { forkJoin, Subscription, combineLatest, of } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 import { API_DATE } from '../api-access/api-constants';
 import { GetRelativeBalanceResponse, Account } from '../generated/openapi/model/models';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
@@ -147,9 +147,9 @@ export class EarningsComponent implements OnInit, OnDestroy {
     this.dates = null;
     this.earnings = null;
 
-    this.chartLabels = balances.map(balances => this.presentation.value == Presentation.CHART_MONTH ? 
-      this.localService.formatMonth(moment(balances.start)) :
-      this.localService.formatYear(moment(balances.start)));
+    this.chartLabels = balances.map(balance => this.presentation.value == Presentation.CHART_MONTH ? 
+      this.localService.formatMonth(moment(balance.start)) :
+      this.localService.formatYear(moment(balance.start)));
 
     const rootAccount = this.accountHierarchy.root.get(this.accountType);
     
@@ -161,8 +161,8 @@ export class EarningsComponent implements OnInit, OnDestroy {
         stack: '1',
         label: account.name,
         data: balances
-          .map(balances => {
-            const difference = balances.differences.find(difference => difference.accountId == account.id);
+          .map(balance => {
+            const difference = balance.differences.find(d => d.accountId == account.id);
             const amount = difference ? difference.amount : 0;
             return this.accountType == AccountType.EXPENSE ? amount : -amount;
           })
