@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { ContextTransaction, EntryType, TransactionType } from '../context/context-transaction';
 import { ContextService } from '../context/context.service';
 import { Router } from '@angular/router';
