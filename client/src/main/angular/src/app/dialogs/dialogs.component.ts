@@ -43,11 +43,10 @@ export class DialogsComponent implements OnInit {
   }
 
   get showCancel() {
-    switch (this.dialogService.message) {
-      case DialogMessage.REMOVE_TRANSACTION:
-        return true;
-      default:
-        return false;
+    if (this.dialogService.message == DialogMessage.REMOVE_TRANSACTION) {
+      return true;
+    } else {
+      return false;
     }
   }
 }
