@@ -43,7 +43,7 @@ export class LocalService {
     while (i < value.length && value[i] >= '0' && value[i] <= '9') { i++; digit = true; }
     if (i < value.length && [','].includes(value[i])) i++;
     while (i < value.length && value[i] >= '0' && value[i] <= '9') { i++; }
-    return i == value.length - 1 && digit;
+    return i == value.length && digit;
   }
 
   formatDate(value: moment.Moment, format?: string): string {
