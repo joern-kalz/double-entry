@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { AccountHierarchy, AccountType } from '../app/account-hierarchy/account-hierarchy';
+import { AccountHierarchy } from '../app/account-hierarchy/account-hierarchy';
 import { AccountHierarchyNode } from '../app/account-hierarchy/account-hierarchy-node';
 
 @Component({selector: 'app-account-name', template: '{{account.name}}'})

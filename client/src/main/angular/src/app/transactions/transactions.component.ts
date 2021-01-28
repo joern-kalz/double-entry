@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { ViewTransaction, ViewTransactionEntry } from '../transaction-details/view-transaction';
+import { ViewTransaction } from '../transaction-details/view-transaction';
 import { TransactionsService } from '../generated/openapi/api/transactions.service'
 import { AccountsService } from '../generated/openapi/api/accounts.service'
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { forkJoin, } from 'rxjs';
-import { Transaction, TransactionEntries, Account } from '../generated/openapi/model/models';
+import { Transaction, Account } from '../generated/openapi/model/models';
 import * as moment from 'moment';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { LocalService } from '../local/local.service';
