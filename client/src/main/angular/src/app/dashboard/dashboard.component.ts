@@ -185,7 +185,7 @@ export class DashboardComponent implements OnInit {
 
     const chartData = this.absoluteBalancesList
       .map(balancesListEntry => {
-        const balance = balancesListEntry.balances.find(balance => balance.accountId == rootAccount.id);
+        const balance = balancesListEntry.balances.find(b => b.accountId == rootAccount.id);
         return balance ? balance.amount : 0;
       });
 
