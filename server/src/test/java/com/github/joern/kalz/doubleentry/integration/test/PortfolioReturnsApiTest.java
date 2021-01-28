@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-public class PortfolioReturnsApiTest {
+class PortfolioReturnsApiTest {
     MockMvc mockMvc;
 
     @Autowired
