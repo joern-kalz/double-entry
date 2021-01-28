@@ -1,11 +1,10 @@
-import { query } from '@angular/animations';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { Label } from 'ng2-charts';
-import { combineLatest, EMPTY, forkJoin, of, Subscription } from 'rxjs';
-import { filter, map, switchMap, tap } from 'rxjs/operators';
+import { combineLatest, forkJoin, of, Subscription } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs/operators';
 import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
 import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.service';
 import { AccountsService } from '../generated/openapi/api/accounts.service';
@@ -60,34 +59,34 @@ export class PortfolioReturnsComponent implements OnInit {
         map(accounts => this.accountHierarchyService.createAccountHierarchy(accounts))
       )
     ]).pipe(
-      filter(([query, accountHierarchy]) => query.get('account') != null),
-      switchMap(([query, accountHierarchy]) => forkJoin([
-        of(query),
+      filter(([queryParams, accountHierarchy]) => queryParams.get('account') != null),
+      switchMap(([queryParams, accountHierarchy]) => forkJoin([
+        of(queryParams),
         of(accountHierarchy),
-        this.getPortfolioReturns('account', query, accountHierarchy),
-        this.getPortfolioReturns('comparison', query, accountHierarchy),
+        this.getPortfolioReturns('account', queryParams, accountHierarchy),
+        this.getPortfolioReturns('comparison', queryParams, accountHierarchy),
       ])),
-    ).subscribe(([query, accountHierarchy, accountPeriods, comparisonPeriods]) => {
-      this.account.setValue(+query.get('account'));
-      this.comparison.setValue(query.get('comparison') != null ? +query.get('comparison') : null);
-      this.stepYears.setValue(query.get('stepYears') != null ? +query.get('stepYears') : 1);
+    ).subscribe(([queryParams, accountHierarchy, accountPeriods, comparisonPeriods]) => {
+      this.account.setValue(+queryParams.get('account'));
+      this.comparison.setValue(queryParams.get('comparison') != null ? +queryParams.get('comparison') : null);
+      this.stepYears.setValue(queryParams.get('stepYears') != null ? +queryParams.get('stepYears') : 1);
       this.accountHierarchy = accountHierarchy;
       this.accountList = accountHierarchy.list.get(AccountType.ASSET);
       this.updateChart(accountPeriods, comparisonPeriods);
     }));
   }
 
-  private getPortfolioReturns(name: string, query: ParamMap, accountHierarchy: AccountHierarchy) {
-    if (query.get(name) == null) {
+  private getPortfolioReturns(name: string, queryParams: ParamMap, accountHierarchy: AccountHierarchy) {
+    if (queryParams.get(name) == null) {
       return of(null);
     }
 
     return this.portfolioReturnsService.getPortfolioReturns(
-      +query.get(name), 
+      +queryParams.get(name), 
       accountHierarchy.root.get(AccountType.REVENUE).id, 
       accountHierarchy.root.get(AccountType.EXPENSE).id, 
       moment().format(API_DATE),
-      query.get('stepYears') != null ? +query.get('stepYears') : 1
+      queryParams.get('stepYears') != null ? +queryParams.get('stepYears') : 1
     );
   }
 
