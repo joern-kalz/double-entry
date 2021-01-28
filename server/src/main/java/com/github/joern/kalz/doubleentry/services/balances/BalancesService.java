@@ -24,14 +24,14 @@ public class BalancesService {
     }
 
     public List<Balances> getBalances(LocalDate date, int stepInMonth, int stepCount) {
-        LocalDate before = date.plusMonths(stepInMonth * stepCount);
+        LocalDate before = date.plusMonths((long) stepInMonth * stepCount);
         Map<Long, TurnoverIterator> turnoverIterators = getTurnoverIteratorsByAccountId(null, before);
 
         return getBalances(turnoverIterators, date, stepInMonth, stepCount, true);
     }
 
     public List<BalanceDifferences> getBalanceDifferences(LocalDate start, int stepInMonth, int stepCount) {
-        LocalDate before = start.plusMonths(stepInMonth * stepCount);
+        LocalDate before = start.plusMonths((long) stepInMonth * stepCount);
         Map<Long, TurnoverIterator> turnoverIterators = getTurnoverIteratorsByAccountId(start, before);
 
         return getBalances(turnoverIterators, start.plusMonths(stepInMonth), stepInMonth, stepCount - 1, false)
@@ -48,7 +48,7 @@ public class BalancesService {
         List<Balances> balancesList = new ArrayList<>();
 
         for (int step = 0; step <= stepCount; step++) {
-            LocalDate stepEnd = start.plusMonths(stepInMonth * step);
+            LocalDate stepEnd = start.plusMonths((long) stepInMonth * step);
             Map<Long, BigDecimal> amountsByAccountId = accumulate && !balancesList.isEmpty() ?
                     new HashMap<>(balancesList.get(balancesList.size() - 1).getAmountsByAccountId()) :
                     turnoversByAccountId.keySet().stream().collect(Collectors.toMap(id -> id, id -> BigDecimal.ZERO));

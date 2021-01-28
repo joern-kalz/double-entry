@@ -125,7 +125,7 @@ public class PortfolioReturnsService {
     private LocalDate getFirstStepStart(LocalDate from, LocalDate until, int stepYears) {
         LocalDate start = until
                 .with(TemporalAdjusters.firstDayOfYear())
-                .minusYears(stepYears - 1);
+                .minusYears(stepYears - 1L);
 
         while (start.isAfter(from)) {
             start = start.minusYears(stepYears);
