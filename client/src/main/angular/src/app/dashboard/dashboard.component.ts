@@ -90,7 +90,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     const startEarnings = moment().startOf('month').subtract(12, 'month').format(API_DATE);
-    const startAssets = moment().endOf('year').subtract(20, 'years').format(API_DATE);
+    const startAssets = moment().endOf('month').subtract(20, 'years').format(API_DATE);
 
     this.accountsService.getAccounts().subscribe(accounts => {
       this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
@@ -181,14 +181,21 @@ export class DashboardComponent implements OnInit {
 
     const rootAccount = this.accountHierarchy.root.get(AccountType.ASSET);
 
-    this.transactionsChartLabels = this.absoluteBalancesList
-      .map(balances => this.localService.formatYear(moment(balances.date)));
-
-    const chartData = this.absoluteBalancesList
+    const rootAmounts = this.absoluteBalancesList
       .map(balancesListEntry => {
         const balance = balancesListEntry.balances.find(b => b.accountId == rootAccount.id);
         return balance ? Converter.parseApiAmount(balance.amount) : 0;
       });
+
+    const firstNonZeroAmountIndex = rootAmounts.findIndex(amount => amount > 0);
+    const startIndex = firstNonZeroAmountIndex > -1 ? firstNonZeroAmountIndex : 0;
+
+    this.transactionsChartLabels = this.absoluteBalancesList
+      .filter((balances, index) => index >= startIndex)
+      .map(balances => this.localService.formatMonth(moment(balances.date)));
+
+    const chartData = rootAmounts
+      .filter((balances, index) => index >= startIndex);
 
     this.transactionsChartData = [{ data: chartData, pointRadius: 0 }];
   }
