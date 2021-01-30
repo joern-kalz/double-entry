@@ -19,6 +19,7 @@ import { SearchRequest } from './search-request';
 import { Label } from 'ng2-charts';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { LocalService } from '../local/local.service';
+import { Converter } from '../api-access/converter';
 
 @Component({
   selector: 'app-earnings',
@@ -163,7 +164,7 @@ export class EarningsComponent implements OnInit, OnDestroy {
         data: balances
           .map(balance => {
             const difference = balance.differences.find(d => d.accountId == account.id);
-            const amount = difference ? difference.amount : 0;
+            const amount = difference ? Converter.parseApiAmount(difference.amount) : 0;
             return this.accountType == AccountType.EXPENSE ? amount : -amount;
           })
       }));
@@ -203,7 +204,7 @@ export class EarningsComponent implements OnInit, OnDestroy {
     const factor = this.accountType == AccountType.REVENUE ? -1 : 1;
 
     for (let balance of balances[0].differences) {
-      balancesById.set(balance.accountId, factor * balance.amount);
+      balancesById.set(balance.accountId, factor * Converter.parseApiAmount(balance.amount));
     }
     
     return balancesById;

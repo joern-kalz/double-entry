@@ -16,6 +16,7 @@ import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.
 import { ViewTransactionFactoryService } from '../transaction-details/view-transaction-factory.service';
 import { DialogService } from '../dialogs/dialog.service';
 import { DialogMessage } from '../dialogs/dialog-message.enum';
+import { Converter } from '../api-access/converter';
 
 @Component({
   selector: 'app-verification',
@@ -63,7 +64,7 @@ export class VerificationComponent implements OnInit {
     this.submitted = false;
     this.accountHierarchy = this.accountHierarchyService.createAccountHierarchy(accounts);
     this.account = this.accountHierarchy.accountsById.get(this.contextService.verification.accountId);
-    this.lastVerifiedBalance = verification.verifiedBalance;
+    this.lastVerifiedBalance = Converter.parseApiAmount(verification.verifiedBalance);
     
     const transactionIds = new Set<number>();
     this.transactions = [];

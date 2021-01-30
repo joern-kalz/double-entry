@@ -7,6 +7,7 @@ import com.github.joern.kalz.doubleentry.generated.model.ApiSaveTransactionReque
 import com.github.joern.kalz.doubleentry.generated.model.ApiTransaction;
 import com.github.joern.kalz.doubleentry.models.Transaction;
 import com.github.joern.kalz.doubleentry.models.TransactionOrder;
+import com.github.joern.kalz.doubleentry.services.exceptions.ParameterException;
 import com.github.joern.kalz.doubleentry.services.transactions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -117,10 +119,18 @@ public class TransactionsApiImpl implements TransactionsApi {
                 .map(entry -> {
                     RequestEntry requestEntry = new RequestEntry();
                     requestEntry.setAccountId(entry.getAccountId());
-                    requestEntry.setAmount(entry.getAmount());
+                    requestEntry.setAmount(convertToBigDecimal(entry.getAmount()));
                     requestEntry.setVerified(Optional.ofNullable(entry.getVerified()).orElse(false));
                     return requestEntry;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private BigDecimal convertToBigDecimal(String value) {
+        try {
+            return new BigDecimal(value);
+        } catch (NumberFormatException e) {
+            throw new ParameterException("not a valid amount: " + value);
+        }
     }
 }

@@ -36,7 +36,7 @@ public class VerificationsApiImpl implements VerificationsApi {
                 .collect(Collectors.toList());
 
         ApiGetVerificationResponse response = new ApiGetVerificationResponse()
-                .verifiedBalance(verificationState.getVerifiedBalance())
+                .verifiedBalance(verificationState.getVerifiedBalance().toString())
                 .unverifiedTransactions(unverifiedTransactions);
 
         return new ResponseEntity<>(response, HttpStatus.OK);

@@ -36,12 +36,12 @@ describe('EarningsComponent', () => {
     start: '2020-01-01',
     end: '2021-01-01',
     differences: [
-      { accountId: 1, amount: 12 },
-      { accountId: 2, amount: 14 },
-      { accountId: 3, amount: 41 },
-      { accountId: 4, amount: 51 },
-      { accountId: 5, amount: 27 },
-      { accountId: 6, amount: 24 },
+      { accountId: 1, amount: '12' },
+      { accountId: 2, amount: '14' },
+      { accountId: 3, amount: '41' },
+      { accountId: 4, amount: '51' },
+      { accountId: 5, amount: '27' },
+      { accountId: 6, amount: '24' },
   ]}];
 
   let component: EarningsComponent;

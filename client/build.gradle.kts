@@ -6,6 +6,8 @@ plugins {
     id("com.github.node-gradle.node") version "2.2.4"
 }
 
+java.sourceCompatibility = JavaVersion.VERSION_11
+
 node {
     download = true
     version = "14.8.0"

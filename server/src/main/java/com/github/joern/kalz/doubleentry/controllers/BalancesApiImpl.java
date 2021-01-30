@@ -71,7 +71,7 @@ public class BalancesApiImpl implements BalancesApi {
         return amounts.entrySet().stream()
                 .map(amount -> new ApiGetAbsoluteBalanceResponseBalances()
                         .accountId(amount.getKey())
-                        .amount(amount.getValue()))
+                        .amount(amount.getValue().toString()))
                 .collect(Collectors.toList());
     }
 }

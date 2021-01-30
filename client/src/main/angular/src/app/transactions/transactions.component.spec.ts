@@ -31,12 +31,12 @@ describe('TransactionsComponent', () => {
 
   const TRANSACTIONS_MOCK: Transaction[] =     [
     { id: 1, name: 'transaction-1', date: '2020-01-01', entries: [
-      {accountId: 1, amount: -1, verified: false},
-      {accountId: 2, amount: 1, verified: false},
+      {accountId: 1, amount: '-1', verified: false},
+      {accountId: 2, amount: '1', verified: false},
     ]},
     { id: 2, name: 'transaction-2', date: '2020-01-01', entries: [
-      {accountId: 1, amount: -1, verified: false},
-      {accountId: 2, amount: 1, verified: false},
+      {accountId: 1, amount: '-1', verified: false},
+      {accountId: 2, amount: '1', verified: false},
     ]}
   ];
 

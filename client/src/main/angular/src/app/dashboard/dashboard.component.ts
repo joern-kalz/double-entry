@@ -15,6 +15,7 @@ import { BalancesService } from '../generated/openapi/api/balances.service';
 import { API_DATE } from '../api-access/api-constants';
 import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.service';
 import { AccountsService } from '../generated/openapi/api/accounts.service';
+import { Converter } from '../api-access/converter';
 
 @Component({
   selector: 'app-dashboard',
@@ -147,7 +148,7 @@ export class DashboardComponent implements OnInit {
         data: this.relativeBalancesList
           .map(balances => {
             const difference = balances.differences.find(d => d.accountId == account.id);
-            const amount = difference ? difference.amount : 0;
+            const amount = difference ? Converter.parseApiAmount(difference.amount) : 0;
             return accountType == AccountType.EXPENSE ? amount : -amount;
           })
       }));
@@ -165,13 +166,13 @@ export class DashboardComponent implements OnInit {
 
     const balances = childAccounts
       .map(account => lastBalances.find(balance => balance.accountId == account.id))
-      .filter(balance => balance && balance.amount >= 0);
+      .filter(balance => balance && Converter.parseApiAmount(balance.amount) >= 0);
 
     this.assetChartLabels = balances
       .map(balance => this.accountHierarchy.accountsById.get(balance.accountId).name);
 
     this.assetChartData = balances
-      .map(balance => balance.amount);
+      .map(balance => Converter.parseApiAmount(balance.amount));
   }
 
   private refreshTransactions() {
@@ -186,7 +187,7 @@ export class DashboardComponent implements OnInit {
     const chartData = this.absoluteBalancesList
       .map(balancesListEntry => {
         const balance = balancesListEntry.balances.find(b => b.accountId == rootAccount.id);
-        return balance ? balance.amount : 0;
+        return balance ? Converter.parseApiAmount(balance.amount) : 0;
       });
 
     this.transactionsChartData = [{ data: chartData, pointRadius: 0 }];

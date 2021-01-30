@@ -15,6 +15,7 @@ import { DialogService } from '../dialogs/dialog.service';
 import { DialogMessage } from '../dialogs/dialog-message.enum';
 import { Router } from '@angular/router';
 import { ContextService } from '../context/context.service';
+import { Converter } from '../api-access/converter';
 
 @Component({
   selector: 'app-assets',
@@ -82,7 +83,7 @@ export class AssetsComponent implements OnInit {
     const balancesById = new Map<number, number>();
 
     for (let balance of balances[0].balances) {
-      balancesById.set(balance.accountId, balance.amount);
+      balancesById.set(balance.accountId, Converter.parseApiAmount(balance.amount));
     }
 
     return balancesById;

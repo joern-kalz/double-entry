@@ -73,11 +73,11 @@ class BalancesApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3))
                 .andExpect(jsonPath("$[?(@.date == '2019-01-01')].balances[?(@.accountId == " +
-                        cashAccount.getId() + " && @.amount == 0.00)]").exists())
+                        cashAccount.getId() + " && @.amount == '0')]").exists())
                 .andExpect(jsonPath("$[?(@.date == '2020-01-01')].balances[?(@.accountId == " +
-                        cashAccount.getId() + " && @.amount == -3.88)]").exists())
+                        cashAccount.getId() + " && @.amount == '-3.88')]").exists())
                 .andExpect(jsonPath("$[?(@.date == '2021-01-01')].balances[?(@.accountId == " +
-                        cashAccount.getId() + " && @.amount == -6.37)]").exists());
+                        cashAccount.getId() + " && @.amount == '-6.37')]").exists());
     }
 
     @Test
@@ -122,9 +122,9 @@ class BalancesApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[?(@.start == '2019-01-01' && @.end == '2019-12-31')]" +
-                        ".differences[?(@.accountId == " + cashAccount.getId() + " && @.amount == -3.88)]").exists())
+                        ".differences[?(@.accountId == " + cashAccount.getId() + " && @.amount == '-3.88')]").exists())
                 .andExpect(jsonPath("$[?(@.start == '2020-01-01' && @.end == '2020-12-31')]" +
-                        ".differences[?(@.accountId == " + cashAccount.getId() + " && @.amount == 0.00)]").exists());
+                        ".differences[?(@.accountId == " + cashAccount.getId() + " && @.amount == '0')]").exists());
     }
 
     @Test
@@ -135,11 +135,11 @@ class BalancesApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[?(@.start == '2020-01-01' && @.end == '2020-01-31')]" +
-                        ".differences[?(@.accountId == " + cashAccount.getId() + " && @.amount == -1)]").exists())
+                        ".differences[?(@.accountId == " + cashAccount.getId() + " && @.amount == '-1.00')]").exists())
                 .andExpect(jsonPath("$[?(@.start == '2020-01-01' && @.end == '2020-01-31')]" +
-                        ".differences[?(@.accountId == " + foodAccount.getId() + " && @.amount == 1)]").exists())
+                        ".differences[?(@.accountId == " + foodAccount.getId() + " && @.amount == '1.00')]").exists())
                 .andExpect(jsonPath("$[?(@.start == '2020-01-01' && @.end == '2020-01-31')]" +
-                        ".differences[?(@.accountId == " + expenseAccount.getId() + " && @.amount == 1)]").exists());
+                        ".differences[?(@.accountId == " + expenseAccount.getId() + " && @.amount == '1.00')]").exists());
     }
 
     @Test

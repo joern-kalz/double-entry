@@ -95,8 +95,8 @@ describe('TransactionComponent', () => {
       date: '2020-01-01',
       name: 'transaction-name',
       entries: [
-        {amount: -10, accountId: 1, verified: false},
-        {amount: 10, accountId: 3, verified: false},
+        {amount: '-10.00', accountId: 1, verified: false},
+        {amount: '10.00', accountId: 3, verified: false},
       ]
     });
     expect(location.back).toHaveBeenCalled();
@@ -138,8 +138,8 @@ describe('TransactionComponent', () => {
 
   function createMockTransaction(name, amount) {
     return { id: 1, date: '2010-01-01', name, entries: [
-      { accountId: 1, amount: -amount, verified: false },
-      { accountId: 3, amount: +amount, verified: false },
+      { accountId: 1, amount: String(-amount), verified: false },
+      { accountId: 3, amount: String(+amount), verified: false },
     ]};
   }
 });

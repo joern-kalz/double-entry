@@ -16,8 +16,8 @@ describe('ViewTransactionFactoryService', () => {
   it('should create ViewTransaction', () => {
     const transaction: Transaction = {
       id: 1, date: '2020-01-01', name: 'transaction-name', entries: [
-        { accountId: 1, amount: 10, verified: false },
-        { accountId: 2, amount: -10, verified: false },
+        { accountId: 1, amount: '10', verified: false },
+        { accountId: 2, amount: '-10', verified: false },
       ]
     };
 

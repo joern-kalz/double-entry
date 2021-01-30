@@ -7,6 +7,7 @@ import com.github.joern.kalz.doubleentry.services.repository.ImportRepositoryReq
 import com.github.joern.kalz.doubleentry.services.repository.ImportRepositoryRequestTransaction;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,7 +50,7 @@ public class RequestFactory {
     private ImportRepositoryRequestEntry convertEntry(ApiTransactionEntries entry) {
         ImportRepositoryRequestEntry importEntry = new ImportRepositoryRequestEntry();
         importEntry.setAccountId(entry.getAccountId());
-        importEntry.setAmount(entry.getAmount());
+        importEntry.setAmount(new BigDecimal(entry.getAmount()));
         importEntry.setVerified(entry.getVerified());
         return importEntry;
     }

@@ -16,6 +16,7 @@ import { AccountHierarchyNode } from '../account-hierarchy/account-hierarchy-nod
 import { Transaction } from '../generated/openapi/model/models';
 import { switchMap } from 'rxjs/operators';
 import * as moment from 'moment';
+import { Converter } from '../api-access/converter';
 
 @Component({
   selector: 'app-transaction',
@@ -278,9 +279,11 @@ export class TransactionComponent implements OnInit, OnDestroy {
   }
 
   private createSaveEntry(control: AbstractControl, isCredit: boolean) {
+    const amount = (isCredit ? -1 : 1) * this.localService.parseAmount(control.get('amount').value);
+
     return {
       accountId: control.get('account').value,
-      amount: (isCredit ? -1 : 1) * this.localService.parseAmount(control.get('amount').value),
+      amount: Converter.formatApiAmount(amount),
       verified: false
     };
   }
@@ -328,12 +331,15 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
   onSuggestionSelected(suggestion: Transaction) {
     const creditEntries = suggestion.entries
-      .filter(entry => entry.amount < 0)
+      .filter(entry => Converter.parseApiAmount(entry.amount) < 0)
       .map(entry => ({ account: entry.accountId, amount: this.localService.formatAmount(-entry.amount) }));
 
     const debitEntries = suggestion.entries
-      .filter(entry => entry.amount > 0)
-      .map(entry => ({ account: entry.accountId, amount: this.localService.formatAmount(entry.amount) }));
+      .filter(entry => Converter.parseApiAmount(entry.amount) > 0)
+      .map(entry => ({ 
+        account: entry.accountId, 
+        amount: this.localService.formatAmount(Converter.parseApiAmount(entry.amount)) 
+      }));
 
     this.adjustFormArrayLength(this.creditEntries, creditEntries.length);
     this.adjustFormArrayLength(this.debitEntries, debitEntries.length);

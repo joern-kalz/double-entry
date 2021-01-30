@@ -29,16 +29,16 @@ describe('VerificationComponent', () => {
   ];
 
   const GET_VERIFICATION_RESPONSE_MOCK: GetVerificationResponse = {
-    verifiedBalance: 100,
+    verifiedBalance: '100',
     unverifiedTransactions: 
     [
       { id: 1, name: 'transaction-1', date: '2020-01-01', entries: [
-        {accountId: 1, amount: -1, verified: false},
-        {accountId: 2, amount: 1, verified: false},
+        {accountId: 1, amount: '-1', verified: false},
+        {accountId: 2, amount: '1', verified: false},
       ]},
       { id: 2, name: 'transaction-2', date: '2020-01-01', entries: [
-        {accountId: 1, amount: -1, verified: false},
-        {accountId: 2, amount: 1, verified: false},
+        {accountId: 1, amount: '-1', verified: false},
+        {accountId: 2, amount: '1', verified: false},
       ]}
     ]
   };

@@ -25,7 +25,7 @@ public class ResponseFactory {
     public ApiTransactionEntries convertToResponse(Entry entry) {
         return new ApiTransactionEntries()
                 .accountId(entry.getId().getAccount().getId())
-                .amount(entry.getAmount())
+                .amount(entry.getAmount().toString())
                 .verified(entry.isVerified());
     }
 

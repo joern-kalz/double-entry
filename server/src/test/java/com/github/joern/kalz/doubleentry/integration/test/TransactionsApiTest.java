@@ -57,8 +57,8 @@ class TransactionsApiTest {
     @Test
     void shouldCreateTransaction() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
-                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
-                "{\"accountId\":" + foodAccount.getId() + ",\"amount\":9.99}]}";
+                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":\"-9.99\"}," +
+                "{\"accountId\":" + foodAccount.getId() + ",\"amount\":\"9.99\"}]}";
 
         mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isCreated());
@@ -82,8 +82,8 @@ class TransactionsApiTest {
     @Test
     void shouldNotCreateTransactionWithDuplicatedAccount() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
-                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
-                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":9.99}]}";
+                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":\"-9.99\"}," +
+                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":\"9.99\"}]}";
 
         mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isBadRequest());
@@ -92,8 +92,8 @@ class TransactionsApiTest {
     @Test
     void shouldNotCreateTransactionWithNonZeroTotal() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
-                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.98}," +
-                "{\"accountId\":" + foodAccount.getId() + ",\"amount\":9.99}]}";
+                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":\"-9.98\"}," +
+                "{\"accountId\":" + foodAccount.getId() + ",\"amount\":\"9.99\"}]}";
 
         mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isBadRequest());
@@ -102,8 +102,8 @@ class TransactionsApiTest {
     @Test
     void shouldNotCreateTransactionWithAccountOfOtherUser() throws Exception {
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
-                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":-9.99}," +
-                "{\"accountId\":" + accountOfOtherUser.getId() + ",\"amount\":9.99}]}";
+                "{\"accountId\":" + cashAccount.getId() + ",\"amount\":\"-9.99\"}," +
+                "{\"accountId\":" + accountOfOtherUser.getId() + ",\"amount\":\"9.99\"}]}";
 
         mockMvc.perform(post("/api/transactions").content(requestBody))
                 .andExpect(status().isBadRequest());
@@ -125,10 +125,13 @@ class TransactionsApiTest {
 
     @Test
     void shouldGetTransaction() throws Exception {
-        long id = createTransactionWithUser("supermarket", loggedInUser).getId();
+        long id = createTransactionWithAmount("supermarket", "12.34").getId();
         mockMvc.perform(get("/api/transactions/" + id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("supermarket")));
+                .andExpect(jsonPath("$.name", is("supermarket")))
+                .andExpect(jsonPath("$.entries.length()", is(2)))
+                .andExpect(jsonPath("$.entries[?(@.amount == '12.34')]").exists())
+                .andExpect(jsonPath("$.entries[?(@.amount == '-12.34')]").exists());
     }
 
     @Test
@@ -140,10 +143,13 @@ class TransactionsApiTest {
 
     @Test
     void shouldGetTransactions() throws Exception {
-        createTransactionWithUser("supermarket", loggedInUser);
+        createTransactionWithAmount("supermarket", "12.34");
         mockMvc.perform(get("/api/transactions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name", is("supermarket")));
+                .andExpect(jsonPath("$[0].name", is("supermarket")))
+                .andExpect(jsonPath("$[0].entries.length()", is(2)))
+                .andExpect(jsonPath("$[0].entries[?(@.amount == '12.34')]").exists())
+                .andExpect(jsonPath("$[0].entries[?(@.amount == '-12.34')]").exists());
     }
 
     @Test
@@ -313,6 +319,12 @@ class TransactionsApiTest {
         return testSetup.createTransaction(name, user, LocalDate.of(2020, 1, 1),
                 new TestTransactionEntry(foodAccount, "9.99", false),
                 new TestTransactionEntry(cashAccount,  "-9.99", false));
+    }
+
+    Transaction createTransactionWithAmount(String name, String amount) {
+        return testSetup.createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1),
+                new TestTransactionEntry(foodAccount, amount, false),
+                new TestTransactionEntry(cashAccount,  "-" + amount, false));
     }
 
     void createTransactionWithDate(String name, LocalDate date) {

@@ -61,8 +61,9 @@ class VerificationsApiTest {
 
         mockMvc.perform(get("/api/verifications/" + foodAccount.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.verifiedBalance", is(7.58)))
+                .andExpect(jsonPath("$.verifiedBalance", is("7.58")))
                 .andExpect(jsonPath("$.unverifiedTransactions.length()", is(1)))
+                .andExpect(jsonPath("$.unverifiedTransactions[0].entries[?(@.amount == '3.79')]").exists())
                 .andExpect(jsonPath("$.unverifiedTransactions[0].name", is("baker")));
     }
 
@@ -73,7 +74,7 @@ class VerificationsApiTest {
 
         mockMvc.perform(get("/api/verifications/" + foodAccount.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.verifiedBalance", is(1.59)))
+                .andExpect(jsonPath("$.verifiedBalance", is("1.59")))
                 .andExpect(jsonPath("$.unverifiedTransactions.length()", is(0)));
     }
 
