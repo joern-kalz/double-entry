@@ -8,7 +8,9 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "sonar": "sonar-scanner"
+    "sonar": "sonar-scanner",
+    "extract-i18n": "ng xi18n double-entry-client --i18n-format xlf --output-path src/i18n --i18n-locale en-US && ng run double-entry-client:xliffmerge",
+    "start-de-DE": "ng serve --configuration=de-DE"
   },
   "private": true,
   "dependencies": {
@@ -20,6 +22,7 @@
     "@angular/platform-browser": "~11.0.5",
     "@angular/platform-browser-dynamic": "~11.0.5",
     "@angular/router": "~11.0.5",
+    "@ngx-i18nsupport/tooling": "^8.0.3",
     "chart.js": "^2.9.4",
     "file-saver": "^2.0.2",
     "moment": "^2.27.0",
@@ -33,6 +36,7 @@
     "@angular/cli": "~11.0.5",
     "@angular/compiler-cli": "~11.0.5",
     "@angular/localize": "^11.0.5",
+    "@ngx-i18nsupport/ngx-i18nsupport": "^1.1.6",
     "@types/file-saver": "^2.0.1",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",

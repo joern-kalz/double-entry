@@ -17,7 +17,10 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": ["chart.js", "file-saver"],
+            "allowedCommonJsDependencies": [
+              "chart.js",
+              "file-saver"
+            ],
             "outputPath": "dist/double-entry-client",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -60,6 +63,13 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "de-DE": {
+              "aot": true,
+              "outputPath": "dist/double-entry-client-de-DE",
+              "i18nFile": "src/i18n/messages.de-DE.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "de-DE"
             }
           }
         },
@@ -72,6 +82,9 @@
           "configurations": {
             "production": {
               "browserTarget": "double-entry-client:build:production"
+            },
+            "de-DE": {
+              "browserTarget": "double-entry-client:build:de-DE"
             }
           }
         },
@@ -120,6 +133,21 @@
           "configurations": {
             "production": {
               "devServerTarget": "double-entry-client:serve:production"
+            }
+          }
+        },
+        "xliffmerge": {
+          "builder": "@ngx-i18nsupport/tooling:xliffmerge",
+          "options": {
+            "xliffmergeOptions": {
+              "i18nFormat": "xlf",
+              "srcDir": "src/i18n",
+              "genDir": "src/i18n",
+              "defaultLanguage": "en-US",
+              "languages": [
+                "en-US",
+                "de-DE"
+              ]
             }
           }
         }
