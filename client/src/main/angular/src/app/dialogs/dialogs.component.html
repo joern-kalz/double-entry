@@ -1,52 +1,52 @@
 <div *ngIf="message != null" class="overlay">
     <div class="dialog">
         <div [ngSwitch]="message">
-            <ng-container *ngSwitchCase="DialogMessage.CONNECTION_ERROR">
-                Fehler bei der Verbindung zum Server.
+            <ng-container *ngSwitchCase="DialogMessage.CONNECTION_ERROR" i18n>
+                Cannot connect to the server. Please retry later.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.INTERNAL_SERVER_ERROR">
-                Es ist ein Fehler bei der Ausführung aufgetreten.
+            <ng-container *ngSwitchCase="DialogMessage.INTERNAL_SERVER_ERROR" i18n>
+                The application has encountered an unknown error. Please retry later.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.ERROR_SESSION_EXPIRED">
-                Sitzung abgelaufen. Erneute Anmeldung erforderlich.
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_SESSION_EXPIRED" i18n>
+                Session expired. Please login again.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.ERROR_USERNAME_AND_PASSWORD_REQUIRED">
-                Bitte geben Sie Benutzername und Passwort ein.
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_USERNAME_AND_PASSWORD_REQUIRED" i18n>
+                Please enter username and password.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_AUTHENTICATION">
-                Benutzername oder Passwort ungültig.
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_AUTHENTICATION" i18n>
+                Username or password invalid. Please try again.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.ERROR_USER_ALREADY_EXITS">
-                Benutzername {{parameters.username}} ist bereits vergeben. Bitte wählen Sie einen anderen Benutzernamen.
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_USER_ALREADY_EXITS" i18n>
+                Username {{parameters.username}} is already in use. Please choose a different username.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_USERNAME">
-                Der Benutzername muss zwischen 5 und 50 Zeichen lang sein.
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_USERNAME" i18n>
+                Username must be between 5 and 50 characters long.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_PASSWORD">
-                Das Passwort muss zwischen 10 und 50 Zeichen lang sein.
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_PASSWORD" i18n>
+                Password must be between 5 and 50 characters long.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_REPOSITORY">
-                Das Backup ist beschädigt und kann nicht wiederhergestellt werden.
+            <ng-container *ngSwitchCase="DialogMessage.ERROR_INVALID_REPOSITORY" i18n>
+                The backup is corrupted and cannot be restored.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.REGISTRATION_SUCCESS">
-                Sie wurden erfolgreich registriert. Bitte melden Sie sich nun mit Ihrem Benutzername und Passwort an.
+            <ng-container *ngSwitchCase="DialogMessage.REGISTRATION_SUCCESS" i18n>
+                You were registered successfully. Please login.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.REMOVE_TRANSACTION">
-                Wollen Sie die Transaktion löschen?
+            <ng-container *ngSwitchCase="DialogMessage.REMOVE_TRANSACTION" i18n>
+                Do you want to delete the transaction?
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.ACCOUNT_DEACTIVATED">
-                {{parameters.name}} wurde deaktiviert.
+            <ng-container *ngSwitchCase="DialogMessage.ACCOUNT_DEACTIVATED" i18n>
+                {{parameters.name}} was disabled.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.ACCOUNT_ACTIVATED">
-                {{parameters.name}} wurde aktiviert.
+            <ng-container *ngSwitchCase="DialogMessage.ACCOUNT_ACTIVATED" i18n>
+                {{parameters.name}} was enabled.
             </ng-container>
-            <ng-container *ngSwitchCase="DialogMessage.VERIFIED">
-                {{parameters.count}} Transaktionen wurde verifiziert. Der neue verifizierte Kontostand beträgt {{parameters.newVerifiedBalance | amount}}.
+            <ng-container *ngSwitchCase="DialogMessage.VERIFIED" i18n>
+                {{parameters.count}} transactions were audited. The new audited balance is {{parameters.newVerifiedBalance | amount}}.
             </ng-container>
         </div>
         <div>
-            <button (click)="ok()">OK</button>
-            <button *ngIf="showCancel" (click)="cancel()">Abbrechen</button>
+            <button (click)="ok()" i18n>OK</button>
+            <button *ngIf="showCancel" (click)="cancel()" i18n>Cancel</button>
         </div>
     </div>
 </div>

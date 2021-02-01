@@ -2,17 +2,17 @@
     
     <div class="field">
         <label>
-            <span>Bezeichnung</span>
+            <span i18n>Name</span>
             <input formControlName="name">
         </label>
-        <div *ngIf="showErrors && name.invalid" class="error">
-            Bezeichnung erforderlich
+        <div *ngIf="showErrors && name.invalid" class="error" i18n>
+            Name required
         </div>
     </div>
 
     <div class="field">
         <label>
-            <span>Gruppe</span>
+            <span i18n>Group</span>
             <select formControlName="parent">
                 <option *ngFor="let account of parentAccountList" [ngValue]="account.id">
                     <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
@@ -21,14 +21,14 @@
                 </option>
             </select>
         </label>
-        <div *ngIf="showErrors && parent.invalid" class="error">
-            Gruppe erforderlich
+        <div *ngIf="showErrors && parent.invalid" class="error" i18n>
+            Group required
         </div>
     </div>
     
     <div class="buttons">
-        <button type="button" (click)="cancel()">Abbrechen</button>
-        <button [disabled]="submitted">Speichern</button>
+        <button type="button" (click)="cancel()" i18n>Abbrechen</button>
+        <button [disabled]="submitted" i18n>Speichern</button>
     </div>
     
 </form>

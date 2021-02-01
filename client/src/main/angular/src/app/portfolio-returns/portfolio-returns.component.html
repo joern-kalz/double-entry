@@ -1,6 +1,6 @@
 <form [formGroup]="form" (ngSubmit)="submit()" class="search">
   <label>
-    <span>Konto</span>
+    <span i18n>Portfolio</span>
     <select formControlName="account">
       <option *ngFor="let account of accountList" [ngValue]="account.id">
         <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" [indented]="true">
@@ -9,7 +9,7 @@
     </select>
   </label>
   <label>
-    <span>Vergleich</span>
+    <span i18n>Comparison</span>
     <select formControlName="comparison">
       <option *ngFor="let account of accountList" [ngValue]="account.id">
         <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" [indented]="true">
@@ -18,10 +18,10 @@
     </select>
   </label>
   <label>
-    <span>Intervall in Jahren</span>
+    <span i18n>Step in years</span>
     <input formControlName="stepYears" size="5">
   </label>
-  <button type="submit">Aktualisieren</button>
+  <button type="submit" i18n>Calculate</button>
 </form>
 
 <div *ngIf="chartData">

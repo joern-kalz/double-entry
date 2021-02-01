@@ -2,17 +2,17 @@
 
     <div class="field">
         <label>
-            <span>Datum</span>
+            <span i18n>Date</span>
             <input formControlName="date">
         </label>
-        <div *ngIf="showErrors && date.invalid" class="error">
-            Gültiges Datum erforderlich
+        <div *ngIf="showErrors && date.invalid" class="error" i18n>
+            Valid date required.
         </div>
     </div>
 
     <div class="field">
         <label>
-            <span>Beschreibung</span>
+            <span i18n>Description</span>
             <input formControlName="name" 
                 (focus)="onNameFocus()"
                 (blur)="onNameBlur()" 
@@ -27,13 +27,13 @@
               </li>
             </ul>
         </label>
-        <div *ngIf="showErrors && name.invalid" class="error">
-            Beschreibung erforderlich
+        <div *ngIf="showErrors && name.invalid" class="error" i18n>
+            Description required
         </div>
     </div>
 
     <div formArrayName="creditEntries" class="list">
-        <div class="entry-label">Von Konto</div>
+        <div class="entry-label" i18n>Source account</div>
         <div *ngFor="let entry of creditEntries.controls; let i = index; first as first"
             [formGroupName]="i" class="entry">
             <label class="account">
@@ -45,36 +45,36 @@
                         </app-account-name>
                     </option>
                 </select>
-                <button type="button" (click)="createCreditAccount(i)" class="light">Neu</button>
+                <button type="button" (click)="createCreditAccount(i)" class="light" i18n>Create</button>
             </label>
             <label class="amount">
-                <span>Betrag</span>
+                <span i18n>Amount</span>
                 <input formControlName="amount" #creditEntryAmount>
             </label>
             <button type="button" *ngIf="variableEntries" (click)="deleteCreditEntry(i)"
-                [disabled]="creditEntries.length < 2" class="delete light">
-                Löschen
+                [disabled]="creditEntries.length < 2" class="delete light" i18n>
+                Delete
             </button>
-            <div *ngIf="showErrors && entry.get('account').invalid" class="error">
-                Konto erforderlich
+            <div *ngIf="showErrors && entry.get('account').invalid" class="error" i18n>
+                Account required
             </div>
-            <div *ngIf="showErrors && entry.get('amount').invalid" class="error">
-                Gültiger Betrag erforderlich
+            <div *ngIf="showErrors && entry.get('amount').invalid" class="error" i18n>
+                Valid amount required
             </div>
         </div>
         <div class="add">
-            <button type="button" *ngIf="variableEntries" (click)="addCreditEntry()" class="light">
-                Hinzufügen
+            <button type="button" *ngIf="variableEntries" (click)="addCreditEntry()" class="light" i18n>
+                Add
             </button>
         </div>
     </div>
 
     <div formArrayName="debitEntries" class="list">
-        <div class="entry-label">Nach Konto</div>
+        <div class="entry-label" i18n>Target account</div>
         <div *ngFor="let entry of debitEntries.controls; let i = index; first as first"
             [formGroupName]="i" class="entry">
             <label class="account">
-                <span>Konto</span>
+                <span i18n>Account</span>
                 <select formControlName="account">
                     <option *ngFor="let account of debitAccountList" [ngValue]="account.id">
                         <app-account-name [account]="account" [accountHierarchy]="accountHierarchy"
@@ -82,46 +82,46 @@
                         </app-account-name>
                     </option>
                 </select>
-                <button type="button" (click)="createDebitAccount(i)" class="light">Neu</button>
+                <button type="button" (click)="createDebitAccount(i)" class="light" i18n>Create</button>
             </label>
             <label class="amount">
-                <span>Betrag</span>
+                <span i18n>Amount</span>
                 <input formControlName="amount">
             </label>
             <button type="button" *ngIf="variableEntries" (click)="deleteDebitEntry(i)"
-                [disabled]="debitEntries.length < 2" class="delete light">
-                Löschen
+                [disabled]="debitEntries.length < 2" class="delete light" i18n>
+                Delete
             </button>
-            <div *ngIf="showErrors && entry.get('account').invalid" class="error">
-                Konto erforderlich
+            <div *ngIf="showErrors && entry.get('account').invalid" class="error" i18n>
+                Account required
             </div>
-            <div *ngIf="showErrors && entry.get('amount').invalid" class="error">
-                Gültiger Betrag erforderlich
+            <div *ngIf="showErrors && entry.get('amount').invalid" class="error" i18n>
+                Valid amount required
             </div>
         </div>
         <div class="add">
-            <button type="button" *ngIf="variableEntries" (click)="addDebitEntry()" class="light">
-                Hinzufügen
+            <button type="button" *ngIf="variableEntries" (click)="addDebitEntry()" class="light" i18n>
+                Add
             </button>
         </div>
     </div>
 
 
     <div>
-        <div *ngIf="showErrors && form.errors?.accountsUnique" class="error">
-            Konto doppelt erfasst:
+        <div *ngIf="showErrors && form.errors?.accountsUnique" class="error" i18n>
+            Duplicate entry
             <app-account-name [account]="accountHierarchy.accountsById.get(form.errors.accountsUnique.duplicate)"
                 [accountHierarchy]="accountHierarchy">
             </app-account-name>
         </div>
-        <div *ngIf="showErrors && form.errors?.totalIsZero" class="error">
-            Summe der Beträge muss Null ergeben
+        <div *ngIf="showErrors && form.errors?.totalIsZero" class="error" i18n>
+            Total of amounts must be zero
         </div>
     </div>
 
     <div class="buttons">
-        <button type="button" (click)="cancel()">Abbrechen</button>
-        <button [disabled]="submitted">Speichern</button>
+        <button type="button" (click)="cancel()" i18n>Cancel</button>
+        <button [disabled]="submitted" i18n>Save</button>
     </div>
 
 </form>

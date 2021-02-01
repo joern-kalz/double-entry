@@ -2,16 +2,16 @@
     <div>
         <select [formControl]="presentation">
             <ng-container *ngIf="accountType == AccountType.EXPENSE">
-                <option [ngValue]="Presentation.CHART_MONTH">Grafik Monatsausgaben</option>
-                <option [ngValue]="Presentation.CHART_YEAR">Grafik Jahresausgaben</option>
-                <option [ngValue]="Presentation.LIST_MONTH">Liste Monatsausgaben</option>
-                <option [ngValue]="Presentation.LIST_YEAR">Liste Jahresausgaben</option>
+                <option [ngValue]="Presentation.CHART_MONTH" i18n>Chart monthly expenses</option>
+                <option [ngValue]="Presentation.CHART_YEAR" i18n>Chart annual expenses</option>
+                <option [ngValue]="Presentation.LIST_MONTH" i18n>Table monthly expenses</option>
+                <option [ngValue]="Presentation.LIST_YEAR" i18n>Table annual expenses</option>
             </ng-container>
             <ng-container *ngIf="accountType == AccountType.REVENUE">
-                <option [ngValue]="Presentation.CHART_MONTH">Grafik Monatseinnahmen</option>
-                <option [ngValue]="Presentation.CHART_YEAR">Grafik Jahreseinnahmen</option>
-                <option [ngValue]="Presentation.LIST_MONTH">Liste Monatseinnahmen</option>
-                <option [ngValue]="Presentation.LIST_YEAR">Liste Jahreseinnahmen</option>
+                <option [ngValue]="Presentation.CHART_MONTH" i18n>Chart monthly revenues</option>
+                <option [ngValue]="Presentation.CHART_YEAR" i18n>Chart annual revenues</option>
+                <option [ngValue]="Presentation.LIST_MONTH" i18n>Table monthly revenues</option>
+                <option [ngValue]="Presentation.LIST_YEAR" i18n>Table annual revenues</option>
             </ng-container>
         </select>
     </div>
@@ -36,7 +36,7 @@
 </div>
 
 <div *ngIf="earnings" class="row">
-    <div>Summe</div>
+    <div i18n>Total</div>
     <div *ngFor="let total of totals">{{total | amount}}</div>
 </div>
 
@@ -63,11 +63,11 @@
 <div *ngIf="selection" class="details">
     <div>
         <div>
-            <div>Name</div>
+            <div i18n>Name</div>
             <div>{{selection.account.name}}</div>
         </div>
         <div>
-            <div>Gruppe</div>
+            <div i18n>Group</div>
             <div>
                 <app-account-name [account]="selection.account.parent" 
                     [accountHierarchy]="accountHierarchy">
@@ -75,27 +75,29 @@
             </div>
         </div>
         <div>
-            <div>Aktiv</div>
-            <div *ngIf="selection.account.active">Ja</div>
-            <div *ngIf="!selection.account.active">Nein</div>
+            <div i18n>Enabled</div>
+            <div *ngIf="selection.account.active" i18n>Yes</div>
+            <div *ngIf="!selection.account.active" i18n>No</div>
         </div>
         <div *ngFor="let balance of selection.balances" class="balance">
             <div [ngSwitch]="presentation.value">
                 <ng-container *ngSwitchCase="Presentation.LIST_MONTH">
-                    Stand {{balance.date | date:'month'}}
+                    <ng-container i18n>Balance</ng-container>
+                    {{balance.date | date:'month'}}
                 </ng-container>
                 <ng-container *ngSwitchCase="Presentation.LIST_YEAR">
-                    Stand {{balance.date | date:'year'}}
+                    <ng-container i18n>Balance</ng-container>
+                    {{balance.date | date:'year'}}
                 </ng-container>
             </div>
             <div>{{balance.amount | amount}}</div>
-            <button (click)="showTransactions(balance.date)">Transaktionen</button>
+            <button (click)="showTransactions(balance.date)" i18n>Transactions</button>
         </div>
         <div>
-            <button *ngIf="selection.account.active" (click)="setActive(false)">Deaktivieren</button>
-            <button *ngIf="!selection.account.active" (click)="setActive(true)">Aktivieren</button>
-            <a [routerLink]="['/accounts', selection.account.id]">Bearbeiten</a>
-            <button (click)="select(null)">Schließen</button>
+            <button *ngIf="selection.account.active" (click)="setActive(false)" i18n>Disable</button>
+            <button *ngIf="!selection.account.active" (click)="setActive(true)" i18n>Enable</button>
+            <a [routerLink]="['/accounts', selection.account.id]" i18n>Edit</a>
+            <button (click)="select(null)" i18n>Close</button>
         </div>
     </div>
 </div>

@@ -1,15 +1,15 @@
 <div class="details">
     <div>
         <div>
-            <div>Datum</div>
+            <div i18n>Date</div>
             <div>{{transaction.date | date}}</div>
         </div>
         <div>
-            <div>Beschreibung</div>
+            <div i18n>Description</div>
             <div>{{transaction.name}}</div>
         </div>
         <div>
-            <div>Von</div>
+            <div i18n>From</div>
             <div *ngFor="let entry of transaction.creditEntries" class="entries">
                 <div>
                     <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
@@ -21,7 +21,7 @@
             </div>
         </div>
         <div>
-            <div>Nach</div>
+            <div i18n>To</div>
             <div *ngFor="let entry of transaction.debitEntries" class="entries">
                 <div>
                     <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
@@ -33,9 +33,9 @@
             </div>
         </div>
         <div>
-            <button (click)="delete()">Löschen</button>
-            <button (click)="edit()">Bearbeiten</button>
-            <button (click)="close()">Schließen</button>
+            <button (click)="delete()" i18n>Delete</button>
+            <button (click)="edit()" i18n>Edit</button>
+            <button (click)="close()" i18n>Close</button>
         </div>
     </div>
 </div>

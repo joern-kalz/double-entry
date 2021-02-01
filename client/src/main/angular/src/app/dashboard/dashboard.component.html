@@ -1,12 +1,21 @@
 <div class="actions">
-    <button (click)="createExpenseTransaction()" class="light"><i class="fa fa-plus" aria-hidden="true"></i> Ausgabe</button>
-    <button (click)="createRevenueTransaction()" class="light"><i class="fa fa-plus" aria-hidden="true"></i> Einnahme</button>
-    <button (click)="createTransferTransaction()" class="light"><i class="fa fa-plus" aria-hidden="true"></i> Transfer</button>
+    <button (click)="createExpenseTransaction()" class="light">
+        <i class="fa fa-plus" aria-hidden="true"></i> 
+        <ng-container i18n>Expense</ng-container>
+    </button>
+    <button (click)="createRevenueTransaction()" class="light">
+        <i class="fa fa-plus" aria-hidden="true"></i> 
+        <ng-container i18n>Revenue</ng-container>
+    </button>
+    <button (click)="createTransferTransaction()" class="light">
+        <i class="fa fa-plus" aria-hidden="true"></i> 
+        <ng-container i18n>Transfer</ng-container>
+    </button>
 </div>
 
 <div class="tiles">
     <a [routerLink]="['/earnings', AccountType.EXPENSE]">
-        <h2>Ausgabenübersicht</h2>
+        <h2 i18n>Expenses</h2>
         <canvas baseChart 
             [datasets]="expenseChartData" 
             [labels]="expenseChartLabels" 
@@ -16,7 +25,7 @@
     </a>
 
     <a [routerLink]="['/earnings', AccountType.REVENUE]">
-        <h2>Einnahmenübersicht</h2>
+        <h2 i18n>Revenues</h2>
         <canvas baseChart 
             [datasets]="revenueChartData" 
             [labels]="revenueChartLabels" 
@@ -26,7 +35,7 @@
     </a>
 
     <a [routerLink]="['/assets']">
-        <h2>Bestandsübersicht</h2>
+        <h2 i18n>Assets</h2>
         <canvas *ngIf="assetChartInitialized" baseChart 
             [data]="assetChartData" 
             [labels]="assetChartLabels" 
@@ -36,7 +45,7 @@
     </a>
 
     <a [routerLink]="['/transactions']">
-        <h2>Buchungsübersicht</h2>
+        <h2 i18n>Transactions</h2>
         <canvas baseChart 
             [datasets]="transactionsChartData" 
             [labels]="transactionsChartLabels" 
@@ -48,6 +57,6 @@
 
 <div class="footer">
     <div>
-        <button (click)="export()">Backup erstellen</button>
+        <button (click)="export()" i18n>Create backup</button>
     </div>
 </div>

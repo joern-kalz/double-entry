@@ -1,21 +1,21 @@
 <div class="account">
-    Verifikation
+    <ng-container i18n>Audit of</ng-container>
     <app-account-name *ngIf="account" [account]="account" [accountHierarchy]="accountHierarchy"></app-account-name>
 </div>
 <div class="balance">
-    Letzter verifizierter Kontostand: {{lastVerifiedBalance | amount}}
+    <ng-container i18n>Last audited balance</ng-container>: {{lastVerifiedBalance | amount}}
 </div>
 <div class="balance">
-    Neuer verifizierter Kontostand: {{newVerifiedBalance | amount}}
+    <ng-container i18n>New audited balance</ng-container>: {{newVerifiedBalance | amount}}
 </div>
 <div class="save">
-    <button (click)="save()" [disabled]="isSaveDisabled" class="heavy">Speichern</button>
+    <button (click)="save()" [disabled]="isSaveDisabled" class="heavy" i18n>Save</button>
 </div>
 <div class="create">
-    <button (click)="createExpenseTransaction()" class="light">Ausgabe</button>
-    <button (click)="createRevenueTransaction()" class="light">Einnahme</button>
-    <button (click)="createTransferTransaction()" class="light">Transfer</button>
-    <button (click)="createGenericTransaction()" class="light">Transaktion</button>
+    <button (click)="createExpenseTransaction()" class="light" i18n>Expense</button>
+    <button (click)="createRevenueTransaction()" class="light" i18n>Revenue</button>
+    <button (click)="createTransferTransaction()" class="light" i18n>Transfer</button>
+    <button (click)="createGenericTransaction()" class="light" i18n>Transaction</button>
 </div>
 
 <div *ngFor="let transaction of transactions" class="transaction">
@@ -37,7 +37,7 @@
         <div>{{getAmount(transaction) | amount}}</div>
     </label>
     <div>
-        <button (click)="select(transaction)" class="light">Details</button>
+        <button (click)="select(transaction)" class="light" i18n>Details</button>
     </div>
 </div>
 

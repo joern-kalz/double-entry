@@ -1,23 +1,23 @@
 <form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors" class="search">
     <select formControlName="dateSelectionType" class="type">
-        <option [value]="MONTH">Monatsübersicht</option>
-        <option [value]="YEAR">Jahrsübersicht</option>
-        <option [value]="INTERVAL">Freier Zeitraum</option>
+        <option [value]="MONTH" i18n>Monthly overview</option>
+        <option [value]="YEAR" i18n>Annual overview</option>
+        <option [value]="INTERVAL" i18n>Free period</option>
     </select>
     <ng-container [ngSwitch]="dateSelectionType.value">
         <div *ngSwitchCase="INTERVAL" class="dates">
             <label>
-                <span>von</span>
+                <span i18n>After</span>
                 <input formControlName="after" #after>
             </label>
             <label>
-                <span>bis</span>
+                <span i18n>Before</span>
                 <input formControlName="before" #before>
             </label>
         </div>
         <div *ngSwitchCase="MONTH" class="month">
             <label>
-                <span>Monat</span>
+                <span i18n>Month</span>
                 <input formControlName="month" #month>
             </label>
             <button type="button" (click)="decrementMonth()" class="change-button">-</button>
@@ -25,7 +25,7 @@
         </div>
         <div *ngSwitchCase="YEAR" class="year">
             <label>
-                <span>Jahr</span>
+                <span i18n>Year</span>
                 <input formControlName="year" #year>
             </label>
             <button type="button" (click)="decrementYear()" class="change-button">-</button>
@@ -33,17 +33,17 @@
         </div>
     </ng-container>
     <select formControlName="account" class="account">
-        <option [value]="null">(Alle Konten)</option>
+        <option [value]="null" i18n>(All accounts)</option>
         <option *ngFor="let account of accountsList" [ngValue]="account.id">
             <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" [indented]="true">
             </app-account-name>
         </option>
     </select>
     <div class="submit">
-        <button type="submit">Aktualisieren</button>
+        <button type="submit" i18n>Refresh</button>
     </div>
     <div class="create">
-        <button type="button" (click)="create()">Neu</button>
+        <button type="button" (click)="create()" i18n>Create</button>
     </div>
 </form>
 
@@ -51,14 +51,14 @@
     <div>{{transaction.date | date}}</div>
     <div>{{transaction.name}}</div>
     <div>
-        von
+        <ng-container>From</ng-container>
         <ng-container *ngFor="let entry of transaction.creditEntries; last as last">
             <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
             <ng-container *ngIf="!last">/</ng-container>
         </ng-container>
     </div>
     <div>
-        nach
+        <ng-container>To</ng-container>
         <ng-container *ngFor="let entry of transaction.debitEntries; last as last">
             <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
             <ng-container *ngIf="!last">/</ng-container>

@@ -1,13 +1,13 @@
 <form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors" class="search">
     <label>
-        <span>Kontostände zum</span>
+        <span i18n>Balance at</span>
         <input formControlName="date">
     </label>
-    <button type="submit">Berechnen</button>
+    <button type="submit" i18n>Calculate</button>
 </form>
 
 <div class="total">
-    <div>Summe</div>
+    <div i18n>Total</div>
     <div>{{total | amount}}</div>
 </div>
 <div *ngFor="let asset of assets" (click)="select(asset)" class="asset">
@@ -24,32 +24,32 @@
 <div *ngIf="selectedAsset" class="details">
     <div>
         <div>
-            <div>Name</div>
+            <div i18n>Name</div>
             <div>{{selectedAsset.account.name}}</div>
         </div>
         <div>
-            <div>Gruppe</div>
+            <div i18n>Group</div>
             <div>
                 <app-account-name [account]="selectedAsset.account.parent" [accountHierarchy]="accountHierarchy">
                 </app-account-name>
             </div>
         </div>
         <div>
-            <div>Aktiv</div>
-            <div *ngIf="selectedAsset.account.active">Ja</div>
-            <div *ngIf="!selectedAsset.account.active">Nein</div>
+            <div i18n>Enabled</div>
+            <div *ngIf="selectedAsset.account.active" i18n>Yes</div>
+            <div *ngIf="!selectedAsset.account.active" i18n>No</div>
         </div>
         <div>
-            <div>Kontostand zum {{selectedAsset.date | date}}</div>
+            <div><ng-container i18n>Balance at</ng-container> {{selectedAsset.date | date}}</div>
             <div>{{selectedAsset.balance | amount}}</div>
         </div>
         <div>
-            <button (click)="performance()">Performance</button>
-            <button *ngIf="selectedAsset.account.active" (click)="setActive(false)">Deaktivieren</button>
-            <button *ngIf="!selectedAsset.account.active" (click)="setActive(true)">Aktivieren</button>
-            <a [routerLink]="['/accounts', selectedAsset.account.id]">Bearbeiten</a>
-            <button (click)="verify()">Verifizieren</button>
-            <button (click)="select(null)">Schließen</button>
+            <button (click)="performance()" i18n>Performance</button>
+            <button *ngIf="selectedAsset.account.active" (click)="setActive(false)" i18n>Disable</button>
+            <button *ngIf="!selectedAsset.account.active" (click)="setActive(true)" i18n>Enable</button>
+            <a [routerLink]="['/accounts', selectedAsset.account.id]" i18n>Edit</a>
+            <button (click)="verify()" i18n>Audit</button>
+            <button (click)="select(null)" i18n>Close</button>
         </div>
     </div>
 </div>

@@ -1,14 +1,14 @@
 <div *ngIf="isLoggedIn" class="header-bar">
     <div class="header">
         <div>
-            <a [routerLink]="['/']">Übersicht</a>
-            <a [routerLink]="['/earnings', AccountType.EXPENSE]">Ausgaben</a>
-            <a [routerLink]="['/earnings', AccountType.REVENUE]">Einnahmen</a>
-            <a [routerLink]="['/transactions']">Buchungen</a>
-            <a [routerLink]="['/assets']">Bestand</a>
+            <a [routerLink]="['/']" i18n>Overview</a>
+            <a [routerLink]="['/earnings', AccountType.EXPENSE]" i18n>Expenses</a>
+            <a [routerLink]="['/earnings', AccountType.REVENUE]" i18n>Revenues</a>
+            <a [routerLink]="['/assets']" i18n>Assets</a>
+            <a [routerLink]="['/transactions']" i18n>Transactions</a>
         </div>
         <div>
-            <button (click)="logout()">Abmelden</button>
+            <button (click)="logout()" i18n>Sign out</button>
         </div>
     </div>
 </div>

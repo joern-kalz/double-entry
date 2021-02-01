@@ -2,19 +2,19 @@
     <form [formGroup]="form" (ngSubmit)="submit()">
         <div class="field">
             <label class="field">
-                <span>Name</span>
+                <span i18n>Username</span>
                 <input formControlName="username">
             </label>
         </div>
         <div class="field">
             <label class="field">
-                <span>Passwort</span>
+                <span i18n>Password</span>
                 <input formControlName="password" type="password">
             </label>
         </div>
-        <button type="submit">Anmelden</button>
+        <button type="submit" i18n>Sign in</button>
         <div class="sign-up">
-            <button type="button" (click)="signUp()">Neues Konto erstellen</button>
+            <button type="button" (click)="signUp()" i18n>Sign up</button>
         </div>
     </form>
 </div>
