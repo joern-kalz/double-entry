@@ -5,8 +5,8 @@
             <span i18n>Date</span>
             <input formControlName="date">
         </label>
-        <div *ngIf="showErrors && date.invalid" class="error" i18n>
-            Valid date required.
+        <div *ngIf="showErrors && date.invalid" class="error">
+            <ng-container i18n>Valid date required.</ng-container>
         </div>
     </div>
 
@@ -27,8 +27,8 @@
               </li>
             </ul>
         </label>
-        <div *ngIf="showErrors && name.invalid" class="error" i18n>
-            Description required
+        <div *ngIf="showErrors && name.invalid" class="error">
+            <ng-container i18n>Description required</ng-container>
         </div>
     </div>
 
@@ -52,19 +52,19 @@
                 <input formControlName="amount" #creditEntryAmount>
             </label>
             <button type="button" *ngIf="variableEntries" (click)="deleteCreditEntry(i)"
-                [disabled]="creditEntries.length < 2" class="delete light" i18n>
-                Delete
+                [disabled]="creditEntries.length < 2" class="delete light">
+                <ng-container i18n>Delete</ng-container>
             </button>
-            <div *ngIf="showErrors && entry.get('account').invalid" class="error" i18n>
-                Account required
+            <div *ngIf="showErrors && entry.get('account').invalid" class="error">
+                <ng-container i18n>Account required</ng-container>
             </div>
-            <div *ngIf="showErrors && entry.get('amount').invalid" class="error" i18n>
-                Valid amount required
+            <div *ngIf="showErrors && entry.get('amount').invalid" class="error">
+                <ng-container i18n>Valid amount required</ng-container>
             </div>
         </div>
         <div class="add">
-            <button type="button" *ngIf="variableEntries" (click)="addCreditEntry()" class="light" i18n>
-                Add
+            <button type="button" *ngIf="variableEntries" (click)="addCreditEntry()" class="light">
+                <ng-container i18n>Add</ng-container>
             </button>
         </div>
     </div>
@@ -89,33 +89,33 @@
                 <input formControlName="amount">
             </label>
             <button type="button" *ngIf="variableEntries" (click)="deleteDebitEntry(i)"
-                [disabled]="debitEntries.length < 2" class="delete light" i18n>
-                Delete
+                [disabled]="debitEntries.length < 2" class="delete light">
+                <ng-container i18n>Delete</ng-container>
             </button>
-            <div *ngIf="showErrors && entry.get('account').invalid" class="error" i18n>
-                Account required
+            <div *ngIf="showErrors && entry.get('account').invalid" class="error">
+                <ng-container i18n>Account required</ng-container>
             </div>
-            <div *ngIf="showErrors && entry.get('amount').invalid" class="error" i18n>
-                Valid amount required
+            <div *ngIf="showErrors && entry.get('amount').invalid" class="error">
+                <ng-container i18n>Valid amount required</ng-container>
             </div>
         </div>
         <div class="add">
-            <button type="button" *ngIf="variableEntries" (click)="addDebitEntry()" class="light" i18n>
-                Add
+            <button type="button" *ngIf="variableEntries" (click)="addDebitEntry()" class="light">
+                <ng-container i18n>Add</ng-container>
             </button>
         </div>
     </div>
 
 
     <div>
-        <div *ngIf="showErrors && form.errors?.accountsUnique" class="error" i18n>
-            Duplicate entry
+        <div *ngIf="showErrors && form.errors?.accountsUnique" class="error">
+            <ng-container i18n>Duplicate entry</ng-container>
             <app-account-name [account]="accountHierarchy.accountsById.get(form.errors.accountsUnique.duplicate)"
                 [accountHierarchy]="accountHierarchy">
             </app-account-name>
         </div>
-        <div *ngIf="showErrors && form.errors?.totalIsZero" class="error" i18n>
-            Total of amounts must be zero
+        <div *ngIf="showErrors && form.errors?.totalIsZero" class="error">
+            <ng-container i18n>Total of amounts must be zero</ng-container>
         </div>
     </div>
 
