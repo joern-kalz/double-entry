@@ -1,86 +1,92 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import * as moment from 'moment';
 import { FormControl } from '@angular/forms';
+import * as numeral from 'numeral';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalService {
 
-  private readonly DATE_FORMAT = 'DD.MM.YYYY';
-  private readonly MONTH_FORMAT = 'MM / YYYY';
-  private readonly YEAR_FORMAT = 'YYYY';
+  private readonly LOCALE = {
+    'en-US': {
+      date: 'MM-DD-YYYY',
+      month: 'MM / YYYY',
+      year: 'YYYY',
+    },
+    'de-DE': {
+      date: 'DD.MM.YYYY',
+      month: 'MM / YYYY',
+      year: 'YYYY',
+    },
+  };
 
-  constructor() { }
+  locale = this.LOCALE['en-US'];
+
+  constructor(
+    @Inject(LOCALE_ID) private localeId: string,
+  ) { 
+    this.registerLocales();
+
+    if (localeId != 'en-US') {
+      numeral.locale(localeId);
+      this.locale = this.LOCALE[localeId];
+    }
+  }
 
   formatAmount(value: number): string {
     if (value == null) return '';
-    const sign = value < 0 ? '-' : '';
-    const absoluteValue = Math.abs(value);
-    const integerPart = Math.trunc(absoluteValue)
-    const fractionalPart = Math.round(absoluteValue * 100) % 100;
-    const paddedFractionalPart = fractionalPart < 10 ? '0' + fractionalPart : fractionalPart;
-    return sign + integerPart + ',' + paddedFractionalPart;
+    return numeral(value).format('0,0.00')
   }
 
   parseAmount(value: string): number {
     if (this.isEmpty(value)) return null;
-    if (!this._isAmount(value)) return null;
-    return +value.replace(',', '.');
+    const parsed = numeral(value).value();
+    return parsed != NaN ? parsed : null;
   }
 
   createAmountValidator() {
     return (control: FormControl) => {
       if (this.isEmpty(control.value)) return null;
-      return this._isAmount(control.value) ? null : { amount: true };
+      return numeral.validate(control.value) ? null : { amount: true };
     };
-  }
-
-  _isAmount(value) {
-    let digit = false;
-    let i = 0;
-    if (i < value.length && ['-', '+'].includes(value[i])) i++;
-    while (i < value.length && value[i] >= '0' && value[i] <= '9') { i++; digit = true; }
-    if (i < value.length && [','].includes(value[i])) i++;
-    while (i < value.length && value[i] >= '0' && value[i] <= '9') { i++; }
-    return i == value.length && digit;
   }
 
   formatDate(value: moment.Moment, format?: string): string {
     if (value == null) return '';
-    return value.format(this.DATE_FORMAT);
+    return value.format(this.locale.date);
   }
 
   parseDate(value: string): moment.Moment {
     if (this.isEmpty(value)) return null;
-    const date = moment(value, this.DATE_FORMAT);
+    const date = moment(value, this.locale.date);
     return date.isValid() ? date : null;
   }
 
   createDateValidator() {
     return (control: FormControl) => {
       if (this.isEmpty(control.value)) return null;
-      const valid = moment(control.value, this.DATE_FORMAT).isValid();
+      const valid = moment(control.value, this.locale.date).isValid();
       return valid ? null : { date: true };
     };
   }
 
   formatMonth(value: moment.Moment): string {
     if (value == null) return '';
-    return value.format(this.MONTH_FORMAT);
+    return value.format(this.locale.month);
   }
 
   parseMonth(value: string): moment.Moment {
     if (this.isEmpty(value)) return null;
     const splitted = value.split('/').map(v => v.trim());
-    if (splitted.length != 2 || !this._isInteger(splitted[0]) || !this._isInteger(splitted[1])) return null;
+    if (splitted.length != 2 || !this.isInteger(splitted[0]) || !this.isInteger(splitted[1])) return null;
     const month = +splitted[0];
     const year = +splitted[1];
     if (month < 1 || month > 12) return null;
     return moment([year, month - 1, 1]);
   }
 
-  _isInteger(value: string) {
+  private isInteger(value: string) {
     for (let i = 0; i < value.length; i++) {
       if (value[i] < '0' || value[i] > '9') return false;
     }
@@ -97,13 +103,13 @@ export class LocalService {
 
   formatYear(value: moment.Moment): string {
     if (value == null) return '';
-    return value.format(this.YEAR_FORMAT);
+    return value.format(this.locale.year);
   }
 
   parseYear(value: string): moment.Moment {
     if (this.isEmpty(value)) return null;
     const trimmed = value.trim();
-    if (!this._isInteger(trimmed)) return null;
+    if (!this.isInteger(trimmed)) return null;
     const year = +trimmed;
     return moment([year, 0, 1]);
   }
@@ -120,4 +126,24 @@ export class LocalService {
     return value == null || value.trim() == '';
   }
 
+  private registerLocales() {
+    numeral.register('locale', 'de-DE', {
+      delimiters: {
+        thousands: '.',
+        decimal: ','
+      },
+      abbreviations: {
+        thousand: 'k',
+        million: 'm',
+        billion: 'b',
+        trillion: 't'
+      },
+      ordinal: function (number) {
+        return '.';
+      },
+      currency: {
+        symbol: '€'
+      }
+    });
+  }
 }
