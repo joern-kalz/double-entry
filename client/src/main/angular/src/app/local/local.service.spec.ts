@@ -12,18 +12,18 @@ describe('LocalService', () => {
   });
 
   it('should format Amount', () => {
-    expect(service.formatAmount(1.23)).toEqual('1,23');
+    expect(service.formatAmount(1.23)).toEqual('1.23');
   });
 
   it('should format Date', () => {
-    expect(service.formatDate(moment('2020-01-01'))).toEqual('01.01.2020');
+    expect(service.formatDate(moment('2020-01-01'))).toEqual('01-01-2020');
   });
 
   it('should parse Amount', () => {
-    expect(service.parseAmount('1,23')).toEqual(1.23);
+    expect(service.parseAmount('1.23')).toEqual(1.23);
   });
 
   it('should parse Date', () => {
-    expect(service.parseDate('01.01.2020').format('YYYY-MM-MM')).toEqual('2020-01-01');
+    expect(service.parseDate('01-01-2020').format('YYYY-MM-MM')).toEqual('2020-01-01');
   });
 });

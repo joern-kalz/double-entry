@@ -97,7 +97,7 @@ describe('EarningsComponent', () => {
     setQueryMap('LIST_YEAR', '2020-01-01+2021-01-01');
     fixture.detectChanges();
     const rowDivs = fixture.nativeElement.querySelectorAll('.row');
-    expect(rowDivs[0].textContent).toContain('Summe');
+    expect(rowDivs[0].textContent).toContain('Total');
     expect(rowDivs[0].textContent).toContain('51');
     expect(rowDivs[1].textContent).toContain('interest');
     expect(rowDivs[1].textContent).toContain('24');

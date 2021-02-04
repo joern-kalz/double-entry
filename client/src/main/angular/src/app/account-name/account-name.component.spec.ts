@@ -50,7 +50,7 @@ describe('AccountNameComponent', () => {
     component.indented = true;
     component.account = ASSET;
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toEqual(' Bestand ');
+    expect(fixture.nativeElement.textContent).toEqual('Assets');
   });
 
   it('should show child account', () => {

@@ -31,7 +31,7 @@ describe('DialogsComponent', () => {
 
   it('should show error', () => {
     const dialogDiv = fixture.nativeElement.querySelector('.dialog');
-    expect(dialogDiv.textContent).toContain('Fehler');
+    expect(dialogDiv.textContent).toContain('Cannot connect');
   });
 
   it('should close', () => {
