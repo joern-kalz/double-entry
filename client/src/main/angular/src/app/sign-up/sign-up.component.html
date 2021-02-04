@@ -1,25 +1,43 @@
 <div class="startup">
-    <form [formGroup]="form" (ngSubmit)="submit()">
-        <h1 i18n>Registration</h1>
+    <form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors">
+        <h1 i18n>Create new account</h1>
         <div class="field">
             <label>
                 <span i18n>Username</span>
                 <input formControlName="username">
             </label>
+            <div *ngIf="showErrors && username.invalid" class="error">
+                <ng-container i18n>Username must be between {{usernameLengthMin}} and {{usernameLengthMax}} characters long</ng-container>
+            </div>
         </div>
         <div class="field">
             <label>
                 <span i18n>Password</span>
                 <input formControlName="password" type="password">
             </label>
+            <div *ngIf="showErrors && password.invalid" class="error">
+                <ng-container i18n>Password must be between {{passwordLengthMin}} and {{passwordLengthMax}} characters long</ng-container>
+            </div>
         </div>
         <div class="field">
-            <label class="file">
-                <span i18n>Restore backup</span>
-                <input formControlName="file" type="file" (change)="fileChanged($event)">
-                <span *ngIf="!file" class="file-picker" i18n>Select</span>
-                <span *ngIf="file" class="file-picker" i18n>Selected: {{file.name}}</span>
+            <label>
+                <span i18n>Password confirmation</span>
+                <input formControlName="passwordConfirmation" type="password">
             </label>
+            <div *ngIf="showErrors && form.errors?.passwordConfirmationInvalid" class="error">
+                <ng-container i18n>Password and password confirmation do not match</ng-container>
+            </div>
+        </div>
+        <div class="field file">
+            <span i18n>Restore backup (optional)</span>
+            <div>
+                <label class="file-select">
+                    <input formControlName="file" type="file" (change)="fileChanged($event)">
+                    <span class="file-select-button" i18n>Select</span>
+                    <span class="file-select-name">{{file?.name}}</span>
+                </label>
+                <span class="file-unselect" (click)="unselectFile()"><i class="fa fa-times"></i></span>
+            </div>
         </div>
         <div>
             <button type="submit" [disabled]="submitted" i18n>Sign up</button>

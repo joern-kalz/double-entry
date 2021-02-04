@@ -1,16 +1,44 @@
-.file {
+.file div {
+    display: flex;
+    align-items: baseline;
+}
+
+.file-select {
+    flex-grow: 1;
+    display: flex;
+    border: 1px solid #bbb;
+    cursor: pointer;
+
     input {
         display: none;
     }
 }
 
-.file-picker {
-    border: 1px solid #bbb;
-    cursor: pointer;
-    padding: 4px 0;
+.file-select-button {
+    display: inline;
+    margin: 0;
+    padding: 4px 20px;
     text-align: center;
+    border-right: 1px solid #bbb;
+
+    &:hover {
+        background: #f2f2f2;
+    }
 }
 
-.file-picker:hover {
-    background: #f2f2f2;
+.file-select-name {
+    display: inline;
+    margin: 0;
+    padding: 4px;
+    overflow: hidden;
+}
+
+.file-unselect {
+    padding-left: 10px;
+    margin: 0;
+    font-size: 1.4em;
+    cursor: pointer;
+    &:hover {
+        opacity: 0.6;
+    }
 }

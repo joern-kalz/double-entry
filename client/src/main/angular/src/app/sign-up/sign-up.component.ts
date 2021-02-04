@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { SignUpService } from '../generated/openapi/api/signUp.service';
@@ -8,6 +8,8 @@ import { DialogMessage } from '../dialogs/dialog-message.enum';
 import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
 import { Repository } from '../generated/openapi/model/models';
 import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.service';
+import { MeService } from '../generated/openapi';
+import { AuthenticationService } from '../api-access/authentication.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -16,22 +18,31 @@ import { AccountHierarchyService } from '../account-hierarchy/account-hierarchy.
 })
 export class SignUpComponent implements OnInit {
 
+  usernameLengthMin = 5;
+  usernameLengthMax = 50;
+  passwordLengthMin = 5;
+  passwordLengthMax = 50;
+
   form = this.formBuilder.group({
     username: ['', [
       Validators.required, 
-      Validators.minLength(5), 
-      Validators.maxLength(50)
+      Validators.minLength(this.usernameLengthMin), 
+      Validators.maxLength(this.usernameLengthMax)
     ]],
     password: ['', [
       Validators.required, 
-      Validators.minLength(10), 
-      Validators.maxLength(50)
+      Validators.minLength(this.passwordLengthMin), 
+      Validators.maxLength(this.passwordLengthMax)
     ]],
+    passwordConfirmation: [''],
     file: [''],
+  }, {
+    validators: [this.createPasswordValidator()]
   });
 
-  file: any;
-  submitted: boolean;
+  file = null;
+  submitted = false;
+  showErrors = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -40,6 +51,8 @@ export class SignUpComponent implements OnInit {
     private dialogService: DialogService,
     private apiErrorHandlerService: ApiErrorHandlerService,
     private accountHierarchyService: AccountHierarchyService,
+    private meService: MeService,
+    private authenticationService: AuthenticationService,
   ) { }
 
   ngOnInit(): void {
@@ -49,14 +62,14 @@ export class SignUpComponent implements OnInit {
     this.file = event.target.files[0];
   }
 
-  submit() {
-    if (this.username.invalid) {
-      this.dialogService.show(DialogMessage.ERROR_INVALID_USERNAME);
-      return;
-    }
+  unselectFile() {
+    this.file = null;
+    this.form.get('file').setValue('');
+  }
 
-    if (this.password.invalid) {
-      this.dialogService.show(DialogMessage.ERROR_INVALID_PASSWORD);
+  submit() {
+    if (this.form.invalid) {
+      this.showErrors = true;
       return;
     }
 
@@ -91,28 +104,37 @@ export class SignUpComponent implements OnInit {
     this.submitted = true;
 
     this.signUpService.signUp({name: username, password, repository}).subscribe(
-      () => this.handleSuccess(),
-      error => this.handleError(error)
+      () => this.handleSignUpSuccess(),
+      error => this.handleSignUpError(error)
     );
   }
 
-  private handleSuccess() {
-    this.dialogService.show(DialogMessage.REGISTRATION_SUCCESS, null, () => {
-      this.router.navigate(['/login']);
-    })
+  private handleSignUpSuccess() {
+    this.authenticationService.username = this.username.value;
+    this.authenticationService.password = this.password.value;
+
+    this.meService.getMe().subscribe(
+      () => this.handleLoginSuccess(),
+      error => this.apiErrorHandlerService.handle(error)
+    );
   }
 
-  private handleError(error) {
+  private handleLoginSuccess() {
+    this.authenticationService.password = null;
+    this.authenticationService.isLoggedIn = true;
+    this.router.navigate(['/dashboard']);
+  }
+
+  private handleSignUpError(error) {
     this.submitted = false;
 
     if (error && error.status == 409) {
       this.dialogService.show(DialogMessage.ERROR_USER_ALREADY_EXITS, {
         username: this.username.value
       });
-      return;
+    } else {
+      this.apiErrorHandlerService.handle(error);
     }
-
-    this.apiErrorHandlerService.handle(error);
   }
 
   get username() {
@@ -121,6 +143,18 @@ export class SignUpComponent implements OnInit {
 
   get password() {
     return this.form.get('password') as FormControl;
+  }
+
+  get passwordConfirmation() {
+    return this.form.get('passwordConfirmation') as FormControl;
+  }
+
+  private createPasswordValidator(): ValidatorFn {
+    return (formGroup: FormGroup) => {
+      return formGroup.get('password').value != formGroup.get('passwordConfirmation').value ? 
+        { passwordConfirmationInvalid: true } : 
+        null;
+    };
   }
 
 }
