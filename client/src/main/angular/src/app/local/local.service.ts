@@ -127,7 +127,9 @@ export class LocalService {
   }
 
   private registerLocales() {
-    numeral.register('locale', 'de-DE', {
+    if (numeral['locales']['de-de']) return;
+
+    numeral.register('locale', 'de-de', {
       delimiters: {
         thousands: '.',
         decimal: ','
