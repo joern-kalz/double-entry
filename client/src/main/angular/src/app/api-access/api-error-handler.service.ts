@@ -16,7 +16,7 @@ export class ApiErrorHandlerService {
   ) { }
 
   handle(error: any) {
-    if (!error || !error.status) {
+    if (!error || !error.status || error.status == 504) {
       console.log(error);
       this.dialogService.show(DialogMessage.CONNECTION_ERROR);
     } else if (error.status == 401) {
