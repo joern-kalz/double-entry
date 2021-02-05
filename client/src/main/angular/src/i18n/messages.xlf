@@ -135,53 +135,74 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">15</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="287d3301a32a65a1b31116bda5d3a6463158c42a" datatype="html">
-        <source>Sign in</source>
+      <trans-unit id="f093d9574ab746b231504bd2cbb65f04bd7b00db" datatype="html">
+        <source>Log in</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/login/login.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="c40c132843f349c3aa49730405de1d0ca733aef6" datatype="html">
-        <source>Sign up</source>
+      <trans-unit id="eed29fdf7f25f4191b91edd2b6ca9be446b993dd" datatype="html">
+        <source>Create new account</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/login/login.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
-          <context context-type="linenumber">25</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="7d6573fb998f3a1cf1356623b85850d9d10edaa9" datatype="html">
-        <source>Registration</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4a7f421e3691cd4058572801a5a732f932e083c2" datatype="html">
-        <source>Restore backup</source>
+      <trans-unit id="32a88a00520637cbd2bcb1584bd052d6911e36ab" datatype="html">
+        <source>Password confirmation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4f7627a2744eb03ebbdc59304049c7afc2df36a3" datatype="html">
+        <source>Restore backup (optional)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
+          <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9ca82952a6bc860b5391d5975322d8af8ceddfa4" datatype="html">
         <source>Select</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">36</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="eecdd95e28dfd034213eded51719225f483fd0ea" datatype="html">
-        <source>Selected: <x id="INTERPOLATION" equiv-text="{{file.name}}"/></source>
+      <trans-unit id="c40c132843f349c3aa49730405de1d0ca733aef6" datatype="html">
+        <source>Sign up</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fc8d0203c22e8337f3fce957ff4caa67b4486f87" datatype="html">
+        <source>Username must be between <x id="INTERPOLATION" equiv-text="{{usernameLengthMin}}"/> and <x id="INTERPOLATION_1" equiv-text="{{usernameLengthMax}}"/> characters long</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cb36162cd97dae4eb11ecc1ff3b9ba4975c06cc0" datatype="html">
+        <source>Password must be between <x id="INTERPOLATION" equiv-text="{{passwordLengthMin}}"/> and <x id="INTERPOLATION_1" equiv-text="{{passwordLengthMax}}"/> characters long</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9b69593815211fe2af9bf6a62fc21e256109e2c3" datatype="html">
+        <source>Password and password confirmation do not match</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/sign-up/sign-up.component.html</context>
+          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7e6c975ebea8b5f8b120905ca7acf9f8edf59d8e" datatype="html">
