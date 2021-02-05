@@ -13,6 +13,7 @@ import { AccountType } from './account-hierarchy/account-hierarchy';
 })
 export class AppComponent implements OnInit {
   AccountType = AccountType;
+  initialized = false;
 
   constructor(
     private meService: MeService,
@@ -24,8 +25,14 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.meService.getMe().subscribe(
-      getMeResponse => this.authenticationService.isLoggedIn = true,
-      error => this.apiErrorHandlerService.handle(error)
+      getMeResponse => {
+        this.authenticationService.isLoggedIn = true;
+        this.initialized = true;
+      },
+      error => {
+        this.apiErrorHandlerService.handle(error);
+        this.initialized = true;
+      }
     );
   }
 
