@@ -51,8 +51,6 @@ describe('DashboardComponent', () => {
 
   let contextService: jasmine.SpyObj<ContextService>;
   let router: jasmine.SpyObj<Router>;
-  let repositoryService: jasmine.SpyObj<RepositoryService>;
-  let apiErrorHandlerService: jasmine.SpyObj<ApiErrorHandlerService>;
   let accountsService: jasmine.SpyObj<AccountsService>;
   let balancesService: jasmine.SpyObj<BalancesService>;
 
@@ -67,8 +65,6 @@ describe('DashboardComponent', () => {
         { provide: ContextService, useValue: jasmine.createSpyObj('ContextService', 
           ['setTransaction', 'createTransaction']) },
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
-        { provide: RepositoryService, useValue: jasmine.createSpyObj('RepositoryService', ['exportRepository']) },
-        { provide: ApiErrorHandlerService, useValue: jasmine.createSpyObj('ApiErrorHandlerService', ['handle']) },
         { provide: AccountsService, useValue: jasmine.createSpyObj('AccountsService', ['getAccounts'])},
         AccountHierarchyService,
         { provide: BalancesService, useValue: jasmine.createSpyObj('BalancesService', 
@@ -80,13 +76,10 @@ describe('DashboardComponent', () => {
 
     contextService = TestBed.inject(ContextService) as jasmine.SpyObj<ContextService>;
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    repositoryService = TestBed.inject(RepositoryService) as jasmine.SpyObj<RepositoryService>;
-    apiErrorHandlerService = TestBed.inject(ApiErrorHandlerService) as jasmine.SpyObj<ApiErrorHandlerService>;
     accountsService = TestBed.inject(AccountsService) as jasmine.SpyObj<AccountsService>;
     balancesService = TestBed.inject(BalancesService) as jasmine.SpyObj<BalancesService>;
 
     accountsService.getAccounts.and.returnValue(of(ACCOUNTS_MOCK) as any);
-    repositoryService.exportRepository.and.returnValue(of({}) as any);
     balancesService.getAbsoluteBalances.and.returnValue(of(ABSOLUTE_BALANCES_MOCK) as any);
     balancesService.getRelativeBalances.and.returnValue(of(RELATIVE_BALANCES_MOCK) as any);
   }));

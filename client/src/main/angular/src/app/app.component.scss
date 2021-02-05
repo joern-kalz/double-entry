@@ -11,6 +11,13 @@
 a, button {
     text-align: center;
     padding: 6px 12px;
+    background: #000;
+    &:focus {
+        outline: none;
+    }
+    &:hover {
+        background: #666;
+    }
 }
 
 a {
@@ -21,8 +28,29 @@ a:first-child {
     display: inline-block;
 }
 
-a:hover, button:hover {
-    background: #555;
+.menu-overlay {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.menu-container {
+    position: relative;
+}
+
+.menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 1;
+
+    button {
+        width: 170px;
+        padding: 10px 20px;
+        text-align: left;
+    }
 }
 
 .body {

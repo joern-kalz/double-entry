@@ -7,6 +7,7 @@ import { RouterLinkDirectiveStub } from 'src/testing/router-link-directive-stub'
 import { ApiErrorHandlerService } from './api-access/api-error-handler.service';
 import { AuthenticationService } from './api-access/authentication.service';
 import { AppComponent } from './app.component';
+import { RepositoryService } from './generated/openapi';
 import { MeService } from './generated/openapi/api/me.service';
 
 @Component({selector: 'router-outlet', template: ''})
@@ -24,6 +25,7 @@ describe('AppComponent', () => {
   let apiErrorHandlerService: jasmine.SpyObj<ApiErrorHandlerService>;
   let authenticationService: jasmine.SpyObj<AuthenticationService>;
   let httpClient: jasmine.SpyObj<HttpClient>;
+  let repositoryService: jasmine.SpyObj<RepositoryService>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -35,6 +37,7 @@ describe('AppComponent', () => {
         { provide: AuthenticationService, useValue: jasmine.createSpyObj('AuthenticationService', [], 
           {isLoggedIn: true}) },
         { provide: HttpClient, useValue: jasmine.createSpyObj('HttpClient', ['post']) },
+        { provide: RepositoryService, useValue: jasmine.createSpyObj('RepositoryService', ['exportRepository']) },
       ]
     }).compileComponents();
 
@@ -43,6 +46,9 @@ describe('AppComponent', () => {
     apiErrorHandlerService = TestBed.inject(ApiErrorHandlerService) as jasmine.SpyObj<ApiErrorHandlerService>;
     authenticationService = TestBed.inject(AuthenticationService) as jasmine.SpyObj<AuthenticationService>;
     httpClient = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
+    repositoryService = TestBed.inject(RepositoryService) as jasmine.SpyObj<RepositoryService>;
+ 
+    repositoryService.exportRepository.and.returnValue(of({}) as any);
   }));
 
   it('should set logged in if get me successful', () => {
@@ -68,8 +74,11 @@ describe('AppComponent', () => {
     httpClient.post.and.returnValue(of({}) as any);
     fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const logoutButton = fixture.nativeElement.querySelector('button');
 
+    const menuButton = fixture.nativeElement.querySelector('button');
+    menuButton.click();
+    fixture.detectChanges();
+    const logoutButton = fixture.nativeElement.querySelectorAll('button')[2];
     logoutButton.click();
 
     expect(httpClient.post).toHaveBeenCalledWith("/logout", {});

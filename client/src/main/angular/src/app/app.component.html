@@ -7,8 +7,12 @@
             <a [routerLink]="['/assets']" i18n>Assets</a>
             <a [routerLink]="['/transactions']" i18n>Transactions</a>
         </div>
-        <div>
-            <button (click)="logout()" i18n>Sign out</button>
+        <div class="menu-container">
+            <button (click)="toggleMenu()">{{username}} <i class="fa fa-caret-down"></i></button>
+            <div class="menu" *ngIf="menuVisible">
+                <button (click)="backup()" i18n>Create backup</button>
+                <button (click)="logout()" i18n>Sign out</button>
+            </div>
         </div>
     </div>
 </div>
@@ -16,5 +20,7 @@
 <div class="body" *ngIf="initialized">
     <router-outlet></router-outlet>
 </div>
+
+<div *ngIf="menuVisible" (click)="toggleMenu()" class="menu-overlay"></div>
 
 <app-dialogs></app-dialogs>

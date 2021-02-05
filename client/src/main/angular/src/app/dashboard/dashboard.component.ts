@@ -5,10 +5,7 @@ import { LocalService } from '../local/local.service';
 import { TransactionType } from '../context/context-transaction';
 import { Router } from '@angular/router';
 import { AccountHierarchy, AccountType } from '../account-hierarchy/account-hierarchy';
-import { saveAs } from 'file-saver';
-import { RepositoryService } from '../generated/openapi/api/repository.service';
-import { GetAbsoluteBalanceResponse, GetRelativeBalanceResponse, Repository } from '../generated/openapi/model/models';
-import { ApiErrorHandlerService } from '../api-access/api-error-handler.service';
+import { GetAbsoluteBalanceResponse, GetRelativeBalanceResponse } from '../generated/openapi/model/models';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { Label, SingleDataSet } from 'ng2-charts';
 import { BalancesService } from '../generated/openapi/api/balances.service';
@@ -53,7 +50,7 @@ export class DashboardComponent implements OnInit {
     },
     tooltips: { enabled: false },
     hover: { mode: null },
-    aspectRatio: 1.6
+    aspectRatio: 1.7
   };
 
   assetChartOptions: ChartOptions = {
@@ -62,7 +59,7 @@ export class DashboardComponent implements OnInit {
     elements: { arc: {borderWidth: 0} },
     tooltips: { enabled: false },
     hover: { mode: null },
-    aspectRatio: 1.6
+    aspectRatio: 1.7
   };
 
   transactionsChartOptions : ChartOptions = {
@@ -74,14 +71,12 @@ export class DashboardComponent implements OnInit {
     tooltips: { enabled: false },
     hover: { mode: null },
     elements: { line: {tension: 0} },
-    aspectRatio: 1.6,
+    aspectRatio: 1.7,
   };
 
   constructor(
     private contextService: ContextService,
     private router: Router,
-    private repositoryService: RepositoryService,
-    private apiErrorHandlerService: ApiErrorHandlerService,
     private accountsService: AccountsService,
     private accountHierarchyService: AccountHierarchyService,
     private balancesService: BalancesService,
@@ -222,18 +217,5 @@ export class DashboardComponent implements OnInit {
   createRevenueTransaction() {
     this.contextService.createTransaction(TransactionType.REVENUE);
     this.router.navigate(['/transaction']);
-  }
-
-  export() {
-    this.repositoryService.exportRepository().subscribe(
-      repository => this.handleExportSuccess(repository),
-      error => this.apiErrorHandlerService.handle(error)
-    );
-  }
-
-  private handleExportSuccess(repository: Repository) {
-    const name = `double-entry-backup-${moment().format('YYYY-MM-DD-hh-mm-ss')}.json`;
-    const blob = new Blob([JSON.stringify(repository, null, 2)], {type : 'application/json'});
-    saveAs(blob, name);
   }
 }
