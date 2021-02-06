@@ -259,10 +259,13 @@ export class EarningsComponent implements OnInit, OnDestroy {
   }
 
   showTransactions(date: moment.Moment) {
+    const type = this.presentation.value == Presentation.LIST_MONTH ? 'month' : 'year';
+
     this.router.navigate(['/transactions'], {queryParams: {
       account: this.selection.account.id,
-      type: this.presentation.value == Presentation.LIST_MONTH ? 'month' : 'year',
-      after: date
+      type,
+      after: date.clone().startOf(type).format(API_DATE),
+      before: date.clone().endOf(type).format(API_DATE)
     }});
   }
 }

@@ -95,7 +95,6 @@ describe('EarningsComponent', () => {
 
   it('should show balances', () => {
     setQueryMap('LIST_YEAR', '2020-01-01+2021-01-01');
-    fixture.detectChanges();
     const rowDivs = fixture.nativeElement.querySelectorAll('.row');
     expect(rowDivs[0].textContent).toContain('Total');
     expect(rowDivs[0].textContent).toContain('51');
@@ -105,7 +104,6 @@ describe('EarningsComponent', () => {
 
   it('should switch to year list view', () => {
     setQueryMap('CHART_YEAR', null);
-    fixture.detectChanges();
     const presentationList = fixture.nativeElement.querySelectorAll('.search select')[0];
     presentationList.value = presentationList.options[3].value;
     presentationList.dispatchEvent(new Event('change'));
@@ -115,7 +113,6 @@ describe('EarningsComponent', () => {
 
   it('should decrement year', () => {
     setQueryMap('LIST_YEAR', '2020-01-01+2021-01-01');
-    fixture.detectChanges();
     const decrementYearButton = fixture.nativeElement.querySelectorAll('.search button')[0];
     decrementYearButton.click();
     expect(router.navigate.calls.mostRecent().args[1].queryParams.dates).toEqual('2019-01-01+2021-01-01');
@@ -123,18 +120,24 @@ describe('EarningsComponent', () => {
 
   it('should show transactions', () => {
     setQueryMap('LIST_YEAR', '2020-01-01+2021-01-01');
-    fixture.detectChanges();
+
     const interestRowDiv = fixture.nativeElement.querySelectorAll('.row')[1];
     interestRowDiv.click();
     fixture.detectChanges();
     const showTransactionsButton = fixture.nativeElement.querySelectorAll('.balance button')[0];
     showTransactionsButton.click();
-    expect(router.navigate.calls.mostRecent().args[0][0]).toEqual('/transactions');
-    expect(router.navigate.calls.mostRecent().args[1].queryParams.account).toEqual(6);
+
+    const routerArgs = router.navigate.calls.mostRecent().args;
+    expect(routerArgs[0][0]).toEqual('/transactions');
+    expect(routerArgs[1].queryParams.account).toEqual(6);
+    expect(routerArgs[1].queryParams.after).toEqual('2020-01-01');
+    expect(routerArgs[1].queryParams.before).toEqual('2020-12-31');
+    expect(routerArgs[1].queryParams.type).toEqual('year');
   });
 
   function setQueryMap(presentation, dates) {
     const queryParamMap = (Object.getOwnPropertyDescriptor(activatedRoute, 'queryParamMap').get as any);
     queryParamMap.and.returnValue(of(convertToParamMap({ presentation, dates })));
+    fixture.detectChanges();
   }
 });
