@@ -1,9 +1,9 @@
 package com.github.joern.kalz.doubleentry.models;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepository {
 
@@ -16,16 +16,27 @@ public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepos
 
     @Override
     public List<Transaction> find(TransactionSearchCriteria request) {
+        HashSet<Transaction> transactions = getTransactions(request);
 
+        var filteredTransactions = filterTransactions(transactions, request);
+
+        var sortedTransactions = new TreeSet<>(getTransactionComparator(request.getOrder()));
+        sortedTransactions.addAll(filteredTransactions);
+
+        return getPage(sortedTransactions, request);
+    }
+
+    private HashSet<Transaction> getTransactions(TransactionSearchCriteria request) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Transaction> query = cb.createQuery(Transaction.class);
+
         Root<Transaction> transaction = query.from(Transaction.class);
         transaction.fetch("entries", JoinType.INNER);
-        Predicate[] predicateArray = getPredicates(request, cb, transaction);
 
-        query.select(transaction).where(cb.and(predicateArray));
+        query.select(transaction)
+                .where(cb.and(getPredicates(request, cb, transaction)));
 
-        return getTransactions(query, request.getPageOffset(), request.getMaxPageSize(), request.getOrder());
+        return new HashSet<>(entityManager.createQuery(query).getResultList());
     }
 
     private Predicate[] getPredicates(TransactionSearchCriteria request, CriteriaBuilder cb,
@@ -45,18 +56,6 @@ public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepos
             predicates.add(cb.lessThanOrEqualTo(transaction.get("date"), request.getBefore()));
         }
 
-        if (request.getAccountIds() != null) {
-            predicates.add(getAccountPredicate(request.getAccountIds(), AccountType.ANY, cb, transaction));
-        }
-
-        if (request.getCreditAccountIds() != null) {
-            predicates.add(getAccountPredicate(request.getCreditAccountIds(), AccountType.CREDIT, cb, transaction));
-        }
-
-        if (request.getDebitAccountIds() != null) {
-            predicates.add(getAccountPredicate(request.getDebitAccountIds(), AccountType.DEBIT, cb, transaction));
-        }
-
         if (request.getName() != null && request.getName().length() > 0) {
             predicates.add(cb.like(transaction.get("name"), request.getName().replace('*', '%')));
         }
@@ -64,41 +63,37 @@ public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepos
         return predicates.toArray(new Predicate[0]);
     }
 
-    private Predicate getAccountPredicate(List<Long> accountIds, AccountType type,
-        CriteriaBuilder cb, Root<Transaction> transaction) {
-
-        Join<Object, Entry> entry = transaction.join("entries");
-        CriteriaBuilder.In<Object> idPredicate = cb.in(entry.get("id").get("account").get("id"));
-        accountIds.forEach(idPredicate::value);
-
-        if (type == AccountType.ANY) {
-            return idPredicate;
-        }
-
-        Predicate amountPredicate = type == AccountType.CREDIT ?
-                cb.lessThan(entry.get("amount"), 0) :
-                cb.greaterThan(entry.get("amount"), 0);
-
-        return cb.and(idPredicate, amountPredicate);
+    private Set<Transaction> filterTransactions(Set<Transaction> transactions, TransactionSearchCriteria request) {
+        return transactions.stream()
+                .filter(transaction -> hasTransactionMatchingAccount(transaction, request.getAccountIds(),
+                        AccountType.ANY))
+                .filter(transaction -> hasTransactionMatchingAccount(transaction, request.getCreditAccountIds(),
+                        AccountType.CREDIT))
+                .filter(transaction -> hasTransactionMatchingAccount(transaction, request.getDebitAccountIds(),
+                        AccountType.DEBIT))
+                .collect(Collectors.toSet());
     }
 
-    private List<Transaction> getTransactions(CriteriaQuery<Transaction> query, Integer pageOffset,
-        Integer maxPageSize, TransactionOrder order) {
-
-        TypedQuery<Transaction> typedQuery = entityManager.createQuery(query);
-
-        if (pageOffset != null) {
-            typedQuery = typedQuery.setFirstResult(pageOffset);
+    private boolean hasTransactionMatchingAccount(Transaction transaction, List<Long> accounts, AccountType type) {
+        if (accounts == null) {
+            return true;
         }
 
-        if (maxPageSize != null) {
-            typedQuery = typedQuery.setMaxResults(maxPageSize);
-        }
+        Set<Long> transactionAccounts = getAccountsWithType(transaction, type);
+        return accounts.stream().anyMatch(transactionAccounts::contains);
+    }
 
-        Set<Transaction> transactions = new TreeSet<>(getTransactionComparator(order));
-        transactions.addAll(typedQuery.getResultList());
+    private Set<Long> getAccountsWithType(Transaction transaction, AccountType accountType) {
+        return transaction.getEntries().stream()
+                .filter(entry -> isEntryMatchingType(entry, accountType))
+                .map(entry -> entry.getId().getAccount().getId())
+                .collect(Collectors.toSet());
+    }
 
-        return new ArrayList<>(transactions);
+    private boolean isEntryMatchingType(Entry entry, AccountType accountType) {
+        return accountType == AccountType.ANY ||
+                (accountType == AccountType.CREDIT && entry.getAmount().signum() == -1) ||
+                (accountType == AccountType.DEBIT && entry.getAmount().signum() == 1);
     }
 
     private Comparator<Transaction> getTransactionComparator(TransactionOrder order) {
@@ -107,5 +102,21 @@ public class TransactionsCustomRepositoryImpl implements TransactionsCustomRepos
         } else {
             return Comparator.comparing(Transaction::getDate).reversed().thenComparing(Transaction::getId);
         }
+    }
+
+    private List<Transaction> getPage(TreeSet<Transaction> sortedTransactions, TransactionSearchCriteria request) {
+        if (request.getMaxPageSize() == null) {
+            return new ArrayList<>(sortedTransactions);
+        }
+
+        int fromIndex = request.getPageOffset() != null ? request.getPageOffset() * request.getMaxPageSize() : 0;
+
+        if (fromIndex >= sortedTransactions.size()) {
+            return Collections.emptyList();
+        }
+
+        int toIndex = Math.min(fromIndex + request.getMaxPageSize(), sortedTransactions.size());
+
+        return new ArrayList<>(sortedTransactions).subList(fromIndex, toIndex);
     }
 }

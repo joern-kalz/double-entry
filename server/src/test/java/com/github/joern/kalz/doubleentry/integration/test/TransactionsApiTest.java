@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +35,7 @@ class TransactionsApiTest {
     User loggedInUser;
     User otherUser;
     Account foodAccount;
+    Account clothingAccount;
     Account expenseAccount;
     Account cashAccount;
     Account accountOfOtherUser;
@@ -48,8 +49,10 @@ class TransactionsApiTest {
         mockMvc = testSetup.createAuthenticatedMockMvc(loggedInUser);
 
         foodAccount = testSetup.createAccount("food", loggedInUser);
+        clothingAccount = testSetup.createAccount("clothing", loggedInUser);
         expenseAccount = testSetup.createAccount("expense", loggedInUser);
         testSetup.createParentChildLink(expenseAccount, foodAccount);
+        testSetup.createParentChildLink(expenseAccount, clothingAccount);
         cashAccount = testSetup.createAccount("cash", loggedInUser);
         accountOfOtherUser = testSetup.createAccount("account of other user", otherUser);
     }
@@ -143,13 +146,13 @@ class TransactionsApiTest {
 
     @Test
     void shouldGetTransactions() throws Exception {
-        createTransactionWithAmount("supermarket", "12.34");
+        createTransactionWithAmount("grocery", "1.34");
         mockMvc.perform(get("/api/transactions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name", is("supermarket")))
+                .andExpect(jsonPath("$[0].name", is("grocery")))
                 .andExpect(jsonPath("$[0].entries.length()", is(2)))
-                .andExpect(jsonPath("$[0].entries[?(@.amount == '12.34')]").exists())
-                .andExpect(jsonPath("$[0].entries[?(@.amount == '-12.34')]").exists());
+                .andExpect(jsonPath("$[0].entries[?(@.amount == '1.34')]").exists())
+                .andExpect(jsonPath("$[0].entries[?(@.amount == '-1.34')]").exists());
     }
 
     @Test
@@ -195,14 +198,18 @@ class TransactionsApiTest {
 
     @Test
     void shouldGetTransactionsByDebitAccount() throws Exception {
-        createTransactionWithAccounts("food", foodAccount, cashAccount);
-        createTransactionWithAccounts("expense", expenseAccount, cashAccount);
+        createTransactionWithAccounts("food and clothing", Arrays.asList(foodAccount, clothingAccount),
+                Collections.singletonList(cashAccount));
+        createTransactionWithAccounts("expense", Collections.singletonList(expenseAccount),
+                Collections.singletonList(cashAccount));
         createTransactionWithAccounts("expense-cancellation", cashAccount, expenseAccount);
 
         mockMvc.perform(get("/api/transactions?debitAccountId=" + expenseAccount.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(2)))
-                .andExpect(jsonPath("$[?(@.name == 'food')]").exists())
+                .andExpect(jsonPath("$[?(@.name == 'food and clothing')]").exists())
+                .andExpect(jsonPath("$[?(@.name == 'food and clothing')].entries.length()",
+                        is(Collections.singletonList(3))))
                 .andExpect(jsonPath("$[?(@.name == 'expense')]").exists());
     }
 
@@ -275,6 +282,7 @@ class TransactionsApiTest {
     }
 
     @Test
+    @Transactional
     void shouldUpdateTransaction() throws Exception {
         long id = createTransactionWithUser("supermarket", loggedInUser).getId();
         String requestBody = "{\"name\":\"bread and butter\",\"date\":\"2020-01-01\",\"entries\":[" +
@@ -337,5 +345,15 @@ class TransactionsApiTest {
         testSetup.createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1),
                 new TestTransactionEntry(debitAccount, "9.99", false),
                 new TestTransactionEntry(creditAccount,  "-9.99", false));
+    }
+
+    void createTransactionWithAccounts(String name, List<Account> debitAccounts, List<Account> creditAccounts) {
+        var debitEntries = debitAccounts.stream()
+                .map(account -> new TestTransactionEntry(account, String.valueOf(creditAccounts.size()), true));
+        var creditEntries = creditAccounts.stream()
+                .map(account -> new TestTransactionEntry(account, String.valueOf(debitAccounts.size()), true));
+
+        testSetup.createTransaction(name, loggedInUser, LocalDate.of(2020, 1, 1),
+                Stream.concat(debitEntries, creditEntries).toArray(TestTransactionEntry[]::new));
     }
 }
