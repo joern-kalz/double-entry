@@ -57,7 +57,7 @@ describe('AccountNameComponent', () => {
     component.indented = true;
     component.account = CASH;
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toEqual('\u00a0 cash ');
+    expect(fixture.nativeElement.textContent).toEqual('\u00a0\u00a0 cash ');
   });
 
   it('should offset indentation', () => {
@@ -65,7 +65,7 @@ describe('AccountNameComponent', () => {
     component.indentationOffset = 2;
     component.account = CASH;
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toEqual('\u00a0\u00a0\u00a0 cash ');
+    expect(fixture.nativeElement.textContent).toEqual('\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0 cash ');
   });
 
   it('should deactivate indentation', () => {
