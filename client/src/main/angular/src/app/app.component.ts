@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
     this.meService.getMe().subscribe(
       getMeResponse => {
         this.authenticationService.isLoggedIn = true;
+        this.authenticationService.username = getMeResponse.name;
         this.initialized = true;
       },
       error => {
