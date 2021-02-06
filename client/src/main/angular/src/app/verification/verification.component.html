@@ -12,10 +12,22 @@
     <button (click)="save()" [disabled]="isSaveDisabled" class="heavy" i18n>Save</button>
 </div>
 <div class="create">
-    <button (click)="createExpenseTransaction()" class="light" i18n>Expense</button>
-    <button (click)="createRevenueTransaction()" class="light" i18n>Revenue</button>
-    <button (click)="createTransferTransaction()" class="light" i18n>Transfer</button>
-    <button (click)="createGenericTransaction()" class="light" i18n>Transaction</button>
+    <button (click)="createExpenseTransaction()" class="light">
+        <i class="fa fa-plus" aria-hidden="true"></i> 
+        <ng-container i18n>Expense</ng-container>
+    </button>
+    <button (click)="createRevenueTransaction()" class="light">
+        <i class="fa fa-plus" aria-hidden="true"></i> 
+        <ng-container i18n>Revenue</ng-container>
+    </button>
+    <button (click)="createTransferTransaction()" class="light">
+        <i class="fa fa-plus" aria-hidden="true"></i> 
+        <ng-container i18n>Transfer</ng-container>
+    </button>
+    <button (click)="createGenericTransaction()" class="light">
+        <i class="fa fa-plus" aria-hidden="true"></i> 
+        <ng-container i18n>Transaction</ng-container>
+    </button>
 </div>
 
 <div *ngFor="let transaction of transactions" class="transaction">

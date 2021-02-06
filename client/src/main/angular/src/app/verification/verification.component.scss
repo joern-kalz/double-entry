@@ -13,16 +13,16 @@
 
 .save, .create {
     button {
+        width: 110px;
         height: 29px;
         padding: 0 2px;
-        margin-left: 2px;
+        margin: 0 0 2px 2px;
     }
 }
 
-@media(min-width: 500px) {
-    button {
-        width: 100px;
-    }
+i {
+    color: #555;
+    margin-right: 5px;
 }
 
 input {
