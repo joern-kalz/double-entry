@@ -33,7 +33,7 @@
         </div>
     </ng-container>
     <select formControlName="account" class="account">
-        <option [value]="null" i18n>(All accounts)</option>
+        <option [ngValue]="null" i18n>(All accounts)</option>
         <option *ngFor="let account of accountsList" [ngValue]="account.id">
             <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" [indented]="true">
             </app-account-name>
@@ -43,7 +43,10 @@
         <button type="submit" i18n>Refresh</button>
     </div>
     <div class="create">
-        <button type="button" (click)="create()" i18n>Create</button>
+        <button type="button" (click)="create()">
+            <i class="fa fa-plus" aria-hidden="true"></i> 
+            <ng-container>Transaction</ng-container>
+        </button>
     </div>
 </form>
 
