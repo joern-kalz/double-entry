@@ -13,13 +13,20 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "i18n": {
+        "sourceLocale": "en-US",
+        "locales": {
+          "de-DE": "src/i18n/messages.de-DE.xlf"
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "allowedCommonJsDependencies": [
               "chart.js",
-              "file-saver"
+              "file-saver",
+              "numeral"
             ],
             "outputPath": "dist/double-entry-client",
             "index": "src/index.html",
