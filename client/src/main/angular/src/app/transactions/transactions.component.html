@@ -54,14 +54,14 @@
     <div>{{transaction.date | date}}</div>
     <div>{{transaction.name}}</div>
     <div>
-        <ng-container>From</ng-container>
+        <ng-container i18n>From</ng-container>{{" "}}
         <ng-container *ngFor="let entry of transaction.creditEntries; last as last">
             <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
             <ng-container *ngIf="!last">/</ng-container>
         </ng-container>
     </div>
     <div>
-        <ng-container>To</ng-container>
+        <ng-container i18n>To</ng-container>{{" "}}
         <ng-container *ngFor="let entry of transaction.debitEntries; last as last">
             <app-account-name [account]="entry.account" [accountHierarchy]="accountHierarchy"></app-account-name>
             <ng-container *ngIf="!last">/</ng-container>
