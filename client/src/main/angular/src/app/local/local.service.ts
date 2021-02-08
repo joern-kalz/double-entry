@@ -42,7 +42,7 @@ export class LocalService {
   parseAmount(value: string): number {
     if (this.isEmpty(value)) return null;
     const parsed = numeral(value).value();
-    return parsed != NaN ? parsed : null;
+    return !Number.isNaN(parsed) ? parsed : null;
   }
 
   createAmountValidator() {

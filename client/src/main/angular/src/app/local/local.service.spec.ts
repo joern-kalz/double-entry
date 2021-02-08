@@ -27,6 +27,10 @@ describe('LocalService', () => {
     expect(service.parseAmount('-1.23')).toEqual(-1.23);
   });
 
+  it('should return null if cannot parse amount', () => {
+    expect(service.parseAmount('x:1')).toBeNull();
+  });
+
   it('should validate amount', () => {
     const formControlMock = jasmine.createSpyObj('FormControl', [], {value: '1.23'})
     expect(service.createAmountValidator()(formControlMock)).toBeNull();
