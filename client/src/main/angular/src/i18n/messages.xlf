@@ -69,11 +69,18 @@
           <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="c1ed3e29b1fd9950eb65332036737dcc0952a943" datatype="html">
+        <source>Create backup</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="5d22c795daf43877a5f708dca2bccd549eb0471d" datatype="html">
         <source>Sign out</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app.component.html</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">14</context>
         </context-group>
       </trans-unit>
       <trans-unit id="83f783e0e962ad0134329b028c9ee42b7ae7cc22" datatype="html">
@@ -84,7 +91,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/verification/verification.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">17</context>
         </context-group>
       </trans-unit>
       <trans-unit id="bc0be542fed00c34c312d35ad02afdf26d12b95b" datatype="html">
@@ -95,7 +102,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/verification/verification.component.html</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
       <trans-unit id="798f7720c371eda6d7931bc590b771a02e2881bb" datatype="html">
@@ -106,14 +113,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/verification/verification.component.html</context>
-          <context context-type="linenumber">17</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="c1ed3e29b1fd9950eb65332036737dcc0952a943" datatype="html">
-        <source>Create backup</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/dashboard/dashboard.component.html</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="08c74dc9762957593b91f6eb5d65efdfc975bf48" datatype="html">
@@ -356,21 +356,6 @@
           <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="70a67e04629f6d412db0a12d51820b480788d795" datatype="html">
-        <source>Create</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/transactions/transactions.component.html</context>
-          <context context-type="linenumber">46</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/transaction/transaction.component.html</context>
-          <context context-type="linenumber">48</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/transaction/transaction.component.html</context>
-          <context context-type="linenumber">85</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="be2add3a3d9e4e2556b8f9048a15a9c0f00bf1ad" datatype="html">
         <source>After</source>
         <context-group purpose="location">
@@ -397,6 +382,28 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/transactions/transactions.component.html</context>
           <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d5e0dbc9fd4651759df915cdc6ba26fe3f17475f" datatype="html">
+        <source>From</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/transactions/transactions.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/transaction-details/transaction-details.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="63c9c3aa536dbd11120ae8feab62186c47838028" datatype="html">
+        <source>To</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/transactions/transactions.component.html</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/transaction-details/transaction-details.component.html</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5289fe3f4bde49c4ee4107d14e4be491f2c4246d" datatype="html">
@@ -465,6 +472,17 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/transaction/transaction.component.html</context>
           <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="70a67e04629f6d412db0a12d51820b480788d795" datatype="html">
+        <source>Create</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/transaction/transaction.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/transaction/transaction.component.html</context>
+          <context context-type="linenumber">85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="dfc2fb58e2a04ed944a4bd80f0a2087775134068" datatype="html">
@@ -737,6 +755,41 @@
           <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="effa44a3aad5ed89ae7d0c8839c3a931a57da897" datatype="html">
+        <source>Audit of</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5347ed83cb7fad06b05b83b675547b6256cc763c" datatype="html">
+        <source>Last audited balance</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="229bbf760d4a30bbb05cd794fb868231c308572a" datatype="html">
+        <source>New audited balance</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b59ea65c89a5ae15b787d8318fdad9edd6fec243" datatype="html">
+        <source>Transaction</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4f8b2bb476981727ab34ed40fde1218361f92c45" datatype="html">
+        <source>Details</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="60c7292fbe8d2cc2254139ea888c905be1ac1e2d" datatype="html">
         <source>Chart monthly expenses</source>
         <context-group purpose="location">
@@ -802,55 +855,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/earnings/earnings.component.html</context>
           <context context-type="linenumber">89</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="effa44a3aad5ed89ae7d0c8839c3a931a57da897" datatype="html">
-        <source>Audit of</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
-          <context context-type="linenumber">2</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="5347ed83cb7fad06b05b83b675547b6256cc763c" datatype="html">
-        <source>Last audited balance</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
-          <context context-type="linenumber">6</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="229bbf760d4a30bbb05cd794fb868231c308572a" datatype="html">
-        <source>New audited balance</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
-          <context context-type="linenumber">9</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="b59ea65c89a5ae15b787d8318fdad9edd6fec243" datatype="html">
-        <source>Transaction</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
-          <context context-type="linenumber">18</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="4f8b2bb476981727ab34ed40fde1218361f92c45" datatype="html">
-        <source>Details</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/verification/verification.component.html</context>
-          <context context-type="linenumber">40</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="d5e0dbc9fd4651759df915cdc6ba26fe3f17475f" datatype="html">
-        <source>From</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/transaction-details/transaction-details.component.html</context>
-          <context context-type="linenumber">12</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="63c9c3aa536dbd11120ae8feab62186c47838028" datatype="html">
-        <source>To</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/transaction-details/transaction-details.component.html</context>
-          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="323af13292ecc714ab3848b9dff48f923893be32" datatype="html">
