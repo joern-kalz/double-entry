@@ -8,7 +8,7 @@
             <a [routerLink]="['/transactions']" i18n>Transactions</a>
         </div>
         <div class="menu-container">
-            <button (click)="toggleMenu()">{{username}} <i class="fa fa-caret-down"></i></button>
+            <button (click)="toggleMenu()">{{username}} <i class="fa fa-caret-down" aria-hidden="true"></i></button>
             <div class="menu" *ngIf="menuVisible">
                 <button (click)="backup()" i18n>Create backup</button>
                 <button (click)="logout()" i18n>Sign out</button>
