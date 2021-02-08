@@ -138,8 +138,8 @@ export class TransactionComponent implements OnInit, OnDestroy {
           const debitAccount = this.debitAccountType == AccountType.ALL ? null :
             this.accountHierarchy.root.get(this.debitAccountType).id;
 
-          return this.transactionService.getTransactions(before14month.format(API_DATE), null, null, 
-            debitAccount, creditAccount, name + '*', null, 10, 'dateDescending');
+          return this.transactionService.getTransactions(before14month.format(API_DATE), null, null,
+            debitAccount, creditAccount, name + '*', null, null, 'dateDescending');
         })
       )
       .subscribe(transactions => {
@@ -148,6 +148,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
         for (let transaction of transactions) {
           if (!this.suggestions.some(suggestion => suggestion.name == transaction.name)) {
             this.suggestions.push(transaction);
+            if (this.suggestions.length >= 10) break;
           }
         }
       })
@@ -320,10 +321,10 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
   onNameEnter(event) {
     if (!this.showSuggestions || this.suggestions.length == 0) return;
-    
+
     event.preventDefault();
 
-    if (this.activeSuggestion >= 0 && 
+    if (this.activeSuggestion >= 0 &&
       this.activeSuggestion < this.suggestions.length) {
       this.onSuggestionSelected(this.suggestions[this.activeSuggestion]);
     }
@@ -336,15 +337,20 @@ export class TransactionComponent implements OnInit, OnDestroy {
 
     const debitEntries = suggestion.entries
       .filter(entry => Converter.parseApiAmount(entry.amount) > 0)
-      .map(entry => ({ 
-        account: entry.accountId, 
-        amount: this.localService.formatAmount(Converter.parseApiAmount(entry.amount)) 
+      .map(entry => ({
+        account: entry.accountId,
+        amount: this.localService.formatAmount(Converter.parseApiAmount(entry.amount))
       }));
 
     this.adjustFormArrayLength(this.creditEntries, creditEntries.length);
     this.adjustFormArrayLength(this.debitEntries, debitEntries.length);
-  
+
     this.form.patchValue({ name: suggestion.name, creditEntries, debitEntries });
+
+    if (creditEntries.length > 1 || debitEntries.length > 1) {
+      this.contextService.transaction.type = TransactionType.GENERIC;
+    }
+
     this.showSuggestions = false;
     setTimeout(() => {
       this.creditEntryAmountElements.first.nativeElement.focus();
