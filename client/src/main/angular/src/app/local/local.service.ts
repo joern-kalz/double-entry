@@ -48,7 +48,9 @@ export class LocalService {
   createAmountValidator() {
     return (control: FormControl) => {
       if (this.isEmpty(control.value)) return null;
-      return numeral.validate(control.value) ? null : { amount: true };
+      const trimmed = String(control.value).trim();
+      const positiveTrimmed = trimmed.startsWith('-') ? trimmed.substr(1) : trimmed;
+      return numeral.validate(positiveTrimmed) ? null : { amount: true };
     };
   }
 
