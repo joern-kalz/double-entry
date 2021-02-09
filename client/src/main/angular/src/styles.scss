@@ -74,7 +74,7 @@ button.heavy, a.heavy {
     }
     &:focus {
         outline: none;
-        box-shadow: 0 0 0 4px #bbb;
+        box-shadow: 0 0 0 5px #aaa;
         border-radius: 2px;
     }
     &:disabled {
@@ -152,7 +152,7 @@ button.heavy, a.heavy {
         }
         &:focus {
             outline: none;
-            box-shadow: 0 0 0 4px #bbb;
+            box-shadow: 0 0 0 5px #aaa;
             border-radius: 2px;
         }
         &:disabled {
@@ -255,5 +255,32 @@ button.heavy, a.heavy {
     }
     button:hover {
         background: #555;
+    }
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+
+    button {
+        padding: 2px 0;
+        width: 31%;
+    }
+
+    i {
+        color: #555;
+        margin-right: 5px;
+    }
+}
+
+@media (min-width: 450px) {
+    .actions {
+        justify-content: flex-end;
+
+        button {
+            width: 100px;
+            margin-left: 5px;
+        }
     }
 }

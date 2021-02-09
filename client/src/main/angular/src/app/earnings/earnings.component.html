@@ -1,3 +1,14 @@
+<div class="actions">
+    <button (click)="createExpenseTransaction()" class="light" *ngIf="accountType == AccountType.EXPENSE">
+        <i class="fa fa-plus" aria-hidden="true"></i> 
+        <ng-container i18n>Expense</ng-container>
+    </button>
+    <button (click)="createRevenueTransaction()" class="light" *ngIf="accountType == AccountType.REVENUE">
+        <i class="fa fa-plus" aria-hidden="true"></i> 
+        <ng-container i18n>Revenue</ng-container>
+    </button>
+</div>
+
 <div class="search">
     <div>
         <select [formControl]="presentation">

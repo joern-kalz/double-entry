@@ -15,6 +15,7 @@ import { RouterLinkDirectiveStub } from '../../testing/router-link-directive-stu
 
 import { EarningsComponent } from './earnings.component';
 import { BaseChartDirectiveStub } from 'src/testing/base-chart-directive-stub';
+import { ContextService } from '../context/context.service';
 
 describe('EarningsComponent', () => {
   const PARAM_MOCK: ParamMap = convertToParamMap({
@@ -73,7 +74,9 @@ describe('EarningsComponent', () => {
         { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate']) },
         { provide: ActivatedRoute, useValue: jasmine.createSpyObj('ActivatedRoute', [''], 
           { paramMap: of(PARAM_MOCK), queryParamMap: of(QUERY_MOCK) }) },
-      ]
+        { provide: ContextService, useValue: jasmine.createSpyObj('ContextService', 
+          ['setTransaction', 'createTransaction']) },
+     ]
     })
     .compileComponents();
 

@@ -20,6 +20,8 @@ import { Label } from 'ng2-charts';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { LocalService } from '../local/local.service';
 import { Converter } from '../api-access/converter';
+import { ContextService } from '../context/context.service';
+import { TransactionType } from '../context/context-transaction';
 
 @Component({
   selector: 'app-earnings',
@@ -64,6 +66,7 @@ export class EarningsComponent implements OnInit, OnDestroy {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private localService: LocalService,
+    private contextService: ContextService,
   ) { }
 
   ngOnInit(): void {
@@ -267,5 +270,15 @@ export class EarningsComponent implements OnInit, OnDestroy {
       after: date.clone().startOf(type).format(API_DATE),
       before: date.clone().endOf(type).format(API_DATE)
     }});
+  }
+
+  createExpenseTransaction() {
+    this.contextService.createTransaction(TransactionType.EXPENSE);
+    this.router.navigate(['/transaction']);
+  }
+
+  createRevenueTransaction() {
+    this.contextService.createTransaction(TransactionType.REVENUE);
+    this.router.navigate(['/transaction']);
   }
 }
