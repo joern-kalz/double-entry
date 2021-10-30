@@ -1,9 +1,11 @@
 <div class="actions">
-    <button (click)="createExpenseTransaction()" class="light" *ngIf="accountType == AccountType.EXPENSE">
+    <button (click)="createExpenseTransaction()" class="light" *ngIf="accountType == AccountType.EXPENSE"
+        data-test-id="create-expense">
         <i class="fa fa-plus" aria-hidden="true"></i> 
         <ng-container i18n>Expense</ng-container>
     </button>
-    <button (click)="createRevenueTransaction()" class="light" *ngIf="accountType == AccountType.REVENUE">
+    <button (click)="createRevenueTransaction()" class="light" *ngIf="accountType == AccountType.REVENUE"
+        data-test-id="create-revenue">
         <i class="fa fa-plus" aria-hidden="true"></i> 
         <ng-container i18n>Revenue</ng-container>
     </button>
@@ -11,7 +13,7 @@
 
 <div class="search">
     <div>
-        <select [formControl]="presentation">
+        <select [formControl]="presentation" data-test-id="presentation">
             <ng-container *ngIf="accountType == AccountType.EXPENSE">
                 <option [ngValue]="Presentation.CHART_MONTH" i18n>Chart monthly expenses</option>
                 <option [ngValue]="Presentation.CHART_YEAR" i18n>Chart annual expenses</option>

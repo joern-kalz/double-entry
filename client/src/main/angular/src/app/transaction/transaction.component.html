@@ -3,7 +3,7 @@
     <div class="field">
         <label>
             <span i18n>Date</span>
-            <input formControlName="date">
+            <input formControlName="date" data-test-id="date">
         </label>
         <div *ngIf="showErrors && date.invalid" class="error">
             <ng-container i18n>Valid date required.</ng-container>
@@ -18,7 +18,8 @@
                 (blur)="onNameBlur()" 
                 (keydown.arrowdown)="onNameDown($event)"
                 (keydown.arrowup)="onNameUp($event)"
-                (keydown.enter)="onNameEnter($event)">
+                (keydown.enter)="onNameEnter($event)"
+                data-test-id="name">
             <ul *ngIf="showSuggestions && suggestions.length">
               <li *ngFor="let suggestion of suggestions; let i = index" 
                 (mousedown)="onSuggestionSelected(suggestion)"
@@ -38,21 +39,25 @@
             [formGroupName]="i" class="entry">
             <label class="account">
                 <span>Konto</span>
-                <select formControlName="account">
+                <select formControlName="account" [attr.data-test-id]="'credit-account-' + i">
                     <option *ngFor="let account of creditAccountList" [ngValue]="account.id">
                         <app-account-name [account]="account" [accountHierarchy]="accountHierarchy"
                             [indented]="true">
                         </app-account-name>
                     </option>
                 </select>
-                <button type="button" (click)="createCreditAccount(i)" class="light" i18n>Create</button>
+                <button type="button" (click)="createCreditAccount(i)" class="light" 
+                    [attr.data-test-id]="'create-credit-account-' + i" i18n>
+                    Create
+                </button>
             </label>
             <label class="amount">
                 <span i18n>Amount</span>
-                <input formControlName="amount" #creditEntryAmount>
+                <input formControlName="amount" [attr.data-test-id]="'credit-amount-' + i" #creditEntryAmount>
             </label>
             <button type="button" *ngIf="variableEntries" (click)="deleteCreditEntry(i)"
-                [disabled]="creditEntries.length < 2" class="delete light">
+                [disabled]="creditEntries.length < 2" class="delete light" 
+                [attr.data-test-id]="'delete-credit-account-' + i">
                 <ng-container i18n>Delete</ng-container>
             </button>
             <div *ngIf="showErrors && entry.get('account').invalid" class="error">
@@ -63,7 +68,8 @@
             </div>
         </div>
         <div class="add">
-            <button type="button" *ngIf="variableEntries" (click)="addCreditEntry()" class="light">
+            <button type="button" *ngIf="variableEntries" (click)="addCreditEntry()" class="light"
+                data-test-id="create-credit-entry">
                 <ng-container i18n>Add</ng-container>
             </button>
         </div>
@@ -75,21 +81,25 @@
             [formGroupName]="i" class="entry">
             <label class="account">
                 <span i18n>Account</span>
-                <select formControlName="account">
+                <select formControlName="account" [attr.data-test-id]="'debit-account-' + i">
                     <option *ngFor="let account of debitAccountList" [ngValue]="account.id">
                         <app-account-name [account]="account" [accountHierarchy]="accountHierarchy"
                             [indented]="true">
                         </app-account-name>
                     </option>
                 </select>
-                <button type="button" (click)="createDebitAccount(i)" class="light" i18n>Create</button>
+                <button type="button" (click)="createDebitAccount(i)" class="light" 
+                    [attr.data-test-id]="'create-debit-account-' + i" i18n>
+                    Create
+                </button>
             </label>
             <label class="amount">
                 <span i18n>Amount</span>
-                <input formControlName="amount">
+                <input formControlName="amount" [attr.data-test-id]="'debit-amount-' + i">
             </label>
             <button type="button" *ngIf="variableEntries" (click)="deleteDebitEntry(i)"
-                [disabled]="debitEntries.length < 2" class="delete light">
+                [disabled]="debitEntries.length < 2" class="delete light" 
+                [attr.data-test-id]="'delete-debit-account-' + i">
                 <ng-container i18n>Delete</ng-container>
             </button>
             <div *ngIf="showErrors && entry.get('account').invalid" class="error">
@@ -100,7 +110,8 @@
             </div>
         </div>
         <div class="add">
-            <button type="button" *ngIf="variableEntries" (click)="addDebitEntry()" class="light">
+            <button type="button" *ngIf="variableEntries" (click)="addDebitEntry()" class="light"
+                data-test-id="create-debit-entry">
                 <ng-container i18n>Add</ng-container>
             </button>
         </div>
@@ -120,8 +131,8 @@
     </div>
 
     <div class="buttons">
-        <button type="button" (click)="cancel()" i18n>Cancel</button>
-        <button [disabled]="submitted" i18n>Save</button>
+        <button type="button" (click)="cancel()" data-test-id="cancel" i18n>Cancel</button>
+        <button [disabled]="submitted" data-test-id="save" i18n>Save</button>
     </div>
 
 </form>

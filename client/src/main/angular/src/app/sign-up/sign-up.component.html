@@ -4,7 +4,7 @@
         <div class="field">
             <label>
                 <span i18n>Username</span>
-                <input formControlName="username">
+                <input formControlName="username" data-test-id="username">
             </label>
             <div *ngIf="showErrors && username.invalid" class="error">
                 <ng-container i18n>Username must be between {{usernameLengthMin}} and {{usernameLengthMax}} characters long</ng-container>
@@ -13,7 +13,7 @@
         <div class="field">
             <label>
                 <span i18n>Password</span>
-                <input formControlName="password" type="password">
+                <input formControlName="password" type="password" data-test-id="password">
             </label>
             <div *ngIf="showErrors && password.invalid" class="error">
                 <ng-container i18n>Password must be between {{passwordLengthMin}} and {{passwordLengthMax}} characters long</ng-container>
@@ -22,7 +22,7 @@
         <div class="field">
             <label>
                 <span i18n>Password confirmation</span>
-                <input formControlName="passwordConfirmation" type="password">
+                <input formControlName="passwordConfirmation" type="password" data-test-id="password-confirmation">
             </label>
             <div *ngIf="showErrors && form.errors?.passwordConfirmationInvalid" class="error">
                 <ng-container i18n>Password and password confirmation do not match</ng-container>
@@ -32,7 +32,7 @@
             <span i18n>Restore backup (optional)</span>
             <div>
                 <label class="file-select">
-                    <input formControlName="file" type="file" (change)="fileChanged($event)">
+                    <input formControlName="file" type="file" (change)="fileChanged($event)" data-test-id="file">
                     <span class="file-select-button" i18n>Select</span>
                     <span class="file-select-name">{{file?.name}}</span>
                 </label>
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div>
-            <button type="submit" [disabled]="submitted" i18n>Sign up</button>
+            <button type="submit" [disabled]="submitted" data-test-id="submit" i18n>Sign up</button>
         </div>
     </form>
 </div>

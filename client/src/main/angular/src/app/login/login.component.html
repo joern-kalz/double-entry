@@ -3,18 +3,20 @@
         <div class="field">
             <label class="field">
                 <span i18n>Username</span>
-                <input formControlName="username">
+                <input formControlName="username" data-test-id="username">
             </label>
         </div>
         <div class="field">
             <label class="field">
                 <span i18n>Password</span>
-                <input formControlName="password" type="password">
+                <input formControlName="password" type="password" data-test-id="password">
             </label>
         </div>
-        <button type="submit" i18n>Log in</button>
+        <button type="submit" data-test-id="submit" i18n>Log in</button>
         <div class="sign-up">
-            <button type="button" (click)="signUp()" i18n>Create new account</button>
+            <button type="button" (click)="signUp()" data-test-id="create-new-account" i18n>
+              Create new account
+            </button>
         </div>
     </form>
 </div>

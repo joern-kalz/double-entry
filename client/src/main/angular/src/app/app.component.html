@@ -1,17 +1,19 @@
 <div *ngIf="isLoggedIn" class="header-bar">
     <div class="header">
         <div>
-            <a [routerLink]="['/']" i18n>Overview</a>
-            <a [routerLink]="['/earnings', AccountType.EXPENSE]" i18n>Expenses</a>
-            <a [routerLink]="['/earnings', AccountType.REVENUE]" i18n>Revenues</a>
-            <a [routerLink]="['/assets']" i18n>Assets</a>
-            <a [routerLink]="['/transactions']" i18n>Transactions</a>
+            <a [routerLink]="['/']" data-test-id="overview" i18n>Overview</a>
+            <a [routerLink]="['/earnings', AccountType.EXPENSE]" data-test-id="expenses" i18n>Expenses</a>
+            <a [routerLink]="['/earnings', AccountType.REVENUE]" data-test-id="revenues" i18n>Revenues</a>
+            <a [routerLink]="['/assets']" data-test-id="assets" i18n>Assets</a>
+            <a [routerLink]="['/transactions']" data-test-id="transactions" i18n>Transactions</a>
         </div>
         <div class="menu-container">
-            <button (click)="toggleMenu()">{{username}} <i class="fa fa-caret-down" aria-hidden="true"></i></button>
+            <button (click)="toggleMenu()" data-test-id="account">
+              {{username}} <i class="fa fa-caret-down" aria-hidden="true"></i>
+            </button>
             <div class="menu" *ngIf="menuVisible">
-                <button (click)="backup()" i18n>Create backup</button>
-                <button (click)="logout()" i18n>Sign out</button>
+                <button (click)="backup()" data-test-id="backup" i18n>Create backup</button>
+                <button (click)="logout()" data-test-id="logout" i18n>Sign out</button>
             </div>
         </div>
     </div>

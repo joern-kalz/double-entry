@@ -1,16 +1,16 @@
 <form [formGroup]="form" (ngSubmit)="submit()" [class.show-errors]="showErrors" class="search">
     <label>
         <span i18n>Balance at</span>
-        <input formControlName="date">
+        <input formControlName="date" data-test-id="date">
     </label>
-    <button type="submit" i18n>Calculate</button>
+    <button type="submit" data-test-id="calculate" i18n>Calculate</button>
 </form>
 
-<div class="total">
+<div class="total" data-test-id="total">
     <div i18n>Total</div>
     <div>{{total | amount}}</div>
 </div>
-<div *ngFor="let asset of assets" (click)="select(asset)" class="asset">
+<div *ngFor="let asset of assets" (click)="select(asset)" class="asset" data-test-id="asset">
     <div>
         <app-account-name [account]="asset.account"
             [accountHierarchy]="accountHierarchy"

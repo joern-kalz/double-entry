@@ -45,8 +45,8 @@
             </ng-container>
         </div>
         <div>
-            <button (click)="ok()" i18n>OK</button>
-            <button *ngIf="showCancel" (click)="cancel()" i18n>Cancel</button>
+            <button (click)="ok()" data-test-id="dialog-ok" i18n>OK</button>
+            <button *ngIf="showCancel" (click)="cancel()" data-test-id="dialog-cancel" i18n>Cancel</button>
         </div>
     </div>
 </div>

@@ -1,13 +1,13 @@
 <div class="actions">
-    <button (click)="createExpenseTransaction()" class="light">
+    <button (click)="createExpenseTransaction()" class="light" data-test-id="create-expense">
         <i class="fa fa-plus" aria-hidden="true"></i> 
         <ng-container i18n>Expense</ng-container>
     </button>
-    <button (click)="createRevenueTransaction()" class="light">
+    <button (click)="createRevenueTransaction()" class="light" data-test-id="create-revenue">
         <i class="fa fa-plus" aria-hidden="true"></i> 
         <ng-container i18n>Revenue</ng-container>
     </button>
-    <button (click)="createTransferTransaction()" class="light">
+    <button (click)="createTransferTransaction()" class="light" data-test-id="create-transfer">
         <i class="fa fa-plus" aria-hidden="true"></i> 
         <ng-container i18n>Transfer</ng-container>
     </button>

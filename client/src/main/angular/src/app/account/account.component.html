@@ -3,7 +3,7 @@
     <div class="field">
         <label>
             <span i18n>Name</span>
-            <input formControlName="name">
+            <input formControlName="name" data-test-id="name">
         </label>
         <div *ngIf="showErrors && name.invalid" class="error" i18n>
             Name required
@@ -13,7 +13,7 @@
     <div class="field">
         <label>
             <span i18n>Group</span>
-            <select formControlName="parent">
+            <select formControlName="parent" data-test-id="parent">
                 <option *ngFor="let account of parentAccountList" [ngValue]="account.id">
                     <app-account-name [account]="account" [accountHierarchy]="accountHierarchy" 
                         [indented]="true">
@@ -27,8 +27,8 @@
     </div>
     
     <div class="buttons">
-        <button type="button" (click)="cancel()" i18n>Abbrechen</button>
-        <button [disabled]="submitted" i18n>Speichern</button>
+        <button type="button" (click)="cancel()" data-test-id="cancel" i18n>Abbrechen</button>
+        <button [disabled]="submitted" data-test-id="save" i18n>Speichern</button>
     </div>
     
 </form>
